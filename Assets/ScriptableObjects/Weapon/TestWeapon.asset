@@ -21,3 +21,4 @@ MonoBehaviour:
   AttackSpeed: 0
   AttackPointTime: 0
   StunTime: 0
+  AttackDelay: 0

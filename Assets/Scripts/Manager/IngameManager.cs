@@ -5,20 +5,14 @@ using UnityEngine;
 public class IngameManager : MonoBehaviour
 {
     #region 플레이어 관리 변수들
-    [SerializeField]
-    private GameObject[] players = null;
-    public GameObject[] Players { get { return players; } }
     [HideInInspector] 
     public PlayerScript p1, p2;
     #endregion
 
     void Start()
-    {
-        if(Players.Length > 0)
-        {
-            p1 = Players[0].GetComponent<PlayerScript>();
-            p2 = Players[1].GetComponent<PlayerScript>();
-        }
+    {     
+        p1 = GameObject.Find("Player").GetComponent<PlayerScript>();
+        p2 = GameObject.Find("Player2").GetComponent<PlayerScript>();
     }
     
     void Update()

@@ -450,9 +450,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88a0f56d2bfd5a548a039c4b1e7184a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players:
-  - {fileID: 919132147821870240}
-  - {fileID: 2105595392}
   p1: {fileID: 0}
   p2: {fileID: 0}
 --- !u!4 &501429175
@@ -756,7 +753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91791eb9b707c334685188c69390e05b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &2105595391
+--- !u!1001 &1873794395
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -766,7 +763,7 @@ PrefabInstance:
     - target: {fileID: 4750725039486545803, guid: 5f7941bca071d0c48bba895e6d55ef27,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 10.3
       objectReference: {fileID: 0}
     - target: {fileID: 4750725039486545803, guid: 5f7941bca071d0c48bba895e6d55ef27,
         type: 3}
@@ -818,30 +815,46 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5073109532286863461, guid: 5f7941bca071d0c48bba895e6d55ef27,
+        type: 3}
+      propertyPath: stats.haveWeapons.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5073109532286863461, guid: 5f7941bca071d0c48bba895e6d55ef27,
+        type: 3}
+      propertyPath: stats.haveHelmets.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5073109532286863461, guid: 5f7941bca071d0c48bba895e6d55ef27,
+        type: 3}
+      propertyPath: stats.haveChests.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5073109532286863461, guid: 5f7941bca071d0c48bba895e6d55ef27,
+        type: 3}
+      propertyPath: stats.haveWeapons.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: cbebd043a37931047acc09270ac1f2c5,
+        type: 2}
+    - target: {fileID: 5073109532286863461, guid: 5f7941bca071d0c48bba895e6d55ef27,
+        type: 3}
+      propertyPath: stats.haveHelmets.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 0728d54ee19968b45ac12c5e29113bf5,
+        type: 2}
+    - target: {fileID: 5073109532286863461, guid: 5f7941bca071d0c48bba895e6d55ef27,
+        type: 3}
+      propertyPath: stats.haveChests.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: eb7f264caa8d36143bb1a3e5cf9a7dba,
+        type: 2}
     - target: {fileID: 5379030701093319985, guid: 5f7941bca071d0c48bba895e6d55ef27,
         type: 3}
       propertyPath: m_Name
-      value: Player (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 5379030701093319985, guid: 5f7941bca071d0c48bba895e6d55ef27,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
+      value: Player2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f7941bca071d0c48bba895e6d55ef27, type: 3}
---- !u!1 &2105595392 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5379030701093319985, guid: 5f7941bca071d0c48bba895e6d55ef27,
-    type: 3}
-  m_PrefabInstance: {fileID: 2105595391}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &919132147821870240 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5379030701093319985, guid: 5f7941bca071d0c48bba895e6d55ef27,
-    type: 3}
-  m_PrefabInstance: {fileID: 5073109532545517969}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5073109532545517969
 PrefabInstance:
   m_ObjectHideFlags: 0

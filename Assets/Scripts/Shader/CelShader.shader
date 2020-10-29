@@ -111,13 +111,13 @@
             float fHDotN = saturate(dot(fHalfVector, s.Normal));
             float fPowedHDotN = pow(fHDotN, 500.0f);
 
-            float fSpecularSmooth = smoothstep(0.005, 0.01f, fPowedHDotN);
-            fSpecularColor = fSpecularSmooth * 1.0f;
+            //float fSpecularSmooth = smoothstep(0.005, 0.01f, fPowedHDotN);
+            //fSpecularColor = fSpecularSmooth * 1.0f;
 
 
 
             float4 fFinalColor;
-            fFinalColor.rgb = ((s.Albedo * _Color) + fSpecularColor) *
+            fFinalColor.rgb = ((s.Albedo * _Color) /*+ fSpecularColor*/) *
                                  fBandedDiffuse * _LightColor0.rgb * atten;
             fFinalColor.a = s.Alpha;
 

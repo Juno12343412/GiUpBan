@@ -678,6 +678,26 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3206128113595377461, guid: 75e16d0934a4d084194344ef4d01c553,
+        type: 3}
+      propertyPath: m_Name
+      value: StartButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206128113595377463, guid: 75e16d0934a4d084194344ef4d01c553,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 904880031}
+    - target: {fileID: 3206128113595377463, guid: 75e16d0934a4d084194344ef4d01c553,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ChangeScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 3206128113595377463, guid: 75e16d0934a4d084194344ef4d01c553,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3206128113612985618, guid: 75e16d0934a4d084194344ef4d01c553,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -756,6 +776,11 @@ PrefabInstance:
     - target: {fileID: 3206128114302131556, guid: 75e16d0934a4d084194344ef4d01c553,
         type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5639937567912633541, guid: 75e16d0934a4d084194344ef4d01c553,
+        type: 3}
+      propertyPath: m_UseGravity
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

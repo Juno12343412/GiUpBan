@@ -611,7 +611,7 @@ GameObject:
   - component: {fileID: 5073109532286863460}
   - component: {fileID: 5073109532286863461}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -703,9 +703,12 @@ MonoBehaviour:
     curWeapon: {fileID: 11400000, guid: cbebd043a37931047acc09270ac1f2c5, type: 2}
     curHelmet: {fileID: 11400000, guid: 0728d54ee19968b45ac12c5e29113bf5, type: 2}
     curChest: {fileID: 11400000, guid: eb7f264caa8d36143bb1a3e5cf9a7dba, type: 2}
-    haveWeapons: []
-    haveHelmets: []
-    haveChests: []
+    haveWeapons:
+    - {fileID: 11400000, guid: cbebd043a37931047acc09270ac1f2c5, type: 2}
+    haveHelmets:
+    - {fileID: 11400000, guid: 0728d54ee19968b45ac12c5e29113bf5, type: 2}
+    haveChests:
+    - {fileID: 11400000, guid: eb7f264caa8d36143bb1a3e5cf9a7dba, type: 2}
   State: 0
   Direction: 0
   swipeSensitivity: 0.3

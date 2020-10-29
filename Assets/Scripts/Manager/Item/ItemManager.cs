@@ -75,8 +75,6 @@ public class ItemManager : MonoBehaviour
             return;
         }
         instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        instance = GetComponent<ItemManager>();
+        DontDestroyOnLoad(gameObject);      
     }
 }

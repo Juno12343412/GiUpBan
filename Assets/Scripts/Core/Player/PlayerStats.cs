@@ -22,6 +22,8 @@ public class PlayerStats : MonoBehaviour
         public List<Weapon> haveWeapons = new List<Weapon>();
         public List<Helmet> haveHelmets = new List<Helmet>();
         public List<Chest> haveChests = new List<Chest>();
+
+        
     }
     [HideInInspector] public Player playerStats = new Player();
 
@@ -29,6 +31,20 @@ public class PlayerStats : MonoBehaviour
 
     void Awake()
     {
-        instance = new PlayerStats();
+        if (instance != null)
+        {
+            DestroyImmediate(gameObject);
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        instance = GetComponent<PlayerStats>();
+
+        playerStats.curWeapon = playerStats.haveWeapons[0];
+        playerStats.curHelmet = playerStats.haveHelmets[0];
+        playerStats.curChest = playerStats.haveChests[0];
     }
+
+ 
 }
