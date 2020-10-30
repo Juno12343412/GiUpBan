@@ -36,6 +36,7 @@ public class PlayerScript : MonoBehaviour
     private Vector2 secondPressPos;
     private Vector2 currentSwipe;
     private bool isLong = false;
+    private bool isSwipe = false;
     [Tooltip("스와이프 민감도")] public float swipeSensitivity = 0.3f;
     #endregion
     #region 기타 변수들
@@ -91,24 +92,29 @@ public class PlayerScript : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             isLong = false;
+            isSwipe = false;
             firstPressPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             Ielong = CR_LongTouch();
             StartCoroutine(Ielong);
+            
             if (firstPressPos.x < Screen.width * 0.5)
             {
                 Direction = PlayerDirection.Left;
-                Anim.SetInteger("AttackDir", 0);
 
             }
             else
             {
                 Direction = PlayerDirection.Right;
-                Anim.SetInteger("AttackDir", 1);
-
             }
+            
         }
         if (Input.GetMouseButtonUp(0))
         {
+            if(Direction == PlayerDirection.Left)
+                Anim.SetInteger("AttackDir", 0);
+            else if(Direction == PlayerDirection.Right)
+                Anim.SetInteger("AttackDir", 1);
+
             if (Ielong != null)
             {
                 StopCoroutine(Ielong);
@@ -141,7 +147,7 @@ public class PlayerScript : MonoBehaviour
             }
             else
             {
-                if (!isLong)
+                if (!isLong && !isSwipe)
                     PlayerTouch();
             }
             
@@ -182,6 +188,7 @@ public class PlayerScript : MonoBehaviour
 
     public void PlayerSwipe()
     {
+        isSwipe = true;
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= stats.curWeapon.StaminaMinus))
         {
             if (Cancel)
