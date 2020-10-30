@@ -6,7 +6,7 @@
         _Color("Main Tex Color", Color) = (1,1,1,1)
         _BumpMap("NormalMap", 2D) = "bump" {}
 
-        _Outline_Bold("Outline Bold", Range(0, 1)) = 0.1
+        _Outline_Bold("Outline Bold", Range(0, 10)) = 0.1
 
         _Band_Tex("Band LUT", 2D) = "white" {}
     }
@@ -49,7 +49,7 @@
 
                 float4 _FragmentFuc(ST_VertexOutput i) : SV_Target
                 {
-                    return 0.0f;
+					return 1.f;//float4(219,133,255,255) / 255;
                 }
 
             ENDCG
@@ -109,7 +109,7 @@
             float3 fSpecularColor;
             float3 fHalfVector = normalize(lightDir + viewDir);
             float fHDotN = saturate(dot(fHalfVector, s.Normal));
-            float fPowedHDotN = pow(fHDotN, 500.0f);
+            float fPowedHDotN = pow(fHDotN,100.0f);
 
             //float fSpecularSmooth = smoothstep(0.005, 0.01f, fPowedHDotN);
             //fSpecularColor = fSpecularSmooth * 1.0f;
@@ -117,7 +117,7 @@
 
 
             float4 fFinalColor;
-            fFinalColor.rgb = ((s.Albedo * _Color) /*+ fSpecularColor*/) *
+            fFinalColor.rgb = ((s.Albedo * _Color) + fPowedHDotN/*+ fSpecularColor*/) *
                                  fBandedDiffuse * _LightColor0.rgb * atten;
             fFinalColor.a = s.Alpha;
 
