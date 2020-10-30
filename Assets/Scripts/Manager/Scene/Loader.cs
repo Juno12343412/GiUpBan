@@ -7,6 +7,7 @@ namespace Manager.Scene
 {
     public enum Scene
     {
+        Login,
         Main,
         Loading,
         Game,

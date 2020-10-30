@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Manager.Pooling;
+using Protocol;
+using BackEnd.Tcp;
+using BackEnd;
 
 public enum PlayerCurState
 {
@@ -18,7 +22,7 @@ public enum PlayerDirection
     Right
 } // 플레이어 행동 방향
 
-public class PlayerScript : MonoBehaviour
+public class PlayerScript : PoolingObject
 {
     #region 플레이어 관련 변수들
     [SerializeField]
@@ -28,6 +32,7 @@ public class PlayerScript : MonoBehaviour
     public PlayerCurState State = new PlayerCurState();
     public PlayerDirection Direction = new PlayerDirection();
     #endregion
+
     #region 화면 조작 관련 변수들
     private Vector2 touchBeganPos;
     private Vector2 touchEndedPos;
@@ -39,6 +44,7 @@ public class PlayerScript : MonoBehaviour
     private bool isSwipe = false;
     [Tooltip("스와이프 민감도")] public float swipeSensitivity = 0.3f;
     #endregion
+
     #region 기타 변수들
     private bool Cancel = false;
     private bool AttackPoint = false;
@@ -46,6 +52,26 @@ public class PlayerScript : MonoBehaviour
     private bool isDelay = false;
     private Animator Anim;
     #endregion
+
+    // New Var
+    public SessionId index { get; private set; } = 0;
+    public string nickName = string.Empty;
+    public bool isMe { get; private set; } = false;
+    public bool isLive { get; private set; } = false;
+    // New Var
+
+    public override string objectName => "Player";
+
+    public override void Init()
+    {
+        base.Init();
+    }
+
+    public override void Release()
+    {
+        base.Release();
+    }
+
     void Awake()
     {
         State = PlayerCurState.Idle;
@@ -65,6 +91,20 @@ public class PlayerScript : MonoBehaviour
                 PlayerControl();           
         }
         else {   State = PlayerCurState.Stun;    }
+    }
+
+    public void PlayerSetting(bool isMe, SessionId index, string nickName)
+    {
+        this.isMe = isMe;
+        this.index = index;
+        this.nickName = nickName;
+
+        if (this.isMe)
+        {
+            // 자기 자신만 해야할 설정 (카메라 등)
+            // ...
+        }
+        isLive = true;
     }
 
     public IEnumerator CR_Stun(float Time)
@@ -183,6 +223,18 @@ public class PlayerScript : MonoBehaviour
             stats.Stamina -= stats.curWeapon.StaminaMinus;
             State = PlayerCurState.WeakAttack;
             Debug.Log(State + " " + Direction);
+
+            // 적의 이벤트 함수 보내기
+            PlayerScript tmp = gameObject.GetComponent<PlayerScript>();
+            if (tmp)
+            {
+                PlayerWeakAttackMessage msg1 = new PlayerWeakAttackMessage(tmp.index, Protocol.Direction.Left);
+                BackEndMatchManager.instance.SendDataToInGame(msg1);
+            }
+
+            // 나
+            PlayerWeakAttackMessage msg2 = new PlayerWeakAttackMessage(index, Protocol.Direction.Left);
+            BackEndMatchManager.instance.SendDataToInGame(msg2);
         }
     } // 일반 터치
 
