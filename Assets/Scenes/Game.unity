@@ -969,6 +969,7 @@ GameObject:
   - component: {fileID: 1630036513}
   - component: {fileID: 1630036516}
   - component: {fileID: 1630036517}
+  - component: {fileID: 1630036514}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -1004,8 +1005,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91791eb9b707c334685188c69390e05b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  p1: {fileID: 0}
-  p2: {fileID: 0}
+--- !u!114 &1630036514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1630036511}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f89e1c1affef7648896860fdbcdb3d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1630036516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1019,6 +1030,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myPlayerIndex: 0
+  otherPlayerIndex: 0
+  myAttackPoint: 0
   playerObj: {fileID: 5379030701093319985, guid: 5f7941bca071d0c48bba895e6d55ef27,
     type: 3}
   numOfPlayer: 0

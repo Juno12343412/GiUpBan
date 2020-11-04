@@ -373,7 +373,6 @@ public partial class BackEndMatchManager : MonoBehaviour
                 // 월드 매니저가 존재하지 않으면 바로 리턴
                 return;
             }
-
             WorldPackage.instance.OnRecieve(args);
         };
 

@@ -76,10 +76,8 @@ public class PlayerScript : PoolingObject
 
     void Awake()
     {
-        if (isMe)
-        {           
-            Anim = GetComponent<Animator>();
-        }
+                   
+        
     }
     void Start()
     {               
@@ -87,22 +85,39 @@ public class PlayerScript : PoolingObject
 
     void Update()
     {
+        //if (isMe)
+        //{
+        //    if (stats.CurHp <= 0)
+        //        WorldPackage.instance.playerDie(index);
+
+        //    if (!isStun)
+        //    {
+        //        if (!isDelay)
+        //            PlayerControl();
+        //    }
+        //    else { State = PlayerCurState.STUN; }
+
+        //    if (!BackEndMatchManager.instance.isHost)
+        //    {
+        //        return;
+        //    }
+        //}
+        if (stats.CurHp <= 0)
+            WorldPackage.instance.playerDie(index);
+
         if (isMe)
         {
-            if (stats.CurHp <= 0)
-                WorldPackage.instance.playerDie(index);
-
             if (!isStun)
             {
                 if (!isDelay)
                     PlayerControl();
             }
             else { State = PlayerCurState.STUN; }
+        }
 
-            if (!BackEndMatchManager.instance.isHost)
-            {
-                return;
-            }
+        if (!BackEndMatchManager.instance.isHost)
+        {
+            return;
         }
     }
 
@@ -122,6 +137,8 @@ public class PlayerScript : PoolingObject
             StartCoroutine(CR_StaminaHeal());
 
         }
+        Anim = GetComponent<Animator>();
+
         isLive = true;
     }
 
@@ -169,8 +186,6 @@ public class PlayerScript : PoolingObject
         }
         if (Input.GetMouseButtonUp(0))
         {
-            
-
             if (Ielong != null)
             {
                 StopCoroutine(Ielong);
@@ -222,24 +237,25 @@ public class PlayerScript : PoolingObject
     public void PlayerTouch()
     {
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= stats.curWeapon.StaminaMinus))
-        {           
-            
+        {                       
             stats.Stamina -= stats.curWeapon.StaminaMinus;
             State = PlayerCurState.WEAK_ATTACK;
 
             int keyCode = (int)State;
-            Protocol.Direction dirCode = Direction;
+            Direction dirCode = Direction;
             KeyMessage msg = new KeyMessage(keyCode, transform.position);
             msg = new KeyMessage(keyCode, transform.position, dirCode);
 
-
             if (BackEndMatchManager.instance.isHost)
             {
+                Debug.Log("1-1");
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
             else
             {
-                BackEndMatchManager.instance.SendDataToInGame(msg);
+                Debug.Log("1-2");
+                PlayerWeakAttackMessage weakMsg = new PlayerWeakAttackMessage(index, dirCode);
+                BackEndMatchManager.instance.SendDataToInGame(weakMsg);
             }
         }
     } // 일반 터치
@@ -257,7 +273,6 @@ public class PlayerScript : PoolingObject
             KeyMessage msg = new KeyMessage(keyCode, transform.position);
             msg = new KeyMessage(keyCode, transform.position, dirCode);
 
-
             if (BackEndMatchManager.instance.isHost)
             {
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
@@ -266,7 +281,6 @@ public class PlayerScript : PoolingObject
             {
                 BackEndMatchManager.instance.SendDataToInGame(msg);
             }
-        
         }
     } // 스와이프
 
@@ -281,13 +295,13 @@ public class PlayerScript : PoolingObject
             KeyMessage msg = new KeyMessage(keyCode, transform.position);
             msg = new KeyMessage(keyCode, transform.position, dirCode);
 
-
             if (BackEndMatchManager.instance.isHost)
             {
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
             else
             {
+                //BackEndMatchManager.instance.SendDataToInGame(msg);
                 BackEndMatchManager.instance.SendDataToInGame(msg);
             }
         }

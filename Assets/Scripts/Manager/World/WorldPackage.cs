@@ -202,15 +202,18 @@ public class WorldPackage : MonoBehaviour
         {
             return;
         }
-        if (BackEndMatchManager.instance.isHost != true && args.From.SessionId == myPlayerIndex)
-        {
-            return;
-        }
+        //if (BackEndMatchManager.instance.isHost != true && args.From.SessionId == myPlayerIndex)
+        //{
+        //    Debug.Log("패킷 받기 안됨");
+        //    return;
+        //}
         if (players == null)
         {
-            Debug.LogError("Players 정보가 존재하지 않습니다.");
+            Debug.Log("패킷 받기 안됨");
             return;
         }
+
+        Debug.Log("패킷 받기 : " + (int)msg.type);
         switch (msg.type)
         {
             case Protocol.Type.StartCount:
@@ -273,6 +276,7 @@ public class WorldPackage : MonoBehaviour
     // 약한 공격 상태
     private void ProcessPlayerData(PlayerWeakAttackMessage data)
     {
+        Debug.Log(data.playerSession);
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         Debug.Log(BackEndMatchManager.instance.GetNickNameBySessionId(data.playerSession) + "가 " + data.playerDirection + "쪽으로 약한 공격을 함");
         players[data.playerSession].AnimationReset();
@@ -322,6 +326,8 @@ public class WorldPackage : MonoBehaviour
 
     private void ProcessKeyEvent(SessionId index, KeyMessage keyMsg)
     {
+        Debug.Log("2-1");
+
         if (!BackEndMatchManager.instance.isHost)
             return;
 
@@ -357,6 +363,8 @@ public class WorldPackage : MonoBehaviour
             PlayerAttackEnd msg = new PlayerAttackEnd(index);
             BackEndMatchManager.instance.SendDataToInGame(msg);
         }
+
+        Debug.Log("2-2 상태 : " + keyData);
     }
 
     private void ProcessSyncData(GameSyncMessage syncMessage)
