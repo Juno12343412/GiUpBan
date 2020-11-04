@@ -14,13 +14,16 @@ namespace Protocol
         StrongAttack,
         Defense,
         Stun,
+        AttackEnd,
+        Damaged,
 
         LoadRoomScene,      // 룸 씬으로 전환
         LoadGameScene,      // 인게임 씬으로 전환
-        StartCount,     // 시작 카운트
-        GameStart,      // 게임 시작
-        GameEnd,        // 게임 종료
-        GameSync,       // 플레이어 재접속 시 게임 현재 상황 싱크
+        StartCount,         // 시작 카운트
+        GameStart,          // 게임 시작
+        GameEnd,            // 게임 종료
+        GameSync,           // 플레이어 재접속 시 게임 현재 상황 싱크
+        Calculation,        // 여러 계산
         Max,
 
         NONE = 99
@@ -105,6 +108,15 @@ namespace Protocol
         }
     }
 
+    public class PlayerAttackEnd : Message
+    {
+        public SessionId playerSession;
+        public PlayerAttackEnd(SessionId session) : base(Type.AttackEnd)
+        {
+            this.playerSession = session;
+        }
+    }
+
     #endregion
 
     #region Scene
@@ -161,6 +173,7 @@ namespace Protocol
         public SessionId host;
         public int count = 0;
         public int[] hpValue = null;
+        public bool[] attackPoint = null;
         public bool[] onlineInfo = null;
 
         public GameSyncMessage(SessionId host, int count, int[] hp, bool[] online) : base(Type.GameSync)
@@ -178,19 +191,41 @@ namespace Protocol
         }
     }
 
+    public class CalculationMessage : Message
+    {
+        public SessionId host;
+        public CalculationMessage(SessionId host) : base(Type.Calculation)
+        {
+            this.host = host;
+        }
+    }
+
+    public static class KeyEventCode
+    {
+        public const int NONE          = 0;
+        public const int IDLE          = 1;   // 아무것도 안하는 메시지
+        public const int WEAK_ATTACK   = 2;   // 약한 공격 메시지
+        public const int STRONG_ATTACK = 3;   // 강한 공격 메시지
+        public const int DEFENSE       = 4;   // 방어 메시지
+        public const int STUN          = 5;   // 스턴 메시지
+        public const int ATTACK_END    = 6;   // 공격 종료 메세지
+    }
+
     public class KeyMessage : Message
     {
         public int keyData;
+        public Direction direction;
         public float x;
         public float y;
         public float z;
 
-        public KeyMessage(int data, Vector3 pos) : base(Type.Key)
+        public KeyMessage(int data, Vector3 pos, Direction direction = Direction.NONE) : base(Type.Key)
         {
             this.keyData = data;
             this.x = pos.x;
             this.y = pos.y;
             this.z = pos.z;
+            this.direction = direction;
         }
     }
 }

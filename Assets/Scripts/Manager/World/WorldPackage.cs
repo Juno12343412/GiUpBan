@@ -14,6 +14,9 @@ public class WorldPackage : MonoBehaviour
     const int START_COUNT = 5;
 
     public SessionId myPlayerIndex = SessionId.None;
+    public SessionId otherPlayerIndex = SessionId.None;
+
+    public bool myAttackPoint = false;
 
     public ObjectPool<PlayerScript> playerPool = new ObjectPool<PlayerScript>();
     public GameObject playerObj = null;
@@ -21,7 +24,7 @@ public class WorldPackage : MonoBehaviour
     private Dictionary<SessionId, PlayerScript> players = new Dictionary<SessionId, PlayerScript>();
     private const int MAX_PLAYER = 2;
     public int numOfPlayer = 0;
-    private Vector3[] startingPoint = null;
+    public Transform[] startingPoint = null;
 
     private Stack<SessionId> gameRecord = new Stack<SessionId>();
     public Action<SessionId> playerDie = null;
@@ -38,7 +41,6 @@ public class WorldPackage : MonoBehaviour
     void Start()
     {
         Init();
-        playerPool.Init(playerObj, 2, Vector3.zero, Quaternion.identity, GameObject.Find("Objects").transform);
         if (BackEndMatchManager.instance.isReconnectProcess)
         {
             // 게임 시작전 하고 싶은 이벤트 작성
@@ -49,26 +51,26 @@ public class WorldPackage : MonoBehaviour
     void Init()
     {
         Debug.Log("게임 초기화 진행");
+        playerPool.Init(playerObj, 2, Vector3.zero, Quaternion.identity, GameObject.Find("Objects").transform);
         GameManager.instance.OnOver += OnGameOver;
-        GameManager.instance.OnResult += OnGameResult;
+        //GameManager.instance.OnResult += GameUI.instance.ShowResultBoard;
+
+        playerDie += PlayerDieEvent;
         OnGameStart();
     }
 
     private void PlayerDieEvent(SessionId index)
     {
         players[index].gameObject.SetActive(false);
-
-        //InGameUiManager.GetInstance().SetScoreBoard(alivePlayer);
         gameRecord.Push(index);
 
         // 호스트가 아니면 바로 리턴
-        if (!BackEndMatchManager.instance.isHost)
+        if (BackEndMatchManager.instance.isHost)
         {
-            return;
+            Debug.Log(players[index] + " Die");
+            // 플레이어가 죽으면 바로 종료 체크
+            SendGameEndOrder();
         }
-
-        // 플레이어가 죽으면 바로 종료 체크
-        SendGameEndOrder();
     }
 
     private void SendGameEndOrder()
@@ -113,7 +115,7 @@ public class WorldPackage : MonoBehaviour
         int index = 0;
         foreach (var sessionId in gamers)
         {
-            GameObject player = playerPool.Spawn(startingPoint[index]).gameObject;
+            GameObject player = playerPool.Spawn(startingPoint[index].position, startingPoint[index].rotation).gameObject;
             players.Add(sessionId, player.GetComponent<PlayerScript>());
 
             if (BackEndMatchManager.instance.IsMySessionId(sessionId))
@@ -123,7 +125,8 @@ public class WorldPackage : MonoBehaviour
             }
             else
             {
-                players[sessionId].PlayerSetting(true, sessionId, BackEndMatchManager.instance.GetNickNameBySessionId(sessionId));
+                otherPlayerIndex = sessionId;
+                players[sessionId].PlayerSetting(false, sessionId, BackEndMatchManager.instance.GetNickNameBySessionId(sessionId));
             }
             index += 1;
         }
@@ -186,17 +189,6 @@ public class WorldPackage : MonoBehaviour
         BackEndMatchManager.instance.MatchGameOver(gameRecord);
     }
 
-    public void OnGameResult()
-    {
-        Debug.Log("Game Result");
-        //BackEndMatchManager.GetInstance().LeaveInGameRoom();
-
-        if (GameManager.instance.gameState == GameManager.GameState.MatchLobby)
-        {
-            GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
-        }
-    }
-
     public void OnRecieve(MatchRelayEventArgs args)
     {
         if (args.BinaryUserData == null)
@@ -254,9 +246,17 @@ public class WorldPackage : MonoBehaviour
                 PlayerStunMessage stunMsg = DataParser.ReadJsonData<PlayerStunMessage>(args.BinaryUserData);
                 ProcessPlayerData(stunMsg);
                 break;
+            case Protocol.Type.AttackEnd:
+                PlayerAttackEnd endMsg = DataParser.ReadJsonData<PlayerAttackEnd>(args.BinaryUserData);
+                ProcessPlayerData(endMsg);
+                break;
             case Protocol.Type.GameSync:
                 GameSyncMessage syncMessage = DataParser.ReadJsonData<GameSyncMessage>(args.BinaryUserData);
                 ProcessSyncData(syncMessage);
+                break;
+            case Protocol.Type.Calculation:
+                CalculationMessage calMessage = DataParser.ReadJsonData<CalculationMessage>(args.BinaryUserData);
+                ProcessCalData(calMessage);
                 break;
             default:
                 Debug.Log("Unknown protocol type");
@@ -264,35 +264,99 @@ public class WorldPackage : MonoBehaviour
         }
     }
 
+    // 아무것도 안한 상태
     private void ProcessPlayerData(PlayerIdleMessage data)
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
     }
 
+    // 약한 공격 상태
     private void ProcessPlayerData(PlayerWeakAttackMessage data)
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
+        Debug.Log(BackEndMatchManager.instance.GetNickNameBySessionId(data.playerSession) + "가 " + data.playerDirection + "쪽으로 약한 공격을 함");
+        players[data.playerSession].AnimationReset();
+        players[data.playerSession].Anim.SetInteger("AttackKind", 1);
+        players[data.playerSession].Anim.SetBool("isAttack", true);
     }
 
+    // 강한 공격 상태
     private void ProcessPlayerData(PlayerStrongAttackMessage data)
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
+        players[data.playerSession].AnimationReset();
+        players[data.playerSession].Anim.SetInteger("AttackKind", 2);
+        players[data.playerSession].Anim.SetBool("isAttack", true);
     }
 
+    // 방어 상태
     private void ProcessPlayerData(PlayerDefenseMessage data)
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
+        players[data.playerSession].AnimationReset();
+        players[data.playerSession].Anim.SetInteger("AttackKind", 3);
+        players[data.playerSession].Anim.SetBool("isAttack", true);
     }
 
+    // 스턴 상태
     private void ProcessPlayerData(PlayerStunMessage data)
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
     }
 
-    public void OnRecieveForLocal(KeyMessage keyMessage)
+    // 공격 종료 상태
+    private void ProcessPlayerData(PlayerAttackEnd data)
+    {
+        //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
+    }
+
+    public void OnRecieveForLocal(KeyMessage msg)
     {
         // 키 이벤트 관리 함수
-        // ...
+        ProcessKeyEvent(myPlayerIndex, msg);
+        
+        // 계산 관리 함수
+        //CalculationMessage calMessage = new CalculationMessage(BackEndMatchManager.instance.hostSession);
+        //BackEndMatchManager.instance.SendDataToInGame(calMessage);
+    }
+
+    private void ProcessKeyEvent(SessionId index, KeyMessage keyMsg)
+    {
+        if (!BackEndMatchManager.instance.isHost)
+            return;
+
+        int keyData = keyMsg.keyData;
+
+        if ((keyData & KeyEventCode.IDLE) == KeyEventCode.IDLE)
+        {
+            PlayerIdleMessage msg = new PlayerIdleMessage(index);
+            BackEndMatchManager.instance.SendDataToInGame(msg);
+        }
+        if ((keyData & KeyEventCode.WEAK_ATTACK) == KeyEventCode.WEAK_ATTACK)
+        {
+            PlayerWeakAttackMessage msg = new PlayerWeakAttackMessage(index, keyMsg.direction);
+            BackEndMatchManager.instance.SendDataToInGame(msg);
+        }
+        if ((keyData & KeyEventCode.STRONG_ATTACK) == KeyEventCode.STRONG_ATTACK)
+        {
+            PlayerStrongAttackMessage msg = new PlayerStrongAttackMessage(index, keyMsg.direction);
+            BackEndMatchManager.instance.SendDataToInGame(msg);
+        }
+        if ((keyData & KeyEventCode.DEFENSE) == KeyEventCode.DEFENSE)
+        {
+            PlayerDefenseMessage msg = new PlayerDefenseMessage(index, keyMsg.direction);
+            BackEndMatchManager.instance.SendDataToInGame(msg);
+        }
+        if ((keyData & KeyEventCode.STUN) == KeyEventCode.STUN)
+        {
+            PlayerStunMessage msg = new PlayerStunMessage(index);
+            BackEndMatchManager.instance.SendDataToInGame(msg);
+        }
+        if ((keyData & KeyEventCode.ATTACK_END) == KeyEventCode.ATTACK_END)
+        {
+            PlayerAttackEnd msg = new PlayerAttackEnd(index);
+            BackEndMatchManager.instance.SendDataToInGame(msg);
+        }
     }
 
     private void ProcessSyncData(GameSyncMessage syncMessage)
@@ -311,6 +375,40 @@ public class WorldPackage : MonoBehaviour
             index++;
         }
         BackEndMatchManager.instance.SetHostSession(syncMessage.host);
+    }
+
+    private void ProcessCalData(CalculationMessage calMessage)
+    {
+        if (players[myPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
+        {
+            if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
+            {
+                players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+                    players[otherPlayerIndex].Stats.curHelmet.Defense
+                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
+
+                players[otherPlayerIndex].DelayOn(players[myPlayerIndex].Stats.curWeapon.AttackDelay);
+            }
+            else
+                players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+                    players[otherPlayerIndex].Stats.curHelmet.Defense
+                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)));
+        } // 약공
+        if (players[myPlayerIndex].State == PlayerCurState.STRONG_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
+        {
+            if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
+            {
+                players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+                    players[otherPlayerIndex].Stats.curHelmet.Defense
+                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
+
+                players[otherPlayerIndex].DelayOn(players[myPlayerIndex].Stats.curWeapon.AttackDelay * 1.5f);
+            }
+            else
+                players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+                    players[otherPlayerIndex].Stats.curHelmet.Defense
+                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)));
+        } // 강공
     }
 
     private void SetGameRecord(int count, int[] arr)

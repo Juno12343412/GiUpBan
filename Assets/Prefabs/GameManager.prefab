@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1700226386}
   - component: {fileID: 1700226385}
   - component: {fileID: 1700226387}
+  - component: {fileID: 9011041949659250369}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -96,3 +97,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameState: 0
+--- !u!114 &9011041949659250369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9131468558171056924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a532f2254793ed42a3c8f85977a7b7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weapons:
+  - {fileID: 11400000, guid: cbebd043a37931047acc09270ac1f2c5, type: 2}
+  helmets:
+  - {fileID: 11400000, guid: 0728d54ee19968b45ac12c5e29113bf5, type: 2}
+  chests:
+  - {fileID: 11400000, guid: eb7f264caa8d36143bb1a3e5cf9a7dba, type: 2}

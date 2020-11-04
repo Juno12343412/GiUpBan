@@ -132,6 +132,7 @@ public partial class BackEndMatchManager : MonoBehaviour
     // 서버에서 각 클라이언트가 보낸 결과를 종합
     public void MatchGameOver(Stack<SessionId> record)
     {
+        Debug.Log("Match Over");
         if (nowModeType == MatchModeType.OneOnOne)
         {
             matchGameResult = OneOnOneRecord(record);
@@ -143,13 +144,14 @@ public partial class BackEndMatchManager : MonoBehaviour
         }
 
         // 승/패 나누는 메세지 띄움
-        //MatchResultUI.GetInstance().SetGameResult(matchGameResult);
+        GameUI.instance.ShowResultBoard(matchGameResult);
         Backend.Match.MatchEnd(matchGameResult);
     }
 
     // 1:1 게임 결과
     private MatchGameResult OneOnOneRecord(Stack<SessionId> record)
     {
+        Debug.Log("1대1 결과 도출");
         MatchGameResult nowGameResult = new MatchGameResult();
 
         nowGameResult.m_winners = new List<SessionId>();
@@ -179,20 +181,28 @@ public partial class BackEndMatchManager : MonoBehaviour
 
     private void ProcessSessionOffline(SessionId sessionId)
     {
-        if (hostSession.Equals(sessionId))
+        //if (hostSession.Equals(sessionId))
+        //{
+        //    // 호스트 연결 대기를 띄움
+        //    //InGameUiManager.GetInstance().SetHostWaitBoard();
+        //}
+        //else
+        //{
+        //    // 호스트가 아니면 단순히 UI 만 띄운다.
+        //}
+
+        if (isHost)
         {
-            // 호스트 연결 대기를 띄움
-            //InGameUiManager.GetInstance().SetHostWaitBoard();
-        }
-        else
-        {
-            // 호스트가 아니면 단순히 UI 만 띄운다.
+            // 현재 매치모드가 1대1 일때 플레이거가 오프라인을 하면 게임을 종료시킴
+            if (nowModeType == MatchModeType.OneOnOne)
+            {
+                WorldPackage.instance.playerDie(sessionId);
+            }
         }
     }
 
     private void ProcessSessionOnline(SessionId sessionId, string nickName)
     {
-        //InGameUiManager.GetInstance().SetReconnectBoard(nickName);
         // 호스트가 아니면 아무 작업 안함 (호스트가 해줌)
         if (isHost)
         {

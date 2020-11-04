@@ -78,19 +78,6 @@ public partial class BackEndMatchManager : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        // 이벤트 설정
-        //GameManager.OnRobby += IsMatchGameActivate;
-        //GameManager.OnGameReady += OnGameReady;
-        //GameManager.OnGameReconnect += OnGameReconnect;
-
-        // 핸들러 설정
-        //MatchMakingHandler();
-        //GameHandler();
-        //ExceptionHandler();
-    }
-
     public void HandlerSetting()
     {
         MatchMakingHandler();
@@ -299,9 +286,12 @@ public partial class BackEndMatchManager : MonoBehaviour
             if (args.ErrInfo != ErrorInfo.Success)
             {
                 if (isReconnectProcess)
-                {                  
+                {
                     // 패배했다는 결과만 알려줌
                     // ...
+                    GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
+                    JoinMatchServer();
+                    isConnectInGameServer = false;
                 }
                 return;
             }
@@ -580,7 +570,7 @@ public partial class BackEndMatchManager : MonoBehaviour
         return result;
     }
 
-    public void AddMsgToLocalQueue(KeyMessage message)
+    public void AddMsgToLocalQueue(KeyMessage msg)
     {
         // 로컬 큐에 메시지 추가
         if (isHost == false || localQueue == null)
@@ -588,7 +578,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             return;
         }
 
-        localQueue.Enqueue(message);
+        localQueue.Enqueue(msg);
     }
 
     public void SetHostSession(SessionId host)

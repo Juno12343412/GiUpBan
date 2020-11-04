@@ -8,18 +8,20 @@ using BackEnd;
 
 public enum PlayerCurState
 {
-    Idle,
-    WeakAttack,
-    StrongAttack,
-    Defense,
-    Stun
+    NONE = 0,
+    IDLE = 1,   // 아무것도 안하는 메시지
+    WEAK_ATTACK = 2,   // 약한 공격 메시지
+    STRONG_ATTACK = 3,   // 강한 공격 메시지
+    DEFENSE = 4,   // 방어 메시지
+    STUN = 5,  // 스턴 메시지
+    ATTACK_END = 6  // 공격 종료 메세지
 } // 플레이어 행동 상태
 
-public enum PlayerDirection
+public enum PlayerDirection : sbyte
 {
-    None,
     Left,
-    Right
+    Right,
+    NONE = 99
 } // 플레이어 행동 방향
 
 public class PlayerScript : PoolingObject
@@ -30,7 +32,7 @@ public class PlayerScript : PoolingObject
     public PlayerStats.Player Stats { get { return stats; } }
 
     public PlayerCurState State = new PlayerCurState();
-    public PlayerDirection Direction = new PlayerDirection();
+    public Direction Direction;
     #endregion
 
     #region 화면 조작 관련 변수들
@@ -50,7 +52,7 @@ public class PlayerScript : PoolingObject
     private bool AttackPoint = false;
     private bool isStun = false;
     private bool isDelay = false;
-    private Animator Anim;
+    public Animator Anim;
     #endregion
 
     // New Var
@@ -74,23 +76,34 @@ public class PlayerScript : PoolingObject
 
     void Awake()
     {
-        State = PlayerCurState.Idle;
-        Direction = PlayerDirection.None;
-        Anim = GetComponent<Animator>();
+        if (isMe)
+        {           
+            Anim = GetComponent<Animator>();
+        }
     }
     void Start()
     {               
-        StartCoroutine(CR_StaminaHeal());
     } 
 
     void Update()
-    {        
-        if (!isStun)
+    {
+        if (isMe)
         {
-            if(!isDelay)
-                PlayerControl();           
+            if (stats.CurHp <= 0)
+                WorldPackage.instance.playerDie(index);
+
+            if (!isStun)
+            {
+                if (!isDelay)
+                    PlayerControl();
+            }
+            else { State = PlayerCurState.STUN; }
+
+            if (!BackEndMatchManager.instance.isHost)
+            {
+                return;
+            }
         }
-        else {   State = PlayerCurState.Stun;    }
     }
 
     public void PlayerSetting(bool isMe, SessionId index, string nickName)
@@ -103,6 +116,11 @@ public class PlayerScript : PoolingObject
         {
             // 자기 자신만 해야할 설정 (카메라 등)
             // ...
+            State = PlayerCurState.IDLE;
+
+            Direction = Direction.NONE;
+            StartCoroutine(CR_StaminaHeal());
+
         }
         isLive = true;
     }
@@ -139,21 +157,19 @@ public class PlayerScript : PoolingObject
             
             if (firstPressPos.x < Screen.width * 0.5)
             {
-                Direction = PlayerDirection.Left;
-
+                Direction = Direction.Left;
+                Anim.SetInteger("AttackDir", 0);                
             }
             else
             {
-                Direction = PlayerDirection.Right;
+                Direction = Direction.Right;
+                Anim.SetInteger("AttackDir", 1);
             }
-            
+
         }
         if (Input.GetMouseButtonUp(0))
         {
-            if(Direction == PlayerDirection.Left)
-                Anim.SetInteger("AttackDir", 0);
-            else if(Direction == PlayerDirection.Right)
-                Anim.SetInteger("AttackDir", 1);
+            
 
             if (Ielong != null)
             {
@@ -202,39 +218,29 @@ public class PlayerScript : PoolingObject
         isLong = true;
         PlayerLongTouch();
     } // 긴 터치 코루틴
+
     public void PlayerTouch()
     {
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= stats.curWeapon.StaminaMinus))
-        {
-            if (Cancel)
-            {
-                AnimationReset();
-                Anim.SetInteger("AttackKind", 1);
-                Anim.SetBool("isAttack", true);
-                stats.Stamina -= stats.curWeapon.StaminaMinus;
-                State = PlayerCurState.WeakAttack;
-                Debug.Log("캔슬된" + State + " " + Direction);
-                
-                return;
-            }
+        {           
             
-            Anim.SetInteger("AttackKind", 1);
-            Anim.SetBool("isAttack", true);
             stats.Stamina -= stats.curWeapon.StaminaMinus;
-            State = PlayerCurState.WeakAttack;
-            Debug.Log(State + " " + Direction);
+            State = PlayerCurState.WEAK_ATTACK;
 
-            // 적의 이벤트 함수 보내기
-            PlayerScript tmp = gameObject.GetComponent<PlayerScript>();
-            if (tmp)
+            int keyCode = (int)State;
+            Protocol.Direction dirCode = Direction;
+            KeyMessage msg = new KeyMessage(keyCode, transform.position);
+            msg = new KeyMessage(keyCode, transform.position, dirCode);
+
+
+            if (BackEndMatchManager.instance.isHost)
             {
-                PlayerWeakAttackMessage msg1 = new PlayerWeakAttackMessage(tmp.index, Protocol.Direction.Left);
-                BackEndMatchManager.instance.SendDataToInGame(msg1);
+                BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
-
-            // 나
-            PlayerWeakAttackMessage msg2 = new PlayerWeakAttackMessage(index, Protocol.Direction.Left);
-            BackEndMatchManager.instance.SendDataToInGame(msg2);
+            else
+            {
+                BackEndMatchManager.instance.SendDataToInGame(msg);
+            }
         }
     } // 일반 터치
 
@@ -242,44 +248,48 @@ public class PlayerScript : PoolingObject
     {
         isSwipe = true;
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= stats.curWeapon.StaminaMinus))
-        {
-            if (Cancel)
-            {
-                AnimationReset();
-                Anim.SetInteger("AttackKind", 2);
-                Anim.SetBool("isAttack", true);
-                stats.Stamina -= stats.curWeapon.StaminaMinus * 1.5f;
-                State = PlayerCurState.StrongAttack;
-
-                Debug.Log("캔슬된" + State + " " + Direction);
-            }
-            Anim.SetInteger("AttackKind", 2);
-            Anim.SetBool("isAttack", true);
+        {                
             stats.Stamina -= stats.curWeapon.StaminaMinus * 1.5f;
-            State = PlayerCurState.StrongAttack;
+            State = PlayerCurState.STRONG_ATTACK;
 
-            Debug.Log(State + " " + Direction);
+            int keyCode = (int)State;
+            Protocol.Direction dirCode = Direction;
+            KeyMessage msg = new KeyMessage(keyCode, transform.position);
+            msg = new KeyMessage(keyCode, transform.position, dirCode);
+
+
+            if (BackEndMatchManager.instance.isHost)
+            {
+                BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
+            }
+            else
+            {
+                BackEndMatchManager.instance.SendDataToInGame(msg);
+            }
+        
         }
     } // 스와이프
 
     public void PlayerLongTouch()
     {
         if ((!Anim.GetBool("isAttack") || Cancel))
-        {
-            if (Cancel)
+        {            
+            State = PlayerCurState.DEFENSE;
+
+            int keyCode = (int)State;
+            Protocol.Direction dirCode = Direction;
+            KeyMessage msg = new KeyMessage(keyCode, transform.position);
+            msg = new KeyMessage(keyCode, transform.position, dirCode);
+
+
+            if (BackEndMatchManager.instance.isHost)
             {
-                AnimationReset();
-                Anim.SetInteger("AttackKind", 3);
-                Anim.SetBool("isAttack", true);
-                State = PlayerCurState.Defense;
-
-                Debug.Log("캔슬된" + State + " " + Direction);
+                BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
-            Anim.SetInteger("AttackKind", 3);
-            Anim.SetBool("isAttack", true);
-            State = PlayerCurState.Defense;
-
-            Debug.Log(State + " " + Direction);
+            else
+            {
+                BackEndMatchManager.instance.SendDataToInGame(msg);
+            }
         }
     } // 긴 터치
 
@@ -290,7 +300,7 @@ public class PlayerScript : PoolingObject
     }
     public void AttackPointTrue()
     {
-        AttackPoint = true;
+        AttackPoint = true;       
     }
     public void AttackPointFalse()
     {
@@ -306,7 +316,6 @@ public class PlayerScript : PoolingObject
     {
         isStun = false;
     }
-
 
     public void SufferDamage(float Damage)
     {
@@ -325,7 +334,6 @@ public class PlayerScript : PoolingObject
         Anim.SetBool("isAttack", false);
         AttackPoint = false;
         Cancel = false;
-        Debug.Log(Anim.GetBool("isAttack"));
     }
     #endregion
 
