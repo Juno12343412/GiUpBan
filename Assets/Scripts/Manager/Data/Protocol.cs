@@ -108,12 +108,23 @@ namespace Protocol
         }
     }
 
-    public class PlayerAttackEnd : Message
+    public class PlayerAttackEndMessage : Message
     {
         public SessionId playerSession;
-        public PlayerAttackEnd(SessionId session) : base(Type.AttackEnd)
+        public PlayerAttackEndMessage(SessionId session) : base(Type.AttackEnd)
         {
             this.playerSession = session;
+        }
+    }
+
+    public class PlayerDamagedMessage : Message
+    {
+        public SessionId playerSession;
+        public float damage;
+        public PlayerDamagedMessage(SessionId session, float damage) : base(Type.Damaged)
+        {
+            this.playerSession = session;
+            this.damage = damage;
         }
     }
 
@@ -172,21 +183,25 @@ namespace Protocol
     {
         public SessionId host;
         public int count = 0;
-        public int[] hpValue = null;
-        public bool[] attackPoint = null;
+        public float[] CurHp = null, MaxHp = null;
+        public int[] weaponCode = null, helmetCode = null, chestCode = null;
         public bool[] onlineInfo = null;
 
-        public GameSyncMessage(SessionId host, int count, int[] hp, bool[] online) : base(Type.GameSync)
+        public GameSyncMessage(SessionId host, int count, float[] curHp, float[] maxHp, int[] weaponCode, int[] helmetCode, int[] chestCode, bool[] online) : base(Type.GameSync)
         {
             this.host = host;
             this.count = count;
-            this.hpValue = new int[count];
+            this.CurHp = this.MaxHp = new float[count];
+            this.weaponCode = this.helmetCode = this.chestCode = new int[count];
             this.onlineInfo = new bool[count];
 
             for (int i = 0; i < count; ++i)
             {
-                hpValue[i] = hp[i];
-                onlineInfo[i] = online[i];
+                this.CurHp[i]      = curHp[i];
+                this.weaponCode[i] = weaponCode[i];
+                this.helmetCode[i] = helmetCode[i];
+                this.chestCode[i]  = chestCode[i];
+                onlineInfo[i]      = online[i];
             }
         }
     }
@@ -209,6 +224,7 @@ namespace Protocol
         public const int DEFENSE       = 4;   // 방어 메시지
         public const int STUN          = 5;   // 스턴 메시지
         public const int ATTACK_END    = 6;   // 공격 종료 메세지
+        public const int DAMAGED       = 7;   // 공격 받는 메세지
     }
 
     public class KeyMessage : Message

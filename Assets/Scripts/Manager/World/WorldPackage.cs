@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Protocol;
 using BackEnd;
 using BackEnd.Tcp;
@@ -9,6 +10,8 @@ using Manager.Pooling;
 
 public class WorldPackage : MonoBehaviour
 {
+    [SerializeField] private Image[] hpImages = new Image[2] { null, null };
+
     static public WorldPackage instance;
 
     const int START_COUNT = 5;
@@ -115,7 +118,7 @@ public class WorldPackage : MonoBehaviour
         int index = 0;
         foreach (var sessionId in gamers)
         {
-            GameObject player = playerPool.Spawn(startingPoint[index].position, startingPoint[index].rotation).gameObject;
+            GameObject player = playerPool.Spawn().gameObject;
             players.Add(sessionId, player.GetComponent<PlayerScript>());
 
             if (BackEndMatchManager.instance.IsMySessionId(sessionId))
@@ -133,6 +136,10 @@ public class WorldPackage : MonoBehaviour
 
         if (BackEndMatchManager.instance.isHost)
         {
+            // 이제 적의 데이터를 가져오는 패킷을 호출
+            var message = instance.GetNowGameState(BackEndMatchManager.instance.hostSession);
+            BackEndMatchManager.instance.SendDataToInGame(message);
+
             // 시작 이벤트 설정 (방장만 호출)
             StartCoroutine("StartCount");
         }
@@ -250,7 +257,7 @@ public class WorldPackage : MonoBehaviour
                 ProcessPlayerData(stunMsg);
                 break;
             case Protocol.Type.AttackEnd:
-                PlayerAttackEnd endMsg = DataParser.ReadJsonData<PlayerAttackEnd>(args.BinaryUserData);
+                PlayerAttackEndMessage endMsg = DataParser.ReadJsonData<PlayerAttackEndMessage>(args.BinaryUserData);
                 ProcessPlayerData(endMsg);
                 break;
             case Protocol.Type.GameSync:
@@ -260,6 +267,10 @@ public class WorldPackage : MonoBehaviour
             case Protocol.Type.Calculation:
                 CalculationMessage calMessage = DataParser.ReadJsonData<CalculationMessage>(args.BinaryUserData);
                 ProcessCalData(calMessage);
+                break;
+            case Protocol.Type.Damaged:
+                PlayerDamagedMessage damMessage = DataParser.ReadJsonData<PlayerDamagedMessage>(args.BinaryUserData);
+                ProcessPlayerData(damMessage);
                 break;
             default:
                 Debug.Log("Unknown protocol type");
@@ -280,6 +291,12 @@ public class WorldPackage : MonoBehaviour
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         Debug.Log(BackEndMatchManager.instance.GetNickNameBySessionId(data.playerSession) + "가 " + data.playerDirection + "쪽으로 약한 공격을 함");
         players[data.playerSession].AnimationReset();
+        if (players[data.playerSession].Direction == Direction.Left)
+            players[data.playerSession].Anim.SetInteger("AttackDir", 0);
+        if (players[data.playerSession].Direction == Direction.Right)
+            players[data.playerSession].Anim.SetInteger("AttackDir", 1);
+        players[data.playerSession].State = PlayerCurState.WEAK_ATTACK;
+
         players[data.playerSession].Anim.SetInteger("AttackKind", 1);
         players[data.playerSession].Anim.SetBool("isAttack", true);
     }
@@ -289,6 +306,13 @@ public class WorldPackage : MonoBehaviour
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         players[data.playerSession].AnimationReset();
+        if(players[data.playerSession].Direction == Direction.Left)
+            players[data.playerSession].Anim.SetInteger("AttackDir", 0);
+        if (players[data.playerSession].Direction == Direction.Right)
+            players[data.playerSession].Anim.SetInteger("AttackDir", 1);
+        players[data.playerSession].State = PlayerCurState.STRONG_ATTACK;
+
+
         players[data.playerSession].Anim.SetInteger("AttackKind", 2);
         players[data.playerSession].Anim.SetBool("isAttack", true);
     }
@@ -298,6 +322,13 @@ public class WorldPackage : MonoBehaviour
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         players[data.playerSession].AnimationReset();
+        if (players[data.playerSession].Direction == Direction.Left)
+            players[data.playerSession].Anim.SetInteger("AttackDir", 0);
+        if (players[data.playerSession].Direction == Direction.Right)
+            players[data.playerSession].Anim.SetInteger("AttackDir", 1);
+        players[data.playerSession].State = PlayerCurState.DEFENSE;
+
+
         players[data.playerSession].Anim.SetInteger("AttackKind", 3);
         players[data.playerSession].Anim.SetBool("isAttack", true);
     }
@@ -309,19 +340,32 @@ public class WorldPackage : MonoBehaviour
     }
 
     // 공격 종료 상태
-    private void ProcessPlayerData(PlayerAttackEnd data)
+    private void ProcessPlayerData(PlayerAttackEndMessage data)
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
+        players[data.playerSession].Anim.SetBool("isAttack", false);
+        players[data.playerSession].AttackPointFalse();
+        players[data.playerSession].CancelFalse();
+
+    }
+
+    private void ProcessPlayerData(PlayerDamagedMessage data)
+    {
+        //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
+        Debug.Log("데미지넣음" + data.damage);
+        Debug.Log("넣기전 체력" + players[data.playerSession].Stats.CurHp);
+        players[data.playerSession].Stats.CurHp -= data.damage;
+        Debug.Log("넣은후 체력" + players[data.playerSession].Stats.CurHp);
+        hpImages[1].fillAmount = (players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
+        hpImages[0].fillAmount = (players[otherPlayerIndex].Stats.CurHp / players[otherPlayerIndex].Stats.MaxHp);
     }
 
     public void OnRecieveForLocal(KeyMessage msg)
     {
         // 키 이벤트 관리 함수
         ProcessKeyEvent(myPlayerIndex, msg);
+
         
-        // 계산 관리 함수
-        //CalculationMessage calMessage = new CalculationMessage(BackEndMatchManager.instance.hostSession);
-        //BackEndMatchManager.instance.SendDataToInGame(calMessage);
     }
 
     private void ProcessKeyEvent(SessionId index, KeyMessage keyMsg)
@@ -360,9 +404,14 @@ public class WorldPackage : MonoBehaviour
         }
         if ((keyData & KeyEventCode.ATTACK_END) == KeyEventCode.ATTACK_END)
         {
-            PlayerAttackEnd msg = new PlayerAttackEnd(index);
+            PlayerAttackEndMessage msg = new PlayerAttackEndMessage(index);
             BackEndMatchManager.instance.SendDataToInGame(msg);
         }
+        //if ((keyData & KeyEventCode.DAMAGED) == KeyEventCode.DAMAGED)
+        //{
+        //    PlayerDamagedMessage msg = new PlayerDamagedMessage(index);
+        //    BackEndMatchManager.instance.SendDataToInGame(msg);
+        //}
 
         Debug.Log("2-2 상태 : " + keyData);
     }
@@ -379,7 +428,19 @@ public class WorldPackage : MonoBehaviour
         foreach (var player in players)
         {
             // 이 부분에서 모든 플레이어의 데이트를 동기화함
-            // ...
+            if (!player.Value.isMe)
+            {
+
+                player.Value.Stats.CurHp = syncMessage.CurHp[index];
+                player.Value.Stats.MaxHp = syncMessage.MaxHp[index];
+                // 코드값에 따라 아이템을 찾아서 넣어주는 함수 추가바람 ...
+                player.Value.Stats.curWeapon = new Weapon();
+                player.Value.Stats.curHelmet = new Helmet();
+                player.Value.Stats.curChest = new Chest();
+                
+            }     
+            
+
             index++;
         }
         BackEndMatchManager.instance.SetHostSession(syncMessage.host);
@@ -387,36 +448,100 @@ public class WorldPackage : MonoBehaviour
 
     private void ProcessCalData(CalculationMessage calMessage)
     {
+
         if (players[myPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
         {
             if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
             {
-                players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+                players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
                     players[otherPlayerIndex].Stats.curHelmet.Defense
-                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
+                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
 
-                players[otherPlayerIndex].DelayOn(players[myPlayerIndex].Stats.curWeapon.AttackDelay);
+                players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
+                players[myPlayerIndex].AttackPointFalse();
+                return;
             }
             else
-                players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+            {
+                players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
                     players[otherPlayerIndex].Stats.curHelmet.Defense
-                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)));
+                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)));
+                players[myPlayerIndex].AttackPointFalse();
+                Debug.Log("약공 들어감");
+                return;
+
+            }
         } // 약공
+
         if (players[myPlayerIndex].State == PlayerCurState.STRONG_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
         {
             if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
             {
-                players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+                players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
                     players[otherPlayerIndex].Stats.curHelmet.Defense
-                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
+                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
 
-                players[otherPlayerIndex].DelayOn(players[myPlayerIndex].Stats.curWeapon.AttackDelay * 1.5f);
+                players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
+                players[myPlayerIndex].AttackPointFalse();
+
             }
             else
-                players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+            {
+                players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
                     players[otherPlayerIndex].Stats.curHelmet.Defense
-                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)));
+                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)));
+                players[myPlayerIndex].AttackPointFalse();
+                Debug.Log("강공 들어감");
+
+            }
         } // 강공
+        
+        //if (players[otherPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
+        //{
+        //    if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
+        //    {
+        //        players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[myPlayerIndex].Stats.curChest.Defense +
+        //            players[myPlayerIndex].Stats.curHelmet.Defense
+        //            + players[myPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
+
+        //        players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
+        //        players[otherPlayerIndex].AttackPointFalse();
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[myPlayerIndex].Stats.curChest.Defense +
+        //            players[myPlayerIndex].Stats.curHelmet.Defense
+        //            + players[myPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)));
+        //        players[otherPlayerIndex].AttackPointFalse();
+        //        Debug.Log("약공 들어감");
+        //        return;
+
+        //    }
+        //} // 약공
+
+        //if (players[otherPlayerIndex].State == PlayerCurState.STRONG_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
+        //{
+        //    if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
+        //    {
+        //        players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[myPlayerIndex].Stats.curChest.Defense +
+        //            players[myPlayerIndex].Stats.curHelmet.Defense
+        //            + players[myPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
+
+        //        players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
+        //        players[otherPlayerIndex].AttackPointFalse();
+
+        //    }
+        //    else
+        //    {
+        //        players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[myPlayerIndex].Stats.curChest.Defense +
+        //            players[myPlayerIndex].Stats.curHelmet.Defense
+        //            + players[myPlayerIndex].Stats.curWeapon.Defense) - players[otherPlayerIndex].Stats.curWeapon.CrashDefense)));
+        //        players[otherPlayerIndex].AttackPointFalse();
+        //        Debug.Log("강공 들어감");
+
+        //    }
+        //} // 강공
     }
 
     private void SetGameRecord(int count, int[] arr)
@@ -435,12 +560,20 @@ public class WorldPackage : MonoBehaviour
         int numOfClient = players.Count;
         int index = 0;
 
+        float[] curHp = new float[numOfClient], maxHp = new float[numOfClient];
+        int[] weaponCode = new int[numOfClient], helmetCode = new int[numOfClient], chestCode = new int[numOfClient];
         bool[] online = new bool[numOfClient];
+        
         foreach (var player in players)
         {
+            curHp[index] = player.Value.Stats.CurHp;
+            maxHp[index] = player.Value.Stats.MaxHp;
+            //weaponCode[index] = player.Value.Stats.curWeapon.code;
+            //helmetCode[index] = player.Value.Stats.curHelmet.code;
+            //chestCode[index] = player.Value.Stats.curChest.code;
             index++;
         }
 
-        return new GameSyncMessage(hostSession, numOfClient, null, online);
+        return new GameSyncMessage(hostSession, numOfClient, curHp, maxHp, weaponCode, helmetCode, chestCode, online);
     }
 }

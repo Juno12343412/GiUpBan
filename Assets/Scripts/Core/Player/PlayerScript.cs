@@ -74,34 +74,8 @@ public class PlayerScript : PoolingObject
         base.Release();
     }
 
-    void Awake()
-    {
-                   
-        
-    }
-    void Start()
-    {               
-    } 
-
     void Update()
     {
-        //if (isMe)
-        //{
-        //    if (stats.CurHp <= 0)
-        //        WorldPackage.instance.playerDie(index);
-
-        //    if (!isStun)
-        //    {
-        //        if (!isDelay)
-        //            PlayerControl();
-        //    }
-        //    else { State = PlayerCurState.STUN; }
-
-        //    if (!BackEndMatchManager.instance.isHost)
-        //    {
-        //        return;
-        //    }
-        //}
         if (stats.CurHp <= 0)
             WorldPackage.instance.playerDie(index);
 
@@ -113,6 +87,14 @@ public class PlayerScript : PoolingObject
                     PlayerControl();
             }
             else { State = PlayerCurState.STUN; }
+
+            transform.position = WorldPackage.instance.startingPoint[0].position;
+            transform.rotation = WorldPackage.instance.startingPoint[0].rotation;
+        }
+        else
+        {
+            transform.position = WorldPackage.instance.startingPoint[1].position;
+            transform.rotation = WorldPackage.instance.startingPoint[1].rotation;
         }
 
         if (!BackEndMatchManager.instance.isHost)
@@ -127,17 +109,18 @@ public class PlayerScript : PoolingObject
         this.index = index;
         this.nickName = nickName;
 
+        Anim = GetComponent<Animator>();
         if (this.isMe)
         {
             // 자기 자신만 해야할 설정 (카메라 등)
             // ...
+            stats = BackEndServerManager.instance.myInfo;
             State = PlayerCurState.IDLE;
 
             Direction = Direction.NONE;
             StartCoroutine(CR_StaminaHeal());
 
         }
-        Anim = GetComponent<Animator>();
 
         isLive = true;
     }
@@ -153,11 +136,15 @@ public class PlayerScript : PoolingObject
     }// 스턴 코루틴
     public IEnumerator CR_StaminaHeal()
     {
-        if (!Anim.GetBool("isAttack"))
+        while(GameManager.instance.gameState != GameManager.GameState.InGame || GameManager.instance.gameState != GameManager.GameState.GameStart)
         {
-            yield return new WaitForSeconds(0.1f);
-            if(stats.Stamina < 100)
-                stats.Stamina += 1;
+            if (!Anim.GetBool("isAttack"))
+            {
+                yield return new WaitForSeconds(0.1f);
+                if (stats.Stamina < 100)
+                    stats.Stamina += 1;
+            }
+            yield return null;
         }
     } // 스테미너 회복
 
@@ -175,12 +162,10 @@ public class PlayerScript : PoolingObject
             if (firstPressPos.x < Screen.width * 0.5)
             {
                 Direction = Direction.Left;
-                Anim.SetInteger("AttackDir", 0);                
             }
             else
             {
                 Direction = Direction.Right;
-                Anim.SetInteger("AttackDir", 1);
             }
 
         }
@@ -236,25 +221,22 @@ public class PlayerScript : PoolingObject
 
     public void PlayerTouch()
     {
-        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= stats.curWeapon.StaminaMinus))
+        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 10))
         {                       
-            stats.Stamina -= stats.curWeapon.StaminaMinus;
+            stats.Stamina -= 10;
             State = PlayerCurState.WEAK_ATTACK;
-
-            int keyCode = (int)State;
-            Direction dirCode = Direction;
-            KeyMessage msg = new KeyMessage(keyCode, transform.position);
-            msg = new KeyMessage(keyCode, transform.position, dirCode);
 
             if (BackEndMatchManager.instance.isHost)
             {
-                Debug.Log("1-1");
+                int keyCode = (int)State;
+                KeyMessage msg = new KeyMessage(keyCode, transform.position);
+                msg = new KeyMessage(keyCode, transform.position, Direction);
+
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
             else
             {
-                Debug.Log("1-2");
-                PlayerWeakAttackMessage weakMsg = new PlayerWeakAttackMessage(index, dirCode);
+                PlayerWeakAttackMessage weakMsg = new PlayerWeakAttackMessage(index, Direction);
                 BackEndMatchManager.instance.SendDataToInGame(weakMsg);
             }
         }
@@ -263,23 +245,23 @@ public class PlayerScript : PoolingObject
     public void PlayerSwipe()
     {
         isSwipe = true;
-        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= stats.curWeapon.StaminaMinus))
+        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 20))
         {                
-            stats.Stamina -= stats.curWeapon.StaminaMinus * 1.5f;
+            stats.Stamina -= 20;
             State = PlayerCurState.STRONG_ATTACK;
-
-            int keyCode = (int)State;
-            Protocol.Direction dirCode = Direction;
-            KeyMessage msg = new KeyMessage(keyCode, transform.position);
-            msg = new KeyMessage(keyCode, transform.position, dirCode);
 
             if (BackEndMatchManager.instance.isHost)
             {
+                int keyCode = (int)State;
+                KeyMessage msg = new KeyMessage(keyCode, transform.position);
+                msg = new KeyMessage(keyCode, transform.position, Direction);
+
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
             else
             {
-                BackEndMatchManager.instance.SendDataToInGame(msg);
+                PlayerStrongAttackMessage strongMsg = new PlayerStrongAttackMessage(index, Direction);
+                BackEndMatchManager.instance.SendDataToInGame(strongMsg);
             }
         }
     } // 스와이프
@@ -290,19 +272,18 @@ public class PlayerScript : PoolingObject
         {            
             State = PlayerCurState.DEFENSE;
 
-            int keyCode = (int)State;
-            Protocol.Direction dirCode = Direction;
-            KeyMessage msg = new KeyMessage(keyCode, transform.position);
-            msg = new KeyMessage(keyCode, transform.position, dirCode);
-
             if (BackEndMatchManager.instance.isHost)
             {
+                int keyCode = (int)State;
+                KeyMessage msg = new KeyMessage(keyCode, transform.position);
+                msg = new KeyMessage(keyCode, transform.position, Direction);
+
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
             else
             {
-                //BackEndMatchManager.instance.SendDataToInGame(msg);
-                BackEndMatchManager.instance.SendDataToInGame(msg);
+                PlayerDefenseMessage defenseMsg = new PlayerDefenseMessage(index, Direction);
+                BackEndMatchManager.instance.SendDataToInGame(defenseMsg);
             }
         }
     } // 긴 터치
@@ -314,7 +295,10 @@ public class PlayerScript : PoolingObject
     }
     public void AttackPointTrue()
     {
-        AttackPoint = true;       
+        AttackPoint = true;
+        // 계산 관리 함수
+        CalculationMessage calMessage = new CalculationMessage(BackEndMatchManager.instance.hostSession);
+        BackEndMatchManager.instance.SendDataToInGame(calMessage);
     }
     public void AttackPointFalse()
     {
@@ -333,7 +317,8 @@ public class PlayerScript : PoolingObject
 
     public void SufferDamage(float Damage)
     {
-        stats.CurHp -= Damage;
+        PlayerDamagedMessage damagedMsg = new PlayerDamagedMessage(index, Damage);
+        BackEndMatchManager.instance.SendDataToInGame(damagedMsg);
     }
     public void CancelTrue()
     {
@@ -345,9 +330,8 @@ public class PlayerScript : PoolingObject
     }
     public void AnimationReset()
     {
-        Anim.SetBool("isAttack", false);
-        AttackPoint = false;
-        Cancel = false;
+        PlayerAttackEndMessage attackEndMsg = new PlayerAttackEndMessage(index);
+        BackEndMatchManager.instance.SendDataToInGame(attackEndMsg);
     }
     #endregion
 

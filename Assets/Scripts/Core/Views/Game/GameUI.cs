@@ -26,6 +26,7 @@ public class GameUI : BaseScreen<GameUI>
         HideScreen();
     }
 
+
     public void ShowResultBoard(MatchGameResult matchGameResult)
     {
         Debug.Log("Result Board : " + matchGameResult != null);
@@ -44,9 +45,9 @@ public class GameUI : BaseScreen<GameUI>
     public void OnLeaveGameRoom()
     {
         Debug.Log("Game Result");
-        BackEndMatchManager.instance.LeaveInGameRoom();
+        //BackEndMatchManager.instance.LeaveInGameRoom();
 
-        if (GameManager.instance.gameState == GameManager.GameState.MatchLobby)
+        if (GameManager.instance.gameState != GameManager.GameState.MatchLobby)
         {
             GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
         }

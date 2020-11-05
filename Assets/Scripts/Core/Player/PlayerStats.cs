@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BackEnd;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -25,9 +26,8 @@ public class PlayerStats : MonoBehaviour
 
         
     }
-    [HideInInspector] public Player playerStats = new Player();
-
     public static PlayerStats instance = null;
+    private Param param = new Param();
 
     void Awake()
     {
@@ -40,11 +40,38 @@ public class PlayerStats : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         instance = GetComponent<PlayerStats>();
-
-        playerStats.curWeapon = playerStats.haveWeapons[0];
-        playerStats.curHelmet = playerStats.haveHelmets[0];
-        playerStats.curChest = playerStats.haveChests[0];
     }
 
- 
+    public void Add(string table = "UserData")
+    {
+        param = new Param();
+        param.Add("Name", BackEndServerManager.instance.myNickName);
+        param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
+        param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
+        param.Add("WeaponCode", BackEndServerManager.instance.myInfo.curWeapon.code);
+        param.Add("HelmetCode", BackEndServerManager.instance.myInfo.curHelmet.code);
+        param.Add("ChestCode", BackEndServerManager.instance.myInfo.curChest.code);
+        Backend.GameInfo.Insert(table, param);
+    }
+
+    public void Save(string table = "UserData")
+    {
+        param = new Param();
+        param.Add("Name", BackEndServerManager.instance.myNickName);
+        param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
+        param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
+        param.Add("WeaponCode", BackEndServerManager.instance.myInfo.curWeapon.code);
+        param.Add("HelmetCode", BackEndServerManager.instance.myInfo.curHelmet.code);
+        param.Add("ChestCode", BackEndServerManager.instance.myInfo.curChest.code);
+        Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
+    }
+
+    public BackendReturnObject Load(string table = "UserData", int limit = 1)
+    {
+        var bro = Backend.GameInfo.GetPrivateContents(table, limit);
+        
+        // ...
+
+        return bro;
+    }
 }

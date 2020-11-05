@@ -15,7 +15,7 @@ public class Weapon : ScriptableObject
 {
     public Kind kind = Kind.Weapon;
     public int code = 0;
-    public float Damage = 0;
+    public float Damage = 10;
     public float CrashDefense = 0;
     public float Defense = 0;
     public float StaminaMinus = 0;
@@ -50,7 +50,7 @@ public class Chest : ScriptableObject
     public int code = 0;
     public float Damage = 0;
     public float CrashDefense = 0;
-    public float Defense = 0;
+    public float Defense = 99;
     public float StaminaMinus = 0;
     public float AttackSpeed = 0;
     public float AttackPointTime = 0;

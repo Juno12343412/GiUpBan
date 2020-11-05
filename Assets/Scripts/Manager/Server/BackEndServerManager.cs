@@ -21,6 +21,8 @@ public class BackEndServerManager : MonoBehaviour
     public string myNickName { get; private set; } = string.Empty;  // 로그인한 계정의 닉네임
     public string myIndate { get; private set; } = string.Empty;    // 로그인한 계정의 inDate
 
+    public PlayerStats.Player myInfo = new PlayerStats.Player();
+
     private Action<bool, string> loginSuccessFunc = null;
     private const string BackendError = "statusCode : {0}\nErrorCode : {1}\nMessage : {2}";
 
@@ -65,6 +67,9 @@ public class BackEndServerManager : MonoBehaviour
     // 해당 함수는 실제 안드로이드, iOS 환경에서 호출이 안될 수도 있다 (각 os의 특징 때문)
     void OnApplicationQuit()
     {
+        // 플레이어 정보 저장 ...
+        PlayerStats.instance.Save();
+        
         Debug.Log("OnApplicationQuit");
         StopSendQueue();
     }
@@ -101,8 +106,6 @@ public class BackEndServerManager : MonoBehaviour
 
             Debug.Log("토큰 로그인 실패\n" + callback.ToString());
 
-            //if (Backend.BMember.IsAccessTokenAlive() != null)
-            //    Backend.BMember.DeleteGuestInfo();
             func(false, string.Empty);
         });
     }
@@ -119,6 +122,9 @@ public class BackEndServerManager : MonoBehaviour
                     bro.GetStatusCode(), bro.GetErrorCode(), bro.GetMessage()));
                 return;
             }
+            // 플레이어 정보 생성 ...
+            PlayerStats.instance.Add();
+
             loginSuccessFunc = func;
             OnBackendAuthorized();
         });
@@ -155,10 +161,15 @@ public class BackEndServerManager : MonoBehaviour
             myNickName = info["nickname"].ToString();
             myIndate = info["inDate"].ToString();
 
+            // 플레이어 정보 불러오기 ...
+            // PlayerStats.instance.Load();
+            myInfo.curChest = new Chest();
+            myInfo.curHelmet = new Helmet();
+            myInfo.curWeapon = new Weapon();
+
             if (loginSuccessFunc != null)
             {
                 BackEndMatchManager.instance.GetMatchList(loginSuccessFunc);
-                //loginSuccessFunc(true, string.Empty);
             }
         });
     }
