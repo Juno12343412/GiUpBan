@@ -328,7 +328,6 @@ public class WorldPackage : MonoBehaviour
             players[data.playerSession].Anim.SetInteger("AttackDir", 1);
         players[data.playerSession].State = PlayerCurState.DEFENSE;
 
-
         players[data.playerSession].Anim.SetInteger("AttackKind", 3);
         players[data.playerSession].Anim.SetBool("isAttack", true);
     }
@@ -356,8 +355,8 @@ public class WorldPackage : MonoBehaviour
         Debug.Log("넣기전 체력" + players[data.playerSession].Stats.CurHp);
         players[data.playerSession].Stats.CurHp -= data.damage;
         Debug.Log("넣은후 체력" + players[data.playerSession].Stats.CurHp);
-        hpImages[1].fillAmount = (players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
-        hpImages[0].fillAmount = (players[otherPlayerIndex].Stats.CurHp / players[otherPlayerIndex].Stats.MaxHp);
+        hpImages[1].fillAmount = (players[otherPlayerIndex].Stats.CurHp / players[otherPlayerIndex].Stats.MaxHp);
+        hpImages[0].fillAmount = (players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
     }
 
     public void OnRecieveForLocal(KeyMessage msg)

@@ -68,7 +68,7 @@ public class BackEndServerManager : MonoBehaviour
     void OnApplicationQuit()
     {
         // 플레이어 정보 저장 ...
-        PlayerStats.instance.Save();
+        //PlayerStats.instance.Save();
         
         Debug.Log("OnApplicationQuit");
         StopSendQueue();

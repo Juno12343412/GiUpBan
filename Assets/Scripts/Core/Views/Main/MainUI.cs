@@ -26,8 +26,8 @@ public class MainUI : BaseScreen<MainUI>
         loadingObject.SetActive(false);
         errorObject.SetActive(false);
 
-        BackEndMatchManager.instance.HandlerSetting();
         BackEndMatchManager.instance.JoinMatchServer();
+        BackEndMatchManager.instance.HandlerSetting();
         SetNickName();
     }
 
@@ -65,6 +65,7 @@ public class MainUI : BaseScreen<MainUI>
         {
             Debug.Log("방 생성 성공 !");
             loadingObject.SetActive(false);
+            ResetReadyPlayer();
             AddReadyPlayer(BackEndServerManager.instance.myNickName);
             ResetMatchRoom(userList);
             RequestMatch();
@@ -75,6 +76,7 @@ public class MainUI : BaseScreen<MainUI>
             // 실패 에러를 띄움
             // ...
             ResetReadyPlayer();
+            loadingObject.SetActive(false);
             Debug.Log("방 생성 실패 !");
         }
     }
@@ -151,6 +153,7 @@ public class MainUI : BaseScreen<MainUI>
     {
         matchlookingObject.SetActive(false);
         matchFoundObject.SetActive(false);
+        loadingObject.SetActive(false);
     }
 
     public void SetErrorLog(string log = "")

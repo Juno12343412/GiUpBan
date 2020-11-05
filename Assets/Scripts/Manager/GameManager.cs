@@ -52,7 +52,6 @@ public class GameManager : MonoBehaviour
 
     void MatchLobby()
     {
-        BackEndMatchManager.instance.JoinMatchServer();
         Loader.Load(Scene.Main);
     }
 

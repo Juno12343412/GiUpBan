@@ -340,7 +340,8 @@ public partial class BackEndMatchManager : MonoBehaviour
 
             if (args.ErrInfo == ErrorCode.Success)
             {
-                //InGameUiManager.instance.SetGameResult();
+                LeaveInGameRoom();
+                GameUI.instance.ShowResultBoard(matchGameResult);
                 GameManager.instance.ChangeState(GameManager.GameState.Result);
             }
             else if (args.ErrInfo == ErrorCode.Match_InGame_Timeout)

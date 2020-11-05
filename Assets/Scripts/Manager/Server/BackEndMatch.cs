@@ -37,6 +37,9 @@ public partial class BackEndMatchManager : MonoBehaviour
     // 매칭 서버 접속
     public void JoinMatchServer()
     {
+        roomInfo = null;
+        isReconnectEnable = false;
+
         if (isConnectMatchServer)
         {
             return;
@@ -170,22 +173,19 @@ public partial class BackEndMatchManager : MonoBehaviour
             case ErrorCode.Match_MatchMakingCanceled:
                 // 매칭 신청이 취소되었을 때
                 debugLog = string.Format(CANCEL_MATCHMAKE, args.Reason);
-
-                LeaveMatchLoom();
                 MainUI.instance.MatchCancelCallback();
+                LeaveMatchLoom();
                 break;
             case ErrorCode.Match_InvalidMatchType:
                 isError = true;
                 // 매치 타입을 잘못 전송했을 때
                 debugLog = string.Format(FAIL_REGIST_MATCHMAKE, INVAILD_MATCHTYPE);
-
                 MainUI.instance.MatchCancelCallback();
                 break;
             case ErrorCode.Match_InvalidModeType:
                 isError = true;
                 // 매치 모드를 잘못 전송했을 때
                 debugLog = string.Format(FAIL_REGIST_MATCHMAKE, INVALID_MODETYPE);
-
                 MainUI.instance.MatchCancelCallback();
                 break;
             case ErrorCode.InvalidOperation:
@@ -193,7 +193,6 @@ public partial class BackEndMatchManager : MonoBehaviour
                 // 잘못된 요청을 전송했을 때
                 debugLog = string.Format(INVALID_OPERATION, args.Reason);
                 MainUI.instance.MatchCancelCallback();
-                LeaveMatchLoom();
                 CancelRegistMatchMaking();
                 break;
             case ErrorCode.Match_Making_InvalidRoom:
@@ -201,8 +200,6 @@ public partial class BackEndMatchManager : MonoBehaviour
                 // 잘못된 요청을 전송했을 때
                 debugLog = string.Format(INVALID_OPERATION, args.Reason);
                 MainUI.instance.MatchCancelCallback();
-                LeaveMatchLoom();
-                CancelRegistMatchMaking();
                 break;
             case ErrorCode.Exception:
                 isError = true;

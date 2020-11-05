@@ -45,7 +45,6 @@ public class GameUI : BaseScreen<GameUI>
     public void OnLeaveGameRoom()
     {
         Debug.Log("Game Result");
-        //BackEndMatchManager.instance.LeaveInGameRoom();
 
         if (GameManager.instance.gameState != GameManager.GameState.MatchLobby)
         {

@@ -144,7 +144,6 @@ public partial class BackEndMatchManager : MonoBehaviour
         }
 
         // 승/패 나누는 메세지 띄움
-        GameUI.instance.ShowResultBoard(matchGameResult);
         Backend.Match.MatchEnd(matchGameResult);
     }
 
