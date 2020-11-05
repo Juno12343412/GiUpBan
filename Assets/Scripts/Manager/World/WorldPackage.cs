@@ -10,7 +10,7 @@ using Manager.Pooling;
 
 public class WorldPackage : MonoBehaviour
 {
-    [SerializeField] private Image[] hpImages = new Image[2] { null, null };
+    [SerializeField] private Image[] hpImages = null;
 
     static public WorldPackage instance;
 
@@ -364,8 +364,7 @@ public class WorldPackage : MonoBehaviour
     {
         // 키 이벤트 관리 함수
         ProcessKeyEvent(myPlayerIndex, msg);
-
-        
+  
     }
 
     private void ProcessKeyEvent(SessionId index, KeyMessage keyMsg)
@@ -430,7 +429,6 @@ public class WorldPackage : MonoBehaviour
             // 이 부분에서 모든 플레이어의 데이트를 동기화함
             if (!player.Value.isMe)
             {
-
                 player.Value.Stats.CurHp = syncMessage.CurHp[index];
                 player.Value.Stats.MaxHp = syncMessage.MaxHp[index];
                 // 코드값에 따라 아이템을 찾아서 넣어주는 함수 추가바람 ...
