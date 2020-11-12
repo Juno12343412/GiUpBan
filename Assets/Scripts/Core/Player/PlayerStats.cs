@@ -15,7 +15,10 @@ public class PlayerStats : MonoBehaviour
         public int mmr = 0;         /// mmr
         public float CurHp = 100;
         public float MaxHp = 100;
-        public float Stamina = 100;  
+        public float Stamina = 100;
+        public int nowCharacter = 1;
+        public List<int> haveCharacters;
+
     }
     public static PlayerStats instance = null;
     private Param param = new Param();
@@ -39,6 +42,8 @@ public class PlayerStats : MonoBehaviour
         param.Add("Name", BackEndServerManager.instance.myNickName);
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
+        param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters.ToArray());
+        param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
         Backend.GameInfo.Insert(table, param);
 
         param = new Param();
@@ -52,6 +57,8 @@ public class PlayerStats : MonoBehaviour
         param.Add("Name", BackEndServerManager.instance.myNickName);
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
+        param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters.ToArray());
+        param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
         Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
 
         param = new Param();
@@ -64,8 +71,11 @@ public class PlayerStats : MonoBehaviour
         // ...
         SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
         {
-            Debug.Log("Score : " + Convert.ToInt32(callback.Rows()[0]["Gold"]["N"].ToString()));
-            Debug.Log("Ads : " + Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"].ToString()));
+            Debug.Log(callback);
+            BackEndServerManager.instance.myInfo.gold = Convert.ToInt32(callback.Rows()[0]["Gold"]["N"]);
+            BackEndServerManager.instance.myInfo.ads = Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"]);
+            //BackEndServerManager.instance.myInfo.haveCharacters = Convert.ToBase64CharArray(callback.Rows()[0]["NowCharacter"]["N"]);
+            BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
         });
 
         SendQueue.Enqueue(Backend.GameSchemaInfo.Get, "MMR", BackEndServerManager.instance.myIndate, callback =>
@@ -77,3 +87,4 @@ public class PlayerStats : MonoBehaviour
         Debug.Log(errorLog);
     }
 }
+
