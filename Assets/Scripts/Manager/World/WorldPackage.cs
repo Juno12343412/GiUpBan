@@ -305,7 +305,7 @@ public class WorldPackage : MonoBehaviour
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         players[data.playerSession].AnimationReset();
-        if(players[data.playerSession].Direction == Direction.Left)
+        if (players[data.playerSession].Direction == Direction.Left)
             players[data.playerSession].Anim.SetInteger("AttackDir", 0);
         if (players[data.playerSession].Direction == Direction.Right)
             players[data.playerSession].Anim.SetInteger("AttackDir", 1);
@@ -362,7 +362,7 @@ public class WorldPackage : MonoBehaviour
     {
         // 키 이벤트 관리 함수
         ProcessKeyEvent(myPlayerIndex, msg);
-  
+
     }
 
     private void ProcessKeyEvent(SessionId index, KeyMessage keyMsg)
@@ -430,7 +430,7 @@ public class WorldPackage : MonoBehaviour
                 player.Value.Stats.CurHp = syncMessage.CurHp[index];
                 player.Value.Stats.MaxHp = syncMessage.MaxHp[index];
                 // 코드값에 따라 아이템을 찾아서 넣어주는 함수 추가바람 ... 
-            }      
+            }
 
             index++;
         }
@@ -473,7 +473,7 @@ public class WorldPackage : MonoBehaviour
             }
             else
             {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.Damage * 1.5f );
+                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.Damage * 1.5f);
 
                 players[otherPlayerIndex].AttackPointFalse();
                 Debug.Log("강공 들어감");
@@ -501,7 +501,7 @@ public class WorldPackage : MonoBehaviour
         float[] curHp = new float[numOfClient], maxHp = new float[numOfClient];
         int[] weaponCode = new int[numOfClient], helmetCode = new int[numOfClient], chestCode = new int[numOfClient];
         bool[] online = new bool[numOfClient];
-        
+
         foreach (var player in players)
         {
             curHp[index] = player.Value.Stats.CurHp;

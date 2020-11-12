@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BackEnd;
 
+
 public class PlayerStats : MonoBehaviour
 {
     [Serializable]
@@ -16,9 +17,9 @@ public class PlayerStats : MonoBehaviour
         public float CurHp = 100;
         public float MaxHp = 100;
         public float Stamina = 100;
-        public int Damage = 10;
-        public int nowCharacter = 1;
-        public List<int> haveCharacters;
+        public int Damage = 0;
+        public int nowCharacter = 0;
+        public List<int> haveCharacters = null;
 
     }
     public static PlayerStats instance = null;
@@ -75,7 +76,8 @@ public class PlayerStats : MonoBehaviour
             Debug.Log(callback);
             BackEndServerManager.instance.myInfo.gold = Convert.ToInt32(callback.Rows()[0]["Gold"]["N"]);
             BackEndServerManager.instance.myInfo.ads = Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"]);
-            //BackEndServerManager.instance.myInfo.haveCharacters = Convert.ToBase64CharArray(callback.Rows()[0]["NowCharacter"]["N"]);
+            for(int i = 0; i < (callback.Rows()[0]["NowCharacter"]["L"]).Count; i++)
+                BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()["rows"][0]["HaveCharacters"]["L"][i]);
             BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
         });
 
