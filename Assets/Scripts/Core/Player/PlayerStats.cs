@@ -12,19 +12,10 @@ public class PlayerStats : MonoBehaviour
         public string name = "Ghest";
         public long gold = 100;       // 게임 재화
         public bool ads = false;     // 광고 유무
+        public int mmr = 0;         /// mmr
         public float CurHp = 100;
         public float MaxHp = 100;
-        public float Stamina = 100;
-        public Weapon curWeapon = null; // 현재 무기 정보
-        public Helmet curHelmet = null; // 현재 헬멧 정보
-        public Chest curChest = null;  // 현재 갑옷 정보
-        
-        //가지고 있는 아이템 정보
-        public List<Weapon> haveWeapons = new List<Weapon>();
-        public List<Helmet> haveHelmets = new List<Helmet>();
-        public List<Chest> haveChests = new List<Chest>();
-
-        
+        public float Stamina = 100;  
     }
     public static PlayerStats instance = null;
     private Param param = new Param();
@@ -48,10 +39,11 @@ public class PlayerStats : MonoBehaviour
         param.Add("Name", BackEndServerManager.instance.myNickName);
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
-        param.Add("WeaponCode", BackEndServerManager.instance.myInfo.curWeapon.code);
-        param.Add("HelmetCode", BackEndServerManager.instance.myInfo.curHelmet.code);
-        param.Add("ChestCode", BackEndServerManager.instance.myInfo.curChest.code);
         Backend.GameInfo.Insert(table, param);
+
+        param = new Param();
+        param.Add("Score", BackEndServerManager.instance.myInfo.mmr);
+        Backend.GameSchemaInfo.Insert("MMR", param);
     }
 
     public void Save(string table = "UserData")
@@ -60,18 +52,28 @@ public class PlayerStats : MonoBehaviour
         param.Add("Name", BackEndServerManager.instance.myNickName);
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
-        param.Add("WeaponCode", BackEndServerManager.instance.myInfo.curWeapon.code);
-        param.Add("HelmetCode", BackEndServerManager.instance.myInfo.curHelmet.code);
-        param.Add("ChestCode", BackEndServerManager.instance.myInfo.curChest.code);
         Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
+
+        param = new Param();
+        param.Add("Score", BackEndServerManager.instance.myInfo.mmr);
+        Backend.GameSchemaInfo.Update("MMR", BackEndServerManager.instance.myIndate, param);
     }
 
-    public BackendReturnObject Load(string table = "UserData", int limit = 1)
+    public void Load(string table = "UserData")
     {
-        var bro = Backend.GameInfo.GetPrivateContents(table, limit);
-        
         // ...
+        SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
+        {
+            Debug.Log("Score : " + Convert.ToInt32(callback.Rows()[0]["Gold"]["N"].ToString()));
+            Debug.Log("Ads : " + Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"].ToString()));
+        });
 
-        return bro;
+        SendQueue.Enqueue(Backend.GameSchemaInfo.Get, "MMR", BackEndServerManager.instance.myIndate, callback =>
+        {
+            Debug.Log("MMR : " + Convert.ToInt32(callback.Rows()[0]["Score"]["N"].ToString()));
+        });
+
+        var errorLog = string.Format("로드완료 !\n이름 : {0}\n골드 : {1}\n광고 : {2}\nMMR : {3}", BackEndServerManager.instance.myNickName, BackEndServerManager.instance.myInfo.gold, BackEndServerManager.instance.myInfo.ads, BackEndServerManager.instance.myInfo.mmr);
+        Debug.Log(errorLog);
     }
 }

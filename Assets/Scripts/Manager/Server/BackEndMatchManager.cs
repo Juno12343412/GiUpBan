@@ -92,8 +92,12 @@ public partial class BackEndMatchManager : MonoBehaviour
 
     public string GetNickNameBySessionId(SessionId session)
     {
-        // return Backend.Match.GetNickNameBySessionId(session);
         return gameRecords[session].m_nickname;
+    }
+
+    public int GetMMRBySessionId(SessionId session)
+    {
+        return gameRecords[session].m_mmr;
     }
 
     public bool IsSessionListNull()
@@ -186,20 +190,20 @@ public partial class BackEndMatchManager : MonoBehaviour
     // 매칭 서버 관련 이벤트 핸들러
     public void MatchMakingHandler()
     {
-        Backend.Match.OnJoinMatchMakingServer += (args) =>
+        Backend.Match.OnJoinMatchMakingServer = (args) =>
         {
             Debug.Log("OnJoinMatchMakingServer : " + args.ErrInfo);
             // 매칭 서버에 접속하면 호출
             ProcessAccessMatchMakingServer(args.ErrInfo);
         };
-        Backend.Match.OnMatchMakingResponse += (args) =>
+        Backend.Match.OnMatchMakingResponse = (args) =>
         {
             Debug.Log("OnMatchMakingResponse : " + args.ErrInfo + " : " + args.Reason);
             // 매칭 신청 관련 작업에 대한 호출
             ProcessMatchMakingResponse(args);
         };
 
-        Backend.Match.OnLeaveMatchMakingServer += (args) =>
+        Backend.Match.OnLeaveMatchMakingServer = (args) =>
         {
             // 매칭 서버에서 접속 종료할 때 호출
             Debug.Log("OnLeaveMatchMakingServer : " + args.ErrInfo);
@@ -217,7 +221,7 @@ public partial class BackEndMatchManager : MonoBehaviour
         };
 
         // 대기 방 생성/실패 여부
-        Backend.Match.OnMatchMakingRoomCreate += (args) =>
+        Backend.Match.OnMatchMakingRoomCreate = (args) =>
         {
             Debug.Log("OnMatchMakingRoomCreate : " + args.ErrInfo + " : " + args.Reason);
 
@@ -225,7 +229,7 @@ public partial class BackEndMatchManager : MonoBehaviour
         };
 
         // 대기방에 유저 입장 메시지
-        Backend.Match.OnMatchMakingRoomJoin += (args) =>
+        Backend.Match.OnMatchMakingRoomJoin = (args) =>
         {
             Debug.Log(string.Format("OnMatchMakingRoomJoin : {0} : {1}", args.ErrInfo, args.Reason));
             if (args.ErrInfo.Equals(ErrorCode.Success))
@@ -236,7 +240,7 @@ public partial class BackEndMatchManager : MonoBehaviour
         };
 
         // 대기방에 현재 입장해 있는 유저 리스트 메시지
-        Backend.Match.OnMatchMakingRoomUserList += (args) =>
+        Backend.Match.OnMatchMakingRoomUserList = (args) =>
         {
             Debug.Log(string.Format("OnMatchMakingRoomUserList : {0} : {1}", args.ErrInfo, args.Reason));
             List<MatchMakingUserInfo> userList = null;
@@ -249,7 +253,7 @@ public partial class BackEndMatchManager : MonoBehaviour
         };
 
         // 대기방에 유저 퇴장 메시지
-        Backend.Match.OnMatchMakingRoomLeave += (args) =>
+        Backend.Match.OnMatchMakingRoomLeave = (args) =>
         {
             Debug.Log(string.Format("OnMatchMakingRoomLeave : {0} : {1}", args.ErrInfo, args.Reason));
             if (args.ErrInfo.Equals(ErrorCode.Success) || args.ErrInfo.Equals(ErrorCode.Match_Making_KickedByOwner))
@@ -265,7 +269,7 @@ public partial class BackEndMatchManager : MonoBehaviour
         };
 
         // 방장이 대기방에서 나가 대기방 파기 된 메시지
-        Backend.Match.OnMatchMakingRoomDestory += (args) =>
+        Backend.Match.OnMatchMakingRoomDestory = (args) =>
         {
             Debug.Log(string.Format("OnMatchMakingRoomDestory : {0} : {1}", args.ErrInfo, args.Reason));
             MainUI.instance.CloseMatchUI();
@@ -279,7 +283,7 @@ public partial class BackEndMatchManager : MonoBehaviour
     // 인게임 서버 관련 이벤트 핸들러
     private void GameHandler()
     {
-        Backend.Match.OnSessionJoinInServer += (args) =>
+        Backend.Match.OnSessionJoinInServer = (args) =>
         {
             Debug.Log("OnSessionJoinInServer : " + args.ErrInfo);
             // 인게임 서버에 접속하면 호출
@@ -290,7 +294,7 @@ public partial class BackEndMatchManager : MonoBehaviour
                     // 패배했다는 결과만 알려줌
                     // ...
                     GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
-                    JoinMatchServer();
+                    MainUI.instance.SetReconnectUI(true);
                     isConnectInGameServer = false;
                 }
                 return;
@@ -309,7 +313,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             AccessInGameRoom(inGameRoomToken);
         };
 
-        Backend.Match.OnSessionListInServer += (args) =>
+        Backend.Match.OnSessionListInServer = (args) =>
         {
             // 세션 리스트 호출 후 조인 채널이 호출됨
             // 현재 같은 게임(방)에 참가중인 플레이어들 중 나보다 먼저 이 방에 들어와 있는 플레이어들과 나의 정보가 들어있다.
@@ -319,20 +323,20 @@ public partial class BackEndMatchManager : MonoBehaviour
             ProcessMatchInGameSessionList(args);
         };
 
-        Backend.Match.OnMatchInGameAccess += (args) =>
+        Backend.Match.OnMatchInGameAccess = (args) =>
         {
             Debug.Log("OnMatchInGameAccess : " + args.ErrInfo);
             // 세션이 인게임 룸에 접속할 때마다 호출 (각 클라이언트가 인게임 룸에 접속할 때마다 호출됨)
             ProcessMatchInGameAccess(args);
         };
         
-        Backend.Match.OnMatchInGameStart += () =>
+        Backend.Match.OnMatchInGameStart = () =>
         {
             // 서버에서 게임 시작 패킷을 보내면 호출
             GameSetup();
         };
 
-        Backend.Match.OnMatchResult += (args) =>
+        Backend.Match.OnMatchResult = (args) =>
         {
             Debug.Log("게임 결과값 업로드 결과 : " + string.Format("{0} : {1}", args.ErrInfo, args.Reason));
             // 서버에서 게임 결과 패킷을 보내면 호출
@@ -357,7 +361,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             sessionIdList = null;
         };
 
-        Backend.Match.OnMatchRelay += (args) =>
+        Backend.Match.OnMatchRelay = (args) =>
         {
             // 각 클라이언트들이 서버를 통해 주고받은 패킷들
             // 서버는 단순 브로드캐스팅만 지원 (서버에서 어떠한 연산도 수행하지 않음)
@@ -377,7 +381,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             WorldPackage.instance.OnRecieve(args);
         };
 
-        Backend.Match.OnLeaveInGameServer += (args) =>
+        Backend.Match.OnLeaveInGameServer = (args) =>
         {
             Debug.Log("OnLeaveInGameServer : " + args.ErrInfo + " : " + args.Reason);
             if (args.Reason.Equals("Fail To Reconnect"))
@@ -387,7 +391,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             isConnectInGameServer = false;
         };
 
-        Backend.Match.OnSessionOnline += (args) =>
+        Backend.Match.OnSessionOnline = (args) =>
         {
             // 다른 유저가 재접속 했을 때 호출
             var nickName = Backend.Match.GetNickNameBySessionId(args.GameRecord.m_sessionId);
@@ -395,7 +399,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             ProcessSessionOnline(args.GameRecord.m_sessionId, nickName);
         };
 
-        Backend.Match.OnSessionOffline += (args) =>
+        Backend.Match.OnSessionOffline = (args) =>
         {
             // 다른 유저 혹은 자기자신이 접속이 끊어졌을 때 호출
             Debug.Log(string.Format("[{0}] 오프라인되었습니다. - {1} : {2}", args.GameRecord.m_nickname, args.ErrInfo, args.Reason));
@@ -410,7 +414,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             }
         };
 
-        Backend.Match.OnChangeSuperGamer += (args) =>
+        Backend.Match.OnChangeSuperGamer = (args) =>
         {
             Debug.Log(string.Format("이전 방장 : {0} / 새 방장 : {1}", args.OldSuperUserRecord.m_nickname, args.NewSuperUserRecord.m_nickname));
             // 호스트 재설정
@@ -426,7 +430,7 @@ public partial class BackEndMatchManager : MonoBehaviour
     private void ExceptionHandler()
     {
         // 예외가 발생했을 때 호출
-        Backend.Match.OnException += (e) =>
+        Backend.Match.OnException = (e) =>
         {
             Debug.Log(e);
         };

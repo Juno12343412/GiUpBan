@@ -190,13 +190,18 @@ public partial class BackEndMatchManager : MonoBehaviour
         //    // 호스트가 아니면 단순히 UI 만 띄운다.
         //}
 
-        if (isHost)
+        //if (isHost)
+        //{
+        //    // 현재 매치모드가 1대1 일때 플레이어가 오프라인을 하면 게임을 종료시킴
+        //    if (nowModeType == MatchModeType.OneOnOne)
+        //    {
+        //        WorldPackage.instance.playerDie(sessionId);
+        //    }
+        //}
+        // 현재 매치모드가 1대1 일때 플레이어가 오프라인을 하면 게임을 종료시킴
+        if (nowModeType == MatchModeType.OneOnOne)
         {
-            // 현재 매치모드가 1대1 일때 플레이거가 오프라인을 하면 게임을 종료시킴
-            if (nowModeType == MatchModeType.OneOnOne)
-            {
-                WorldPackage.instance.playerDie(sessionId);
-            }
+            WorldPackage.instance.playerDie(sessionId);
         }
     }
 

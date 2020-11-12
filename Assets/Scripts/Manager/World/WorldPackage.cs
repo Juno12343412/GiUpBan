@@ -56,7 +56,6 @@ public class WorldPackage : MonoBehaviour
         Debug.Log("게임 초기화 진행");
         playerPool.Init(playerObj, 2, Vector3.zero, Quaternion.identity, GameObject.Find("Objects").transform);
         GameManager.instance.OnOver += OnGameOver;
-        //GameManager.instance.OnResult += GameUI.instance.ShowResultBoard;
 
         playerDie += PlayerDieEvent;
         OnGameStart();
@@ -430,13 +429,8 @@ public class WorldPackage : MonoBehaviour
             {
                 player.Value.Stats.CurHp = syncMessage.CurHp[index];
                 player.Value.Stats.MaxHp = syncMessage.MaxHp[index];
-                // 코드값에 따라 아이템을 찾아서 넣어주는 함수 추가바람 ...
-                player.Value.Stats.curWeapon = new Weapon();
-                player.Value.Stats.curHelmet = new Helmet();
-                player.Value.Stats.curChest = new Chest();
-                
-            }     
-            
+                // 코드값에 따라 아이템을 찾아서 넣어주는 함수 추가바람 ... 
+            }      
 
             index++;
         }
@@ -446,52 +440,52 @@ public class WorldPackage : MonoBehaviour
     private void ProcessCalData(CalculationMessage calMessage)
     {
 
-        if (players[myPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
-        {
-            if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
-            {
-                players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
-                    players[otherPlayerIndex].Stats.curHelmet.Defense
-                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
+        //if (players[myPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
+        //{
+        //    if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
+        //    {
+        //        players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+        //            players[otherPlayerIndex].Stats.curHelmet.Defense
+        //            + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
 
-                players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
-                players[myPlayerIndex].AttackPointFalse();
-                return;
-            }
-            else
-            {
-                players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
-                    players[otherPlayerIndex].Stats.curHelmet.Defense
-                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)));
-                players[myPlayerIndex].AttackPointFalse();
-                Debug.Log("약공 들어감");
-                return;
+        //        players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
+        //        players[myPlayerIndex].AttackPointFalse();
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+        //            players[otherPlayerIndex].Stats.curHelmet.Defense
+        //            + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)));
+        //        players[myPlayerIndex].AttackPointFalse();
+        //        Debug.Log("약공 들어감");
+        //        return;
 
-            }
-        } // 약공
+        //    }
+        //} // 약공
 
-        if (players[myPlayerIndex].State == PlayerCurState.STRONG_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
-        {
-            if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
-            {
-                players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
-                    players[otherPlayerIndex].Stats.curHelmet.Defense
-                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
+        //if (players[myPlayerIndex].State == PlayerCurState.STRONG_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
+        //{
+        //    if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
+        //    {
+        //        players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+        //            players[otherPlayerIndex].Stats.curHelmet.Defense
+        //            + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)) * 0.1f);
 
-                players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
-                players[myPlayerIndex].AttackPointFalse();
+        //        players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
+        //        players[myPlayerIndex].AttackPointFalse();
 
-            }
-            else
-            {
-                players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
-                    players[otherPlayerIndex].Stats.curHelmet.Defense
-                    + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)));
-                players[myPlayerIndex].AttackPointFalse();
-                Debug.Log("강공 들어감");
+        //    }
+        //    else
+        //    {
+        //        players[otherPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.curWeapon.Damage * (100.0f - ((players[otherPlayerIndex].Stats.curChest.Defense +
+        //            players[otherPlayerIndex].Stats.curHelmet.Defense
+        //            + players[otherPlayerIndex].Stats.curWeapon.Defense) - players[myPlayerIndex].Stats.curWeapon.CrashDefense)));
+        //        players[myPlayerIndex].AttackPointFalse();
+        //        Debug.Log("강공 들어감");
 
-            }
-        } // 강공
+        //    }
+        //} // 강공
         
         //if (players[otherPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
         //{

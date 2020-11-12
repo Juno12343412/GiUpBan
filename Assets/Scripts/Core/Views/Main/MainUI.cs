@@ -12,6 +12,8 @@ public class MainUI : BaseScreen<MainUI>
 {
     [SerializeField] private GameObject matchlookingObject = null;
     [SerializeField] private GameObject matchFoundObject = null;
+    [SerializeField] private GameObject matchReconnectObject = null;
+    [SerializeField] private Text matchReconnectMMR = null;
     [SerializeField] private GameObject loadingObject = null;
     [SerializeField] private GameObject errorObject = null;
     [SerializeField] private Text       errorText = null;
@@ -23,6 +25,7 @@ public class MainUI : BaseScreen<MainUI>
     {
         matchlookingObject.SetActive(false);
         matchFoundObject.SetActive(false);
+        matchReconnectObject.SetActive(false);
         loadingObject.SetActive(false);
         errorObject.SetActive(false);
 
@@ -56,6 +59,14 @@ public class MainUI : BaseScreen<MainUI>
     public void CloseMatchUI()
     {
         MatchCancelCallback();
+    }
+
+    public void SetReconnectUI(bool state)
+    {
+        if (state)
+            matchReconnectMMR.text = BackEndServerManager.instance.myNickName + " (" + BackEndServerManager.instance.myInfo.mmr.ToString() + ")";
+        
+        matchReconnectObject.SetActive(state);
     }
 
     public void CreateRoomResult(bool isSuccess, List<MatchMakingUserInfo> userList = null)
@@ -128,7 +139,11 @@ public class MainUI : BaseScreen<MainUI>
             return;
         }
 
-        BackEndMatchManager.instance.RequestMatchMaking(0);
+        // Random
+        //BackEndMatchManager.instance.RequestMatchMaking(0);
+
+        // MMR
+        BackEndMatchManager.instance.RequestMatchMaking(1);
     }
 
     public void MatchRequestCallback(bool result)
@@ -167,6 +182,17 @@ public class MainUI : BaseScreen<MainUI>
         BackEndMatchManager.instance.LeaveMatchServer();
         Backend.BMember.Logout();
         GameManager.instance.ChangeState(GameManager.GameState.Login);
+    }
+
+    public void OpenChest()
+    {
+        SendQueue.Enqueue(Backend.Probability.GetProbability, "634", callback =>
+        {
+            if (callback.IsSuccess())
+                Debug.Log(callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString());
+            else
+                Debug.Log("실패 !");
+        });
     }
 
     public override void ShowScreen()

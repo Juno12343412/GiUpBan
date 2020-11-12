@@ -32,12 +32,20 @@ public class GameUI : BaseScreen<GameUI>
         Debug.Log("Result Board : " + matchGameResult != null);
         foreach (var user in matchGameResult.m_winners)
         {
-            winnerText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user);
+            winnerText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user) + " (" + BackEndMatchManager.instance.GetMMRBySessionId(user) + ")";
+            if (BackEndMatchManager.instance.IsMySessionId(user))
+            {
+                BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
+            }
         }
 
         foreach (var user in matchGameResult.m_losers)
         {
-            loserText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user);
+            loserText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user) + " (" + BackEndMatchManager.instance.GetMMRBySessionId(user) + ")";
+            if (BackEndMatchManager.instance.IsMySessionId(user))
+            {
+                BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
+            }
         }
         ShowScreen();
     }

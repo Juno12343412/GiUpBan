@@ -638,7 +638,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\uD55C\uC2B9\uC6B0"
+  m_Text: "\uD55C\uC2B9\uC6B0 (100)"
 --- !u!222 &348934823
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1778,7 +1778,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\uD55C\uC2B9\uC6B0"
+  m_Text: "\uD55C\uC2B9\uC6B0 (100)"
 --- !u!222 &1755617693
 CanvasRenderer:
   m_ObjectHideFlags: 0

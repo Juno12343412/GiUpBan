@@ -68,8 +68,8 @@ public class BackEndServerManager : MonoBehaviour
     void OnApplicationQuit()
     {
         // 플레이어 정보 저장 ...
-        //PlayerStats.instance.Save();
-        
+        PlayerStats.instance.Save();
+
         Debug.Log("OnApplicationQuit");
         StopSendQueue();
     }
@@ -162,10 +162,7 @@ public class BackEndServerManager : MonoBehaviour
             myIndate = info["inDate"].ToString();
 
             // 플레이어 정보 불러오기 ...
-            // PlayerStats.instance.Load();
-            myInfo.curChest = new Chest();
-            myInfo.curHelmet = new Helmet();
-            myInfo.curWeapon = new Weapon();
+            PlayerStats.instance.Load();
 
             if (loginSuccessFunc != null)
             {

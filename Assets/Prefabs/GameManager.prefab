@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1700226385}
   - component: {fileID: 1700226387}
   - component: {fileID: 9011041949659250369}
+  - component: {fileID: 4757603113380422441}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -48,6 +49,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45b2c8789c559ad42a869a6d846e4611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myInfo:
+    name: Ghest
+    gold: 100
+    ads: 0
+    mmr: 0
+    CurHp: 100
+    MaxHp: 100
+    Stamina: 100
 --- !u!114 &1700226383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,3 +124,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0728d54ee19968b45ac12c5e29113bf5, type: 2}
   chests:
   - {fileID: 11400000, guid: eb7f264caa8d36143bb1a3e5cf9a7dba, type: 2}
+--- !u!114 &4757603113380422441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9131468558171056924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7b23d90d6b92a840b9b851c1a0d1b9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

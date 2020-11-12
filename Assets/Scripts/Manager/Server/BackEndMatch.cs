@@ -101,13 +101,13 @@ public partial class BackEndMatchManager : MonoBehaviour
         isConnectInGameServer = false;
 
         Debug.Log("매칭 요청중 ...");
-        Backend.Match.RequestMatchMaking(MatchType.Random, MatchModeType.OneOnOne, matchInfos[index].inDate);
+        Backend.Match.RequestMatchMaking(MatchType.MMR, MatchModeType.OneOnOne, matchInfos[index].inDate);
         if (isConnectInGameServer)
         {
             Backend.Match.LeaveGameServer(); //인게임 서버 접속되어 있을 경우를 대비해 인게임 서버 리브 호출
         }
 
-        nowMatchType = MatchType.Random;
+        nowMatchType = MatchType.MMR;
         nowModeType = MatchModeType.OneOnOne;
         numOfClient = int.Parse(matchInfos[index].headCount);
         Debug.Log(string.Format("매칭 중 ... 매칭 타입 : [{0}] / 매칭 모드 : [{1}] / 매칭 정보 [{2}]", MatchType.Random, MatchModeType.OneOnOne, matchInfos[index].inDate));
@@ -146,7 +146,7 @@ public partial class BackEndMatchManager : MonoBehaviour
 	 * 매칭 신청 성공했을 때
 	 * 매칭 성공했을 때
 	 * 매칭 신청 실패했을 때
-	*/
+	 */
     private void ProcessMatchMakingResponse(MatchMakingResponseEventArgs args)
     {
         string debugLog = string.Empty;
