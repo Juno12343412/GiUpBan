@@ -16,6 +16,7 @@ public class PlayerStats : MonoBehaviour
         public float CurHp = 100;
         public float MaxHp = 100;
         public float Stamina = 100;
+        public int Damage = 10;
         public int nowCharacter = 1;
         public List<int> haveCharacters;
 
