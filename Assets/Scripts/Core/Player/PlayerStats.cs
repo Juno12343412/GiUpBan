@@ -73,11 +73,10 @@ public class PlayerStats : MonoBehaviour
         // ...
         SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
         {
-            Debug.Log(callback);
             BackEndServerManager.instance.myInfo.gold = Convert.ToInt32(callback.Rows()[0]["Gold"]["N"]);
             BackEndServerManager.instance.myInfo.ads = Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"]);
             for(int i = 0; i < (callback.Rows()[0]["NowCharacter"]["L"]).Count; i++)
-                BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()["rows"][0]["HaveCharacters"]["L"][i]);
+                BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["S"]);
             BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
         });
 
