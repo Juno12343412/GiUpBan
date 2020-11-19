@@ -354,8 +354,8 @@ public class WorldPackage : MonoBehaviour
         Debug.Log("넣기전 체력" + players[data.playerSession].Stats.CurHp);
         players[data.playerSession].Stats.CurHp -= data.damage;
         Debug.Log("넣은후 체력" + players[data.playerSession].Stats.CurHp);
-        hpImages[1].fillAmount = (players[otherPlayerIndex].Stats.CurHp / players[otherPlayerIndex].Stats.MaxHp);
-        hpImages[0].fillAmount = (players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
+        hpImages[1].fillAmount = (float)(players[otherPlayerIndex].Stats.CurHp / players[otherPlayerIndex].Stats.MaxHp);
+        hpImages[0].fillAmount = (float)(players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
     }
 
     public void OnRecieveForLocal(KeyMessage msg)
@@ -427,8 +427,8 @@ public class WorldPackage : MonoBehaviour
             // 이 부분에서 모든 플레이어의 데이트를 동기화함
             if (!player.Value.isMe)
             {
-                player.Value.Stats.CurHp = syncMessage.CurHp[index];
                 player.Value.Stats.MaxHp = syncMessage.MaxHp[index];
+                player.Value.Stats.CurHp = syncMessage.MaxHp[index];
                 // 코드값에 따라 아이템을 찾아서 넣어주는 함수 추가바람 ... 
             }
 
@@ -498,20 +498,21 @@ public class WorldPackage : MonoBehaviour
         int numOfClient = players.Count;
         int index = 0;
 
-        float[] curHp = new float[numOfClient], maxHp = new float[numOfClient];
-        int[] weaponCode = new int[numOfClient], helmetCode = new int[numOfClient], chestCode = new int[numOfClient];
+        double[] curHp = new double[numOfClient], maxHp = new double[numOfClient], stamina = new double[numOfClient],
+            staminaM = new double[numOfClient], damage = new double[numOfClient], penetration = new double[numOfClient];
         bool[] online = new bool[numOfClient];
 
         foreach (var player in players)
         {
-            curHp[index] = player.Value.Stats.CurHp;
             maxHp[index] = player.Value.Stats.MaxHp;
-            //weaponCode[index] = player.Value.Stats.curWeapon.code;
-            //helmetCode[index] = player.Value.Stats.curHelmet.code;
-            //chestCode[index] = player.Value.Stats.curChest.code;
+            curHp[index] = player.Value.Stats.CurHp;
+            stamina[index] = player.Value.Stats.Stamina;
+            staminaM[index] = player.Value.Stats.StaminaM;
+            damage[index] = player.Value.Stats.Damage;
+            penetration[index] = player.Value.Stats.Penetration;           
             index++;
         }
 
-        return new GameSyncMessage(hostSession, numOfClient, curHp, maxHp, weaponCode, helmetCode, chestCode, online);
+        return new GameSyncMessage(hostSession, numOfClient, maxHp, stamina, staminaM, damage, penetration, online);
     }
 }

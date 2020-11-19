@@ -120,8 +120,8 @@ namespace Protocol
     public class PlayerDamagedMessage : Message
     {
         public SessionId playerSession;
-        public float damage;
-        public PlayerDamagedMessage(SessionId session, float damage) : base(Type.Damaged)
+        public double damage;
+        public PlayerDamagedMessage(SessionId session, double damage) : base(Type.Damaged)
         {
             this.playerSession = session;
             this.damage = damage;
@@ -183,24 +183,27 @@ namespace Protocol
     {
         public SessionId host;
         public int count = 0;
-        public float[] CurHp = null, MaxHp = null;
-        public int[] weaponCode = null, helmetCode = null, chestCode = null;
+        public double[] MaxHp = null;
+        public double[] Stamina = null;
+        public double[] StaminaM = null;
+        public double[] Damage = null;
+        public double[] Penetration = null;
         public bool[] onlineInfo = null;
 
-        public GameSyncMessage(SessionId host, int count, float[] curHp, float[] maxHp, int[] weaponCode, int[] helmetCode, int[] chestCode, bool[] online) : base(Type.GameSync)
+        public GameSyncMessage(SessionId host, int count, double[] maxHp, double[] stamina, double[] staminaM, double[] damage, double[] penetration, bool[] online) : base(Type.GameSync)
         {
             this.host = host;
             this.count = count;
-            this.CurHp = this.MaxHp = new float[count];
-            this.weaponCode = this.helmetCode = this.chestCode = new int[count];
+            this.MaxHp = this.Stamina = this.StaminaM = this.Damage = this.Penetration = new double[count];
             this.onlineInfo = new bool[count];
 
             for (int i = 0; i < count; ++i)
             {
-                this.CurHp[i]      = curHp[i];
-                this.weaponCode[i] = weaponCode[i];
-                this.helmetCode[i] = helmetCode[i];
-                this.chestCode[i]  = chestCode[i];
+                this.MaxHp[i]      = maxHp[i];
+                this.Stamina[i]      = stamina[i];
+                this.StaminaM[i]      = staminaM[i];
+                this.Damage[i]      = damage[i];
+                this.Penetration[i]      = penetration[i];
                 onlineInfo[i]      = online[i];
             }
         }

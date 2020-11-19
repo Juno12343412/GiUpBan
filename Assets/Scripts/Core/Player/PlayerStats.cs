@@ -14,10 +14,18 @@ public class PlayerStats : MonoBehaviour
         public long gold = 100;       // 게임 재화
         public bool ads = false;     // 광고 유무
         public int mmr = 0;         /// mmr
-        public float CurHp = 100;
-        public float MaxHp = 100;
-        public float Stamina = 100;
-        public int Damage = 0;
+        public double CurHp;
+        public double MaxHp;
+        public double Stamina;
+        public double StaminaM;
+        public double Damage;
+        public double Penetration;
+        public double[] pCurHp;
+        public double[] pMaxHp;
+        public double[] pStamina;
+        public double[] pStaminaM;
+        public double[] pDamage;
+        public double[] pPenetration;
         public int nowCharacter = 0;
         public List<int> haveCharacters = null;
 
@@ -80,15 +88,34 @@ public class PlayerStats : MonoBehaviour
             BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
         });
 
-        SendQueue.Enqueue(Backend.Chart.GetChartContents, "Character_List", callback =>
-        {         
-            if(callback.IsSuccess())
+        SendQueue.Enqueue(Backend.Chart.GetChartContents, "10714", callback =>
+        {
+            Debug.Log("111111111");
+
+            if (callback.IsSuccess())
             {
-                Debug.Log(callback);
-                //for (int i = 0; i < callback.Rows()[0]["Character"].Count; i++)
-                //{
-                //    //callback.GetReturnValuetoJSON()["rows"][i]["Character"]["F"];
-                //}
+                for (int i = 0; i < callback.Rows()[0]["10714"].Count; i++)
+                {
+                    if (i != 0)
+                    {
+                        BackEndServerManager.instance.myInfo.pMaxHp[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
+                        BackEndServerManager.instance.myInfo.pCurHp[i] = BackEndServerManager.instance.myInfo.pMaxHp[i];
+                        BackEndServerManager.instance.myInfo.pStamina[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
+                        BackEndServerManager.instance.myInfo.pStaminaM[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
+                        BackEndServerManager.instance.myInfo.pDamage[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
+                        BackEndServerManager.instance.myInfo.pPenetration[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
+                    }
+                    else
+                    {
+                        BackEndServerManager.instance.myInfo.pMaxHp[0] = 0;
+                        BackEndServerManager.instance.myInfo.pCurHp[0] = 0;
+                        BackEndServerManager.instance.myInfo.pStamina[0] = 0;
+                        BackEndServerManager.instance.myInfo.pStaminaM[0] = 0;
+                        BackEndServerManager.instance.myInfo.pDamage[0] = 0;
+                        BackEndServerManager.instance.myInfo.pPenetration[0] = 0;
+                                                            
+                    }                                       
+                }                                           
             }
         });
 

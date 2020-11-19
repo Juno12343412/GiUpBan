@@ -315,7 +315,7 @@ public class PlayerScript : PoolingObject
         isStun = false;
     }
 
-    public void SufferDamage(float Damage)
+    public void SufferDamage(double Damage)
     {
         PlayerDamagedMessage damagedMsg = new PlayerDamagedMessage(index, Damage);
         BackEndMatchManager.instance.SendDataToInGame(damagedMsg);
