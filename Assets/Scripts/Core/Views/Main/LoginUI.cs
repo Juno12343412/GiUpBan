@@ -78,7 +78,7 @@ public class LoginUI : BaseScreen<LoginUI>
         string nickname = nicknameField.text;
         if (nickname.Equals(string.Empty))
         {
-            errorObject.GetComponent<Text>().text = "닉네임을 먼저 입력해주세요";
+            errorText.text = "닉네임을 먼저 입력해주세요";
             errorObject.SetActive(true);
             return;
         }
@@ -90,7 +90,7 @@ public class LoginUI : BaseScreen<LoginUI>
                 if (!result)
                 {
                     loadingObject.SetActive(false);
-                    errorObject.GetComponent<Text>().text = "닉네임 생성 오류\n\n" + error;
+                    errorText.text = "닉네임 생성 오류\n\n" + error;
                     errorObject.SetActive(true);
                     return;
                 }

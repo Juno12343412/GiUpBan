@@ -26,6 +26,19 @@ public class BackEndServerManager : MonoBehaviour
     private Action<bool, string> loginSuccessFunc = null;
     private const string BackendError = "statusCode : {0}\nErrorCode : {1}\nMessage : {2}";
 
+    //void Awake()
+    //{
+    //    if (instance != null)
+    //    {
+    //        Destroy(instance);
+    //    }
+    //    instance = this;
+    //    DontDestroyOnLoad(gameObject);
+    //}
+
+    /*
+	 * 서버 초기화
+	 */
     void Awake()
     {
         if (instance != null)
@@ -34,13 +47,7 @@ public class BackEndServerManager : MonoBehaviour
         }
         instance = this;
         DontDestroyOnLoad(gameObject);
-    }
 
-    /*
-	 * 서버 초기화
-	 */
-    void Start()
-    {
         isLogin = true;
         Backend.Initialize(() =>
         {
@@ -169,7 +176,7 @@ public class BackEndServerManager : MonoBehaviour
                 BackEndMatchManager.instance.GetMatchList(loginSuccessFunc);
             }
         });
-    }
+    } 
 
     void Update()
     {

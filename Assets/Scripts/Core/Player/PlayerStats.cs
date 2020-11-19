@@ -80,6 +80,18 @@ public class PlayerStats : MonoBehaviour
             BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
         });
 
+        SendQueue.Enqueue(Backend.Chart.GetChartContents, "Character_List", callback =>
+        {         
+            if(callback.IsSuccess())
+            {
+                Debug.Log(callback);
+                //for (int i = 0; i < callback.Rows()[0]["Character"].Count; i++)
+                //{
+                //    //callback.GetReturnValuetoJSON()["rows"][i]["Character"]["F"];
+                //}
+            }
+        });
+
         SendQueue.Enqueue(Backend.GameSchemaInfo.Get, "MMR", BackEndServerManager.instance.myIndate, callback =>
         {
             Debug.Log("MMR : " + Convert.ToInt32(callback.Rows()[0]["Score"]["N"].ToString()));
