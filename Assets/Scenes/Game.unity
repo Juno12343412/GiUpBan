@@ -439,6 +439,80 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1001 &298994503
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.19
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.515
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 8.17
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.6982677
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7158367
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 88.576004
+      objectReference: {fileID: 0}
+    - target: {fileID: 2720474481655148412, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353705679589324230, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_Name
+      value: Knight
+      objectReference: {fileID: 0}
+    - target: {fileID: 3353705679589324230, guid: 38c039b9cf91714488fb2cdb28f69664,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 38c039b9cf91714488fb2cdb28f69664, type: 3}
 --- !u!1 &322885498
 GameObject:
   m_ObjectHideFlags: 0
