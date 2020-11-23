@@ -334,6 +334,11 @@ public class WorldPackage : MonoBehaviour
     // 스턴 상태
     private void ProcessPlayerData(PlayerStunMessage data)
     {
+        players[data.playerSession].AnimationReset();
+        players[data.playerSession].State = PlayerCurState.STUN;
+        //players[data.playerSession].Anim.SetInteger("AttackKind", 3);
+
+
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
     }
 
@@ -427,9 +432,13 @@ public class WorldPackage : MonoBehaviour
             // 이 부분에서 모든 플레이어의 데이트를 동기화함
             if (!player.Value.isMe)
             {
+                // 그냥 여기에는 그 적의 모든 스탯을 대입만 해주면 됨 ㅇㅋ?
                 player.Value.Stats.MaxHp = syncMessage.MaxHp[index];
-                player.Value.Stats.CurHp = syncMessage.MaxHp[index];
-                // 코드값에 따라 아이템을 찾아서 넣어주는 함수 추가바람 ... 
+                player.Value.Stats.CurHp = player.Value.Stats.MaxHp;
+                player.Value.Stats.Stamina = syncMessage.MaxHp[index];
+                player.Value.Stats.StaminaM = syncMessage.StaminaM[index];
+                player.Value.Stats.Damage = syncMessage.Damage[index];
+                player.Value.Stats.Penetration = syncMessage.Penetration[index];
             }
 
             index++;

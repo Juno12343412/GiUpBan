@@ -26,8 +26,10 @@ public class PlayerStats : MonoBehaviour
         public double[] pStaminaM;
         public double[] pDamage;
         public double[] pPenetration;
-        public int nowCharacter = 0;
+        public int nowCharacter = 1;
         public List<int> haveCharacters = null;
+        public List<int> charactersLevel = null;
+        public List<int> levelExp = null;
 
     }
     public static PlayerStats instance = null;
@@ -54,6 +56,8 @@ public class PlayerStats : MonoBehaviour
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
         param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters.ToArray());
         param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
+        param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.charactersLevel);
+        param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
         Backend.GameInfo.Insert(table, param);
 
         param = new Param();
@@ -61,14 +65,17 @@ public class PlayerStats : MonoBehaviour
         Backend.GameSchemaInfo.Insert("MMR", param);
     }
 
+    // 게임을 킬 때 사용하는 함수
     public void Save(string table = "UserData")
     {
         param = new Param();
         param.Add("Name", BackEndServerManager.instance.myNickName);
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
-        param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters.ToArray());
+        param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
         param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
+        param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.nowCharacter);
+        param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
         Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
 
         param = new Param();
@@ -76,6 +83,34 @@ public class PlayerStats : MonoBehaviour
         Backend.GameSchemaInfo.Update("MMR", BackEndServerManager.instance.myIndate, param);
     }
 
+    // 인게임에서 사용하는 함수
+    public void CharacterSave(string table = "UserData")
+    {
+        param = new Param();
+        param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
+        param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
+        param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.nowCharacter);
+        param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
+
+        Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
+    }
+
+    // 인게임에서 사용하는 함수
+    public void CharacterLoad(string table = "UserData")
+    {
+        SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
+        {
+            BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
+            for (int i = 0; i < (callback.Rows()[0]["NowCharacter"]["L"]).Count; i++)
+                BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["N"]);
+            for (int i = 0; i < (callback.Rows()[0]["CharacterLevel"]["L"]).Count; i++)
+                BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["CharacterLevel"]["L"][i]["N"]);
+            for (int i = 0; i < (callback.Rows()[0]["LevelExp"]["L"]).Count; i++)
+                BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["LevelExp"]["L"][i]["N"]);
+        });
+    }
+
+    // 게임을 킬 때 사용하는 함수
     public void Load(string table = "UserData")
     {
         // ...
@@ -84,14 +119,17 @@ public class PlayerStats : MonoBehaviour
             BackEndServerManager.instance.myInfo.gold = Convert.ToInt32(callback.Rows()[0]["Gold"]["N"]);
             BackEndServerManager.instance.myInfo.ads = Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"]);
             for(int i = 0; i < (callback.Rows()[0]["NowCharacter"]["L"]).Count; i++)
-                BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["S"]);
+                BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["N"]);
             BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
+            for (int i = 0; i < (callback.Rows()[0]["CharacterLevel"]["L"]).Count; i++)
+                BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["CharacterLevel"]["L"][i]["N"]);
+            for (int i = 0; i < (callback.Rows()[0]["LevelExp"]["L"]).Count; i++)
+                BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["LevelExp"]["L"][i]["N"]);
         });
 
+        // 모든 캐릭터 정보
         SendQueue.Enqueue(Backend.Chart.GetChartContents, "10714", callback =>
         {
-            Debug.Log("111111111");
-
             if (callback.IsSuccess())
             {
                 for (int i = 0; i < callback.Rows()[0]["10714"].Count; i++)
@@ -113,7 +151,6 @@ public class PlayerStats : MonoBehaviour
                         BackEndServerManager.instance.myInfo.pStaminaM[0] = 0;
                         BackEndServerManager.instance.myInfo.pDamage[0] = 0;
                         BackEndServerManager.instance.myInfo.pPenetration[0] = 0;
-                                                            
                     }                                       
                 }                                           
             }

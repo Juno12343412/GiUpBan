@@ -28,6 +28,8 @@ public class PlayerScript : PoolingObject
 {
     #region 플레이어 관련 변수들
     [SerializeField]
+    private GameObject[] CharactersPrefab = null;
+    [SerializeField]
     private PlayerStats.Player stats = new PlayerStats.Player();
     public PlayerStats.Player Stats { get { return stats; } }
 
@@ -52,7 +54,7 @@ public class PlayerScript : PoolingObject
     private bool AttackPoint = false;
     private bool isStun = false;
     private bool isDelay = false;
-    public Animator Anim;
+    [HideInInspector] public Animator Anim;
     #endregion
 
     // New Var
@@ -109,17 +111,43 @@ public class PlayerScript : PoolingObject
         this.index = index;
         this.nickName = nickName;
 
-        Anim = GetComponent<Animator>();
+        Anim = CharactersPrefab[stats.nowCharacter].GetComponent<Animator>();
+
         if (this.isMe)
         {
-            // 자기 자신만 해야할 설정 (카메라 등)
+            // 여기다가 자기 자신 캐릭터에 따라 캐릭터 레벨에 따라 스탯 변경되는거 넣기
             // ...
+            for(int i = 0; i < CharactersPrefab.Length; i++)
+            {
+                if(i+1 != stats.nowCharacter)
+                    CharactersPrefab[i].SetActive(false);
+                else
+                    CharactersPrefab[i].SetActive(true);
+
+            }
+            if (stats.charactersLevel[stats.nowCharacter] == 1)
+            {
+                stats.MaxHp = stats.pMaxHp[stats.nowCharacter];
+                stats.Stamina = stats.pStamina[stats.nowCharacter];
+                stats.StaminaM = stats.pStaminaM[stats.nowCharacter];
+                stats.Damage = stats.pDamage[stats.nowCharacter];
+                stats.Penetration = stats.pPenetration[stats.nowCharacter];
+            }
+            else if(stats.charactersLevel[stats.nowCharacter] > 1)
+            {
+                stats.MaxHp = stats.pMaxHp[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                stats.Stamina = stats.pStamina[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                stats.StaminaM = stats.pStaminaM[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                stats.Damage = stats.pDamage[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                stats.Penetration = stats.pPenetration[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+            }
+
+            // 자기 자신만 해야할 설정 (카메라 등)
             stats = BackEndServerManager.instance.myInfo;
             State = PlayerCurState.IDLE;
 
             Direction = Direction.NONE;
             StartCoroutine(CR_StaminaHeal());
-
         }
 
         isLive = true;

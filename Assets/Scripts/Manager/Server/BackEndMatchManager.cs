@@ -309,6 +309,10 @@ public partial class BackEndMatchManager : MonoBehaviour
                 return;
             }
             Debug.Log("인게임 서버 접속 성공");
+            
+            // 유저 캐릭터 데이터 세이브
+            PlayerStats.instance.CharacterSave();
+            
             isJoinGameRoom = true;
             AccessInGameRoom(inGameRoomToken);
         };
