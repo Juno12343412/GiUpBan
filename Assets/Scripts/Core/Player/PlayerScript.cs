@@ -88,8 +88,21 @@ public class PlayerScript : PoolingObject
                 if (!isDelay)
                     PlayerControl();
             }
-            else { State = PlayerCurState.STUN; }
-
+            else 
+            { 
+                State = PlayerCurState.STUN;
+                if (BackEndMatchManager.instance.isHost)
+                {
+                    int keyCode = (int)State;
+                    KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
+                    BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
+                }
+                else
+                {
+                    PlayerStunMessage stunMsg = new PlayerStunMessage(index);
+                    BackEndMatchManager.instance.SendDataToInGame(stunMsg);
+                }
+            }
             transform.position = WorldPackage.instance.startingPoint[0].position;
             transform.rotation = WorldPackage.instance.startingPoint[0].rotation;
         }
@@ -117,14 +130,13 @@ public class PlayerScript : PoolingObject
         {
             // 여기다가 자기 자신 캐릭터에 따라 캐릭터 레벨에 따라 스탯 변경되는거 넣기
             // ...
-            for(int i = 0; i < CharactersPrefab.Length; i++)
+            foreach (var prefab in CharactersPrefab)
             {
-                if(i+1 != stats.nowCharacter)
-                    CharactersPrefab[i].SetActive(false);
-                else
-                    CharactersPrefab[i].SetActive(true);
-
+                prefab.SetActive(false);
             }
+
+            CharactersPrefab[stats.nowCharacter].SetActive(true);
+
             if (stats.charactersLevel[stats.nowCharacter] == 1)
             {
                 stats.MaxHp = stats.pMaxHp[stats.nowCharacter];
@@ -153,11 +165,16 @@ public class PlayerScript : PoolingObject
         isLive = true;
     }
 
+    public void StunOn(float _Time)
+    {
+        isStun = true;
+        StartCoroutine(CR_Stun(_Time));
+    }
+
     public IEnumerator CR_Stun(float Time)
     {
         if (!isStun)
         {
-            isStun = true;
             yield return new WaitForSeconds(Time);
             isStun = false;
         }
@@ -166,7 +183,7 @@ public class PlayerScript : PoolingObject
     {
         while(GameManager.instance.gameState != GameManager.GameState.InGame || GameManager.instance.gameState != GameManager.GameState.GameStart)
         {
-            if (!Anim.GetBool("isAttack"))
+            if (!Anim.GetBool("isAttack") && !Anim.GetBool("isStun"))
             {
                 yield return new WaitForSeconds(0.1f);
                 if (stats.Stamina < 100)
@@ -281,9 +298,7 @@ public class PlayerScript : PoolingObject
             if (BackEndMatchManager.instance.isHost)
             {
                 int keyCode = (int)State;
-                KeyMessage msg = new KeyMessage(keyCode, transform.position);
-                msg = new KeyMessage(keyCode, transform.position, Direction);
-
+                KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
             else
@@ -303,15 +318,13 @@ public class PlayerScript : PoolingObject
             if (BackEndMatchManager.instance.isHost)
             {
                 int keyCode = (int)State;
-                KeyMessage msg = new KeyMessage(keyCode, transform.position);
-                msg = new KeyMessage(keyCode, transform.position, Direction);
-
+                KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
             }
             else
             {
-                PlayerDefenseMessage defenseMsg = new PlayerDefenseMessage(index, Direction);
-                BackEndMatchManager.instance.SendDataToInGame(defenseMsg);
+                PlayerStrongAttackMessage strongMsg = new PlayerStrongAttackMessage(index, Direction);
+                BackEndMatchManager.instance.SendDataToInGame(strongMsg);
             }
         }
     } // 긴 터치

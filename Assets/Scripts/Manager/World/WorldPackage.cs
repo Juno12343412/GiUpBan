@@ -336,6 +336,10 @@ public class WorldPackage : MonoBehaviour
     {
         players[data.playerSession].AnimationReset();
         players[data.playerSession].State = PlayerCurState.STUN;
+
+        players[data.playerSession].Anim.SetBool("isGroggy", true);
+
+
         //players[data.playerSession].Anim.SetInteger("AttackKind", 3);
 
 
@@ -347,6 +351,8 @@ public class WorldPackage : MonoBehaviour
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         players[data.playerSession].Anim.SetBool("isAttack", false);
+        players[data.playerSession].Anim.SetBool("isGroggy", false);
+
         players[data.playerSession].AttackPointFalse();
         players[data.playerSession].CancelFalse();
 
