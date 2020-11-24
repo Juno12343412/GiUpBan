@@ -2248,6 +2248,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerPrefabs
       objectReference: {fileID: 0}
+    - target: {fileID: 2022405869376058151, guid: 9182ec47fd5e1f540ac5d139e7a2513e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3604881615691406294, guid: 9182ec47fd5e1f540ac5d139e7a2513e,
         type: 3}
       propertyPath: CharactersPrefab.Array.data[0]

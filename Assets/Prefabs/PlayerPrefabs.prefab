@@ -50,12 +50,13 @@ MonoBehaviour:
     gold: 100
     ads: 0
     mmr: 0
-    CurHp: 0
+    CurHp: 100
     MaxHp: 0
     Stamina: 0
     StaminaM: 0
     Damage: 0
     Penetration: 0
+    pName: []
     pCurHp: []
     pMaxHp: []
     pStamina: []

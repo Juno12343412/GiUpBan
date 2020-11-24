@@ -311,7 +311,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             Debug.Log("인게임 서버 접속 성공");
             
             // 유저 캐릭터 데이터 세이브
-            PlayerStats.instance.CharacterSave();
+            //PlayerStats.instance.CharacterSave();
             
             isJoinGameRoom = true;
             AccessInGameRoom(inGameRoomToken);
@@ -426,7 +426,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             if (isHost)
             {
                 // 만약 서브호스트로 설정되면 다른 모든 클라이언트에 싱크메시지 전송
-                Invoke("SendGameSyncMessage", 1.0f);
+                //Invoke("SendGameSyncMessage", 1.0f);
             }
         };
     }

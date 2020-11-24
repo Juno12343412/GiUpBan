@@ -11,7 +11,7 @@ public class PlayerStats : MonoBehaviour
     public class Player
     {
         public string name = "Ghest";
-        public long gold = 100;       // 게임 재화
+        public int gold = 100;       // 게임 재화
         public bool ads = false;     // 광고 유무
         public int mmr = 0;         /// mmr
         public double CurHp;
@@ -20,17 +20,17 @@ public class PlayerStats : MonoBehaviour
         public double StaminaM;
         public double Damage;
         public double Penetration;
-        public double[] pCurHp;
-        public double[] pMaxHp;
-        public double[] pStamina;
-        public double[] pStaminaM;
-        public double[] pDamage;
-        public double[] pPenetration;
-        public int nowCharacter = 1;
-        public List<int> haveCharacters = null;
-        public List<int> charactersLevel = null;
-        public List<int> levelExp = null;
-
+        public List<string> pName = new List<string>();
+        public List<double> pCurHp = new List<double>();
+        public List<double> pMaxHp = new List<double>();
+        public List<double> pStamina = new List<double>();
+        public List<double> pStaminaM = new List<double>();
+        public List<double> pDamage = new List<double>();
+        public List<double> pPenetration = new List<double>();
+        public int nowCharacter = 0;
+        public List<int> haveCharacters = new List<int>();
+        public List<int> charactersLevel = new List<int>();
+        public List<int> levelExp = new List<int>();
     }
     public static PlayerStats instance = null;
     private Param param = new Param();
@@ -50,11 +50,15 @@ public class PlayerStats : MonoBehaviour
 
     public void Add(string table = "UserData")
     {
+        BackEndServerManager.instance.myInfo.haveCharacters.Add(1);
+        BackEndServerManager.instance.myInfo.charactersLevel.Add(0);
+        BackEndServerManager.instance.myInfo.levelExp.Add(0);
+
         param = new Param();
         param.Add("Name", BackEndServerManager.instance.myNickName);
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
-        param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters.ToArray());
+        param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
         param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
         param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.charactersLevel);
         param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
@@ -74,13 +78,15 @@ public class PlayerStats : MonoBehaviour
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
         param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
         param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
-        param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.nowCharacter);
+        param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.charactersLevel);
         param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
         Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
 
         param = new Param();
         param.Add("Score", BackEndServerManager.instance.myInfo.mmr);
         Backend.GameSchemaInfo.Update("MMR", BackEndServerManager.instance.myIndate, param);
+
+        Debug.Log(BackEndServerManager.instance.myInfo.charactersLevel[0]);
     }
 
     // 인게임에서 사용하는 함수
@@ -116,15 +122,18 @@ public class PlayerStats : MonoBehaviour
         // ...
         SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
         {
-            BackEndServerManager.instance.myInfo.gold = Convert.ToInt32(callback.Rows()[0]["Gold"]["N"]);
-            BackEndServerManager.instance.myInfo.ads = Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"]);
-            for(int i = 0; i < (callback.Rows()[0]["NowCharacter"]["L"]).Count; i++)
-                BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["N"]);
-            BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
-            for (int i = 0; i < (callback.Rows()[0]["CharacterLevel"]["L"]).Count; i++)
-                BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["CharacterLevel"]["L"][i]["N"]);
-            for (int i = 0; i < (callback.Rows()[0]["LevelExp"]["L"]).Count; i++)
-                BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["LevelExp"]["L"][i]["N"]);
+            Debug.Log(callback.GetReturnValuetoJSON()["rows"][0]["CharacterLevel"]["L"][0]);
+
+            Debug.Log(callback.Rows()[0]["HaveCharacters"]["L"]);
+            BackEndServerManager.instance.myInfo.gold = Convert.ToInt32(callback.Rows()[0]["Gold"]["N"].ToString());
+            BackEndServerManager.instance.myInfo.ads = Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"].ToString());
+            for (int i = 0; i < callback.Rows()[0]["HaveCharacters"]["L"].Count; i++)
+                BackEndServerManager.instance.myInfo.haveCharacters.Add(Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["N"].ToString()));
+            BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"].ToString());
+            for (int i = 0; i < callback.Rows()[0]["CharacterLevel"]["L"].Count; i++)
+                BackEndServerManager.instance.myInfo.charactersLevel.Add(Convert.ToInt32(callback.GetReturnValuetoJSON()["rows"][0]["CharacterLevel"]["L"][i]["N"].ToString()));
+            for (int i = 0; i < callback.Rows()[0]["LevelExp"]["L"].Count; i++)
+                BackEndServerManager.instance.myInfo.levelExp.Add(Convert.ToInt32(callback.Rows()[0]["LevelExp"]["L"][i]["N"].ToString()));
         });
 
         // 모든 캐릭터 정보
@@ -132,27 +141,17 @@ public class PlayerStats : MonoBehaviour
         {
             if (callback.IsSuccess())
             {
-                for (int i = 0; i < callback.Rows()[0]["10714"].Count; i++)
+                for (int i = 0; i < callback.GetReturnValuetoJSON()["rows"].Count; i++)
                 {
-                    if (i != 0)
-                    {
-                        BackEndServerManager.instance.myInfo.pMaxHp[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
-                        BackEndServerManager.instance.myInfo.pCurHp[i] = BackEndServerManager.instance.myInfo.pMaxHp[i];
-                        BackEndServerManager.instance.myInfo.pStamina[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
-                        BackEndServerManager.instance.myInfo.pStaminaM[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
-                        BackEndServerManager.instance.myInfo.pDamage[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
-                        BackEndServerManager.instance.myInfo.pPenetration[i] = Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Character"]["S"]);
-                    }
-                    else
-                    {
-                        BackEndServerManager.instance.myInfo.pMaxHp[0] = 0;
-                        BackEndServerManager.instance.myInfo.pCurHp[0] = 0;
-                        BackEndServerManager.instance.myInfo.pStamina[0] = 0;
-                        BackEndServerManager.instance.myInfo.pStaminaM[0] = 0;
-                        BackEndServerManager.instance.myInfo.pDamage[0] = 0;
-                        BackEndServerManager.instance.myInfo.pPenetration[0] = 0;
-                    }                                       
-                }                                           
+                    Debug.Log("차트 불러오는 중 ... : " + i);
+                    BackEndServerManager.instance.myInfo.pName.Add(callback.GetReturnValuetoJSON()["rows"][i]["Name"]["S"].ToString());
+                    BackEndServerManager.instance.myInfo.pMaxHp.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Hp"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pCurHp.Add(BackEndServerManager.instance.myInfo.pMaxHp[i]);
+                    BackEndServerManager.instance.myInfo.pStamina.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Stamina"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pStaminaM.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["StaminaM"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pDamage.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Damage"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pPenetration.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Penetration"]["S"].ToString()));
+                }
             }
         });
 
@@ -165,4 +164,3 @@ public class PlayerStats : MonoBehaviour
         Debug.Log(errorLog);
     }
 }
-

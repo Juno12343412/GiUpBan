@@ -23,6 +23,7 @@ namespace Protocol
         GameStart,          // 게임 시작
         GameEnd,            // 게임 종료
         GameSync,           // 플레이어 재접속 시 게임 현재 상황 싱크
+        GameMySync,           // 플레이어 재접속 시 게임 현재 상황 싱크
         Calculation,        // 여러 계산
         Max,
 
@@ -178,6 +179,26 @@ namespace Protocol
     }
 
     #endregion
+
+    public class GameMySyncMessage : Message
+    {
+        public SessionId session;
+        public double MaxHp = 0f;
+        public double Stamina = 0f;
+        public double StaminaM = 0f;
+        public double Damage = 0f;
+        public double Penetration = 0f;
+
+        public GameMySyncMessage(SessionId session, double maxHp, double stamina, double staminaM, double damage, double penetration) : base(Type.GameMySync)
+        {
+            this.session = session;
+            this.MaxHp = maxHp;
+            this.Stamina = stamina;
+            this.StaminaM = staminaM;
+            this.Damage = damage;
+            this.Penetration = penetration;
+        }
+    }
 
     public class GameSyncMessage : Message
     {

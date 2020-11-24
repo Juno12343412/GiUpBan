@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
     void GameStart()
     {
         Loader.Load(Scene.Game);
-        OnStart();
+        //OnStart();
     }
 
     void InGame()

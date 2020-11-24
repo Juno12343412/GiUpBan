@@ -78,7 +78,7 @@ public class PlayerScript : PoolingObject
 
     void Update()
     {
-        if (stats.CurHp <= 0)
+        if (stats.CurHp <= 0 && GameManager.instance.gameState == GameManager.GameState.InGame)
             WorldPackage.instance.playerDie(index);
 
         if (isMe)
@@ -136,8 +136,13 @@ public class PlayerScript : PoolingObject
             }
 
             CharactersPrefab[stats.nowCharacter].SetActive(true);
+            
+            stats = BackEndServerManager.instance.myInfo;
 
-            if (stats.charactersLevel[stats.nowCharacter] == 1)
+            Debug.Log("현재 캐릭터들 개수 : " + stats.charactersLevel[stats.nowCharacter]);
+            Debug.Log("현재 캐릭터 : " + stats.nowCharacter);
+
+            if (stats.charactersLevel[stats.nowCharacter] == 0)
             {
                 stats.MaxHp = stats.pMaxHp[stats.nowCharacter];
                 stats.Stamina = stats.pStamina[stats.nowCharacter];
@@ -145,7 +150,7 @@ public class PlayerScript : PoolingObject
                 stats.Damage = stats.pDamage[stats.nowCharacter];
                 stats.Penetration = stats.pPenetration[stats.nowCharacter];
             }
-            else if(stats.charactersLevel[stats.nowCharacter] > 1)
+            else if(stats.charactersLevel[stats.nowCharacter] >= 1)
             {
                 stats.MaxHp = stats.pMaxHp[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
                 stats.Stamina = stats.pStamina[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
@@ -154,8 +159,6 @@ public class PlayerScript : PoolingObject
                 stats.Penetration = stats.pPenetration[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
             }
 
-            // 자기 자신만 해야할 설정 (카메라 등)
-            stats = BackEndServerManager.instance.myInfo;
             State = PlayerCurState.IDLE;
 
             Direction = Direction.NONE;

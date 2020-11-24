@@ -133,12 +133,11 @@ public class WorldPackage : MonoBehaviour
             index += 1;
         }
 
+        var message = instance.GetNowGameState(myPlayerIndex);
+        BackEndMatchManager.instance.SendDataToInGame(message);
+
         if (BackEndMatchManager.instance.isHost)
         {
-            // 이제 적의 데이터를 가져오는 패킷을 호출
-            var message = instance.GetNowGameState(BackEndMatchManager.instance.hostSession);
-            BackEndMatchManager.instance.SendDataToInGame(message);
-
             // 시작 이벤트 설정 (방장만 호출)
             StartCoroutine("StartCount");
         }
@@ -170,6 +169,7 @@ public class WorldPackage : MonoBehaviour
     IEnumerator StartCount()
     {
         StartCountMessage msg = new StartCountMessage(START_COUNT);
+        Debug.Log("현재 상태 : " + GameManager.instance.gameState);
 
         // 카운트 다운
         for (int i = 0; i < START_COUNT + 1; ++i)
@@ -177,6 +177,7 @@ public class WorldPackage : MonoBehaviour
             msg.time = START_COUNT - i;
             BackEndMatchManager.instance.SendDataToInGame(msg);
             yield return new WaitForSeconds(1); //1초 단위
+            Debug.Log("게임 시작 : " + i);
         }
 
         // 게임 시작 메시지를 전송
@@ -262,6 +263,11 @@ public class WorldPackage : MonoBehaviour
             case Protocol.Type.GameSync:
                 GameSyncMessage syncMessage = DataParser.ReadJsonData<GameSyncMessage>(args.BinaryUserData);
                 ProcessSyncData(syncMessage);
+                break;
+            case Protocol.Type.GameMySync:
+                Debug.Log("싱크 맞추기");
+                GameMySyncMessage mySyncMessage = DataParser.ReadJsonData<GameMySyncMessage>(args.BinaryUserData);
+                ProcessSyncData(mySyncMessage);
                 break;
             case Protocol.Type.Calculation:
                 CalculationMessage calMessage = DataParser.ReadJsonData<CalculationMessage>(args.BinaryUserData);
@@ -438,10 +444,15 @@ public class WorldPackage : MonoBehaviour
             // 이 부분에서 모든 플레이어의 데이트를 동기화함
             if (!player.Value.isMe)
             {
+                Debug.Log(player.Value.gameObject.name + " : 셋팅");
+                Debug.Log(syncMessage.MaxHp[index]);
+                Debug.Log(syncMessage.Stamina[index]);
+                Debug.Log(syncMessage.Damage[index]);
+
                 // 그냥 여기에는 그 적의 모든 스탯을 대입만 해주면 됨 ㅇㅋ?
                 player.Value.Stats.MaxHp = syncMessage.MaxHp[index];
                 player.Value.Stats.CurHp = player.Value.Stats.MaxHp;
-                player.Value.Stats.Stamina = syncMessage.MaxHp[index];
+                player.Value.Stats.Stamina = syncMessage.Stamina[index];
                 player.Value.Stats.StaminaM = syncMessage.StaminaM[index];
                 player.Value.Stats.Damage = syncMessage.Damage[index];
                 player.Value.Stats.Penetration = syncMessage.Penetration[index];
@@ -450,6 +461,41 @@ public class WorldPackage : MonoBehaviour
             index++;
         }
         BackEndMatchManager.instance.SetHostSession(syncMessage.host);
+    }
+
+    private void ProcessSyncData(GameMySyncMessage mySyncMessage)
+    {
+        // 플레이어 데이터 동기화
+        int index = 0;
+        if (players == null)
+        {
+            Debug.LogError("Player Poll is null!");
+            return;
+        }
+        foreach (var player in players)
+        {
+            // 이 부분에서 모든 플레이어의 데이트를 동기화함
+            Debug.Log(mySyncMessage.session + " : 셋팅");
+            if (!player.Value.isMe)
+            {
+                if (mySyncMessage.session != otherPlayerIndex)
+                    continue;
+
+                Debug.Log(player.Value.gameObject.name + " : 셋팅"); 
+                Debug.Log(mySyncMessage.MaxHp);
+                Debug.Log(mySyncMessage.Stamina);
+                Debug.Log(mySyncMessage.Damage);
+
+                // 그냥 여기에는 그 적의 모든 스탯을 대입만 해주면 됨 ㅇㅋ?
+                player.Value.Stats.MaxHp = mySyncMessage.MaxHp;
+                player.Value.Stats.CurHp = player.Value.Stats.MaxHp;
+                player.Value.Stats.Stamina = mySyncMessage.Stamina;
+                player.Value.Stats.StaminaM = mySyncMessage.StaminaM;
+                player.Value.Stats.Damage = mySyncMessage.Damage;
+                player.Value.Stats.Penetration = mySyncMessage.Penetration;
+            }
+            index++;
+        }
     }
 
     private void ProcessCalData(CalculationMessage calMessage)
@@ -507,27 +553,9 @@ public class WorldPackage : MonoBehaviour
         }
     }
 
-    public GameSyncMessage GetNowGameState(SessionId hostSession)
+    public GameMySyncMessage GetNowGameState(SessionId session)
     {
-        // 플레이어 패킷 보내기용 함수
-        int numOfClient = players.Count;
-        int index = 0;
-
-        double[] curHp = new double[numOfClient], maxHp = new double[numOfClient], stamina = new double[numOfClient],
-            staminaM = new double[numOfClient], damage = new double[numOfClient], penetration = new double[numOfClient];
-        bool[] online = new bool[numOfClient];
-
-        foreach (var player in players)
-        {
-            maxHp[index] = player.Value.Stats.MaxHp;
-            curHp[index] = player.Value.Stats.CurHp;
-            stamina[index] = player.Value.Stats.Stamina;
-            staminaM[index] = player.Value.Stats.StaminaM;
-            damage[index] = player.Value.Stats.Damage;
-            penetration[index] = player.Value.Stats.Penetration;           
-            index++;
-        }
-
-        return new GameSyncMessage(hostSession, numOfClient, maxHp, stamina, staminaM, damage, penetration, online);
+        return new GameMySyncMessage(session, players[myPlayerIndex].Stats.MaxHp
+            , players[myPlayerIndex].Stats.CurHp, players[myPlayerIndex].Stats.StaminaM, players[myPlayerIndex].Stats.Damage, players[myPlayerIndex].Stats.Penetration);
     }
 }
