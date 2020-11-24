@@ -169,7 +169,10 @@ public class BackEndServerManager : MonoBehaviour
             myIndate = info["inDate"].ToString();
 
             // 플레이어 정보 불러오기 ...
-            PlayerStats.instance.Load();
+            if (!PlayerStats.instance.Load())
+            {
+                PlayerStats.instance.Add();
+            }
 
             if (loginSuccessFunc != null)
             {

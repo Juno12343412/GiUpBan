@@ -466,36 +466,19 @@ public class WorldPackage : MonoBehaviour
     private void ProcessSyncData(GameMySyncMessage mySyncMessage)
     {
         // 플레이어 데이터 동기화
-        int index = 0;
         if (players == null)
         {
             Debug.LogError("Player Poll is null!");
             return;
         }
-        foreach (var player in players)
-        {
-            // 이 부분에서 모든 플레이어의 데이트를 동기화함
-            Debug.Log(mySyncMessage.session + " : 셋팅");
-            if (!player.Value.isMe)
-            {
-                if (mySyncMessage.session != otherPlayerIndex)
-                    continue;
+        Debug.Log(BackEndMatchManager.instance.GetNickNameBySessionId(mySyncMessage.session) + " : 셋팅");
 
-                Debug.Log(player.Value.gameObject.name + " : 셋팅"); 
-                Debug.Log(mySyncMessage.MaxHp);
-                Debug.Log(mySyncMessage.Stamina);
-                Debug.Log(mySyncMessage.Damage);
-
-                // 그냥 여기에는 그 적의 모든 스탯을 대입만 해주면 됨 ㅇㅋ?
-                player.Value.Stats.MaxHp = mySyncMessage.MaxHp;
-                player.Value.Stats.CurHp = player.Value.Stats.MaxHp;
-                player.Value.Stats.Stamina = mySyncMessage.Stamina;
-                player.Value.Stats.StaminaM = mySyncMessage.StaminaM;
-                player.Value.Stats.Damage = mySyncMessage.Damage;
-                player.Value.Stats.Penetration = mySyncMessage.Penetration;
-            }
-            index++;
-        }
+        players[mySyncMessage.session].Stats.MaxHp = mySyncMessage.MaxHp;
+        players[mySyncMessage.session].Stats.CurHp = mySyncMessage.MaxHp;
+        players[mySyncMessage.session].Stats.Stamina = mySyncMessage.Stamina;
+        players[mySyncMessage.session].Stats.StaminaM = mySyncMessage.StaminaM;
+        players[mySyncMessage.session].Stats.Damage = mySyncMessage.Damage;
+        players[mySyncMessage.session].Stats.Penetration = mySyncMessage.Penetration;
     }
 
     private void ProcessCalData(CalculationMessage calMessage)

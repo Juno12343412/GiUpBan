@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public GameState gameState;
 
     public event Action OnReady = null;
-    public event Action OnStart = null;
+    //public event Action OnStart = null;
     public event Action OnIngame = null;
     public event Action OnOver = null;
     public event Action OnResult = null;
