@@ -18,6 +18,7 @@ public class MainUI : BaseScreen<MainUI>
     [SerializeField] private GameObject errorObject = null;
     [SerializeField] private Text       errorText = null;
                      private Text       nameText = null;
+                     private int        characterNum = 0;
 
     [SerializeField] private GameObject cardUpgrade = null;
     [SerializeField] private GameObject cardPurchase = null;
@@ -78,6 +79,11 @@ public class MainUI : BaseScreen<MainUI>
     public void SetCardUpgradeUI(bool state)
     {
         cardUpgrade.SetActive(state);
+    }
+
+    public void SetCardUpgradeUiNum(int num)
+    {
+        characterNum = num;
     }
 
     public void SetCardPurchaseUI(bool state)
@@ -225,4 +231,9 @@ public class MainUI : BaseScreen<MainUI>
     //{
     //    Loader.Load(Scene.Game);
     //}
+
+    public void CharacterChange()
+    {
+        BackEndServerManager.instance.myInfo.nowCharacter = characterNum;
+    }
 }

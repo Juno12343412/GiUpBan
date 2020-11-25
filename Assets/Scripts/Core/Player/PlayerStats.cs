@@ -51,7 +51,7 @@ public class PlayerStats : MonoBehaviour
     public void Add(string table = "UserData")
     {
         BackEndServerManager.instance.myInfo.haveCharacters.Add(1);
-        BackEndServerManager.instance.myInfo.charactersLevel.Add(0);
+        BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
         BackEndServerManager.instance.myInfo.levelExp.Add(0);
 
         param = new Param();
