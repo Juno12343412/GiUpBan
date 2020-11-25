@@ -13,11 +13,14 @@ public class MainUI : BaseScreen<MainUI>
     [SerializeField] private GameObject matchlookingObject = null;
     [SerializeField] private GameObject matchFoundObject = null;
     [SerializeField] private GameObject matchReconnectObject = null;
-    [SerializeField] private Text matchReconnectMMR = null;
+    [SerializeField] private Text       matchReconnectMMR = null;
     [SerializeField] private GameObject loadingObject = null;
     [SerializeField] private GameObject errorObject = null;
     [SerializeField] private Text       errorText = null;
-    [SerializeField] private Text       nameText = null;
+                     private Text       nameText = null;
+
+    [SerializeField] private GameObject cardUpgrade = null;
+    [SerializeField] private GameObject cardPurchase = null;
 
     public List<string> readyUserList = new List<string>();
     
@@ -28,6 +31,9 @@ public class MainUI : BaseScreen<MainUI>
         matchReconnectObject.SetActive(false);
         loadingObject.SetActive(false);
         errorObject.SetActive(false);
+
+        cardUpgrade.SetActive(false);
+        cardPurchase.SetActive(false);
 
         BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
@@ -42,7 +48,7 @@ public class MainUI : BaseScreen<MainUI>
             Debug.LogError("닉네임 불러오기 실패");
             name = "test123";
         }
-        nameText.text = name;
+        //nameText.text = name;
     }
 
     public void OpenMatchUI()
@@ -67,6 +73,16 @@ public class MainUI : BaseScreen<MainUI>
             matchReconnectMMR.text = BackEndServerManager.instance.myNickName + " (" + BackEndServerManager.instance.myInfo.mmr.ToString() + ")";
         
         matchReconnectObject.SetActive(state);
+    }
+
+    public void SetCardUpgradeUI(bool state)
+    {
+        cardUpgrade.SetActive(state);
+    }
+
+    public void SetCardPurchaseUI(bool state)
+    {
+        cardPurchase.SetActive(state);
     }
 
     public void CreateRoomResult(bool isSuccess, List<MatchMakingUserInfo> userList = null)

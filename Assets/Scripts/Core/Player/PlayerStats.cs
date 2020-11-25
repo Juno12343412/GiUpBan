@@ -94,31 +94,31 @@ public class PlayerStats : MonoBehaviour
     }
 
     // 인게임에서 사용하는 함수
-    public void CharacterSave(string table = "UserData")
-    {
-        param = new Param();
-        param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
-        param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
-        param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.nowCharacter);
-        param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
+    //public void CharacterSave(string table = "UserData")
+    //{
+    //    param = new Param();
+    //    param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
+    //    param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
+    //    param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.nowCharacter);
+    //    param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
 
-        Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
-    }
+    //    Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
+    //}
 
     // 인게임에서 사용하는 함수
-    public void CharacterLoad(string table = "UserData")
-    {
-        SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
-        {
-            BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
-            for (int i = 0; i < (callback.Rows()[0]["NowCharacter"]["L"]).Count; i++)
-                BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["N"]);
-            for (int i = 0; i < (callback.Rows()[0]["CharacterLevel"]["L"]).Count; i++)
-                BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["CharacterLevel"]["L"][i]["N"]);
-            for (int i = 0; i < (callback.Rows()[0]["LevelExp"]["L"]).Count; i++)
-                BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["LevelExp"]["L"][i]["N"]);
-        });
-    }
+    //public void CharacterLoad(string table = "UserData")
+    //{
+    //    SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
+    //    {
+    //        BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
+    //        for (int i = 0; i < (callback.Rows()[0]["NowCharacter"]["L"]).Count; i++)
+    //            BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["N"]);
+    //        for (int i = 0; i < (callback.Rows()[0]["CharacterLevel"]["L"]).Count; i++)
+    //            BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["CharacterLevel"]["L"][i]["N"]);
+    //        for (int i = 0; i < (callback.Rows()[0]["LevelExp"]["L"]).Count; i++)
+    //            BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["LevelExp"]["L"][i]["N"]);
+    //    });
+    //}
 
     // 게임을 킬 때 사용하는 함수
     public bool Load(string table = "UserData")
