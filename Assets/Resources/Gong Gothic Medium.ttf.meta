@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0afec28938ff3b34080fed29999047e2
+guid: c5ddbb96bcb87274c8839f020a17868b
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -8,9 +8,9 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: KoreanCRISR
+  fontName: Gong Gothic
   fontNames:
-  - KoreanCRISR
+  - Gong Gothic
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
