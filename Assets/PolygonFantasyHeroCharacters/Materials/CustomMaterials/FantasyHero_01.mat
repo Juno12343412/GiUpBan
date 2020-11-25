@@ -4,8 +4,9 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: FantasyHero_01
   m_Shader: {fileID: 4800000, guid: e603b0446c7f2804db0c8dd0fb5c1af0, type: 3}
   m_ShaderKeywords: 
@@ -109,8 +110,8 @@ Material:
     m_Floats:
     - _BodyArt_Amount: 1
     - _Emission: 0
-    - _Metallic: 0
-    - _Smoothness: 0.2
+    - _Metallic: 0.393
+    - _Smoothness: 0.538
     - _Tattoo_Amount: 1
     - __dirty: 0
     m_Colors:
