@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using BackEnd;
 
+public enum CharacterKind : byte
+{
+    나이트 = 0,
+    벤전스,
+    NONE = 99
+}
 
 public class PlayerStats : MonoBehaviour
 {

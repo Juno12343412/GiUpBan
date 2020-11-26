@@ -10,16 +10,6 @@ public class Main : MonoBehaviour
 {
     void Start()
     {
-       
-    }
-
-    void Update()
-    {
-        
-    }
-
-    public void ChangeScene()
-    {
-        Loader.Load(Scene.Game);
+        MainUI.instance.SetShopItems();    
     }
 }

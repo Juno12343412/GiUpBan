@@ -1,29 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class CharacterCard : MonoBehaviour
 {
-
     [SerializeField] private int num = 0;
     [SerializeField] private GameObject UpgradeArrow;
     [SerializeField] private GameObject LevelBase;
     private bool have = false;
 
-    private void Start()
+    void Start()
     {
         LevelBase = transform.GetChild(0).gameObject;
-        UpgradeArrow = LevelBase.transform.GetChild(0).gameObject;
+        UpgradeArrow = LevelBase.transform.GetChild(0).gameObject;  
     }
 
     void FixedUpdate()
     {
-        for (int i = 0; i < BackEndServerManager.instance.myInfo.haveCharacters.Count; i++)
+        foreach (var iter in BackEndServerManager.instance.myInfo.haveCharacters)
         {
-            if (BackEndServerManager.instance.myInfo.haveCharacters[i] == num)
+            if (iter == num)
                 have = true;
         }
+
         if(!have)
         {
             UpgradeArrow.GetComponent<Image>().color = new Color(160f/255f,160f/255f,160f/255f, 255f/255f);

@@ -262,6 +262,7 @@ public partial class BackEndMatchManager : MonoBehaviour
                 if (args.UserInfo.m_nickName.Equals(BackEndServerManager.instance.myNickName))
                 {
                     MainUI.instance.CloseMatchUI();
+                    MainUI.instance.SetJaehwaUI(true);
                     MainUI.instance.RemoveReadyPlayer(args.UserInfo.m_nickName);
                     return;
                 }

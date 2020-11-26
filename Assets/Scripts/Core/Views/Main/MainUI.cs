@@ -8,8 +8,9 @@ using Manager.View;
 using Manager.Scene;
 using Manager.Dispatcher;
 
-public class MainUI : BaseScreen<MainUI>
+public partial class MainUI : BaseScreen<MainUI>
 {
+    [Header("Match")]
     [SerializeField] private GameObject matchlookingObject = null;
     [SerializeField] private GameObject matchFoundObject = null;
     [SerializeField] private GameObject matchReconnectObject = null;
@@ -17,13 +18,16 @@ public class MainUI : BaseScreen<MainUI>
     [SerializeField] private GameObject loadingObject = null;
     [SerializeField] private GameObject errorObject = null;
     [SerializeField] private Text       errorText = null;
-                     private Text       nameText = null;
-                     private int        characterNum = 0;
 
+    [Header("Card")]
     [SerializeField] private GameObject cardUpgrade = null;
     [SerializeField] private GameObject cardPurchase = null;
+                     private int        characterNum = 0;
 
-    public List<string> readyUserList = new List<string>();
+    [Header("Main")]
+    [SerializeField] private GameObject jaehwaObject = null;
+
+    [HideInInspector] public List<string> readyUserList = new List<string>();
     
     void Start()
     {
@@ -39,6 +43,8 @@ public class MainUI : BaseScreen<MainUI>
         BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
         SetNickName();
+
+        Init();
     }
 
     private void SetNickName()
@@ -68,6 +74,11 @@ public class MainUI : BaseScreen<MainUI>
         MatchCancelCallback();
     }
 
+    public void SetJaehwaUI(bool state)
+    {
+        jaehwaObject.SetActive(state);
+    }
+
     public void SetReconnectUI(bool state)
     {
         if (state)
@@ -86,11 +97,6 @@ public class MainUI : BaseScreen<MainUI>
         characterNum = num;
     }
 
-    public void SetCardPurchaseUI(bool state)
-    {
-        cardPurchase.SetActive(state);
-    }
-
     public void CreateRoomResult(bool isSuccess, List<MatchMakingUserInfo> userList = null)
     {
         // 대기 방 생성에 성공 시 대기방 UI를 활성화 시키고,
@@ -98,6 +104,7 @@ public class MainUI : BaseScreen<MainUI>
         {
             Debug.Log("방 생성 성공 !");
             loadingObject.SetActive(false);
+            SetJaehwaUI(false);
             ResetReadyPlayer();
             AddReadyPlayer(BackEndServerManager.instance.myNickName);
             ResetMatchRoom(userList);
@@ -215,16 +222,6 @@ public class MainUI : BaseScreen<MainUI>
             else
                 Debug.Log("실패 !");
         });
-    }
-
-    public override void ShowScreen()
-    {
-        base.ShowScreen();
-    }
-
-    public override void HideScreen()
-    {
-        base.HideScreen();
     }
 
     //public void GamePvpStart()
