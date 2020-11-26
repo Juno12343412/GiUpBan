@@ -27,8 +27,7 @@ public enum PlayerDirection : sbyte
 public class PlayerScript : PoolingObject
 {
     #region 플레이어 관련 변수들
-    [SerializeField]
-    private GameObject[] CharactersPrefab = null;
+    public GameObject[] CharactersPrefab = null;
     [SerializeField]
     private PlayerStats.Player stats = new PlayerStats.Player();
     public PlayerStats.Player Stats { get { return stats; } }
@@ -124,7 +123,7 @@ public class PlayerScript : PoolingObject
         this.index = index;
         this.nickName = nickName;
 
-        Anim = CharactersPrefab[stats.nowCharacter].GetComponent<Animator>();
+        //Anim = CharactersPrefab[stats.nowCharacter].GetComponent<Animator>();
 
         if (this.isMe)
         {
@@ -135,14 +134,14 @@ public class PlayerScript : PoolingObject
                 prefab.SetActive(false);
             }
 
-            CharactersPrefab[stats.nowCharacter].SetActive(true);
+            //CharactersPrefab[stats.nowCharacter].SetActive(true);
             
             stats = BackEndServerManager.instance.myInfo;
 
             Debug.Log("현재 캐릭터들 개수 : " + stats.charactersLevel[stats.nowCharacter]);
             Debug.Log("현재 캐릭터 : " + stats.nowCharacter);
 
-            if (stats.charactersLevel[stats.nowCharacter] == 0)
+            if (stats.charactersLevel[stats.nowCharacter] == 1)
             {
                 stats.MaxHp = stats.pMaxHp[stats.nowCharacter];
                 stats.Stamina = stats.pStamina[stats.nowCharacter];
@@ -150,7 +149,7 @@ public class PlayerScript : PoolingObject
                 stats.Damage = stats.pDamage[stats.nowCharacter];
                 stats.Penetration = stats.pPenetration[stats.nowCharacter];
             }
-            else if(stats.charactersLevel[stats.nowCharacter] >= 1)
+            else if(stats.charactersLevel[stats.nowCharacter] >= 2)
             {
                 stats.MaxHp = stats.pMaxHp[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
                 stats.Stamina = stats.pStamina[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);

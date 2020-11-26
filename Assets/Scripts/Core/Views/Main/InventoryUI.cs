@@ -170,5 +170,6 @@ public partial class MainUI : BaseScreen<MainUI>
     public void CharacterChange()
     {
         BackEndServerManager.instance.myInfo.nowCharacter = curSelectCard;
+        cardUpgrade.SetActive(false);
     }
 }

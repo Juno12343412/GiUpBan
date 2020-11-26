@@ -361,6 +361,9 @@ public partial class BackEndMatchManager : MonoBehaviour
             else
             {
                 Debug.Log("게임 결과 업로드 실패 : " + args.ErrInfo);
+                LeaveInGameRoom();
+                GameUI.instance.ShowResultBoard(matchGameResult);
+                GameManager.instance.ChangeState(GameManager.GameState.Result);
             }
             // 세션리스트 초기화
             sessionIdList = null;
