@@ -10,7 +10,7 @@ public class CharacterCard : MonoBehaviour
 
     void Start()
     {
-        LevelBase = transform.GetChild(0).gameObject;
+        LevelBase = transform.GetChild(1).gameObject;
         UpgradeArrow = LevelBase.transform.GetChild(0).gameObject;  
     }
 

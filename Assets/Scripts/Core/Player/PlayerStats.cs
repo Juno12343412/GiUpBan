@@ -8,6 +8,7 @@ public enum CharacterKind : byte
 {
     나이트 = 0,
     벤전스,
+    막시무스한,
     NONE = 99
 }
 
@@ -56,7 +57,7 @@ public class PlayerStats : MonoBehaviour
 
     public void Add(string table = "UserData")
     {
-        BackEndServerManager.instance.myInfo.haveCharacters.Add(1);
+        BackEndServerManager.instance.myInfo.haveCharacters.Add(0);
         BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
         BackEndServerManager.instance.myInfo.levelExp.Add(0);
 
@@ -95,42 +96,12 @@ public class PlayerStats : MonoBehaviour
         param = new Param();
         param.Add("Score", BackEndServerManager.instance.myInfo.mmr);
         Backend.GameSchemaInfo.Update("MMR", BackEndServerManager.instance.myIndate, param);
-
-        Debug.Log(BackEndServerManager.instance.myInfo.charactersLevel[0]);
     }
 
-    // 인게임에서 사용하는 함수
-    //public void CharacterSave(string table = "UserData")
-    //{
-    //    param = new Param();
-    //    param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
-    //    param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
-    //    param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.nowCharacter);
-    //    param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
-
-    //    Backend.GameInfo.Update(table, BackEndServerManager.instance.myIndate, param);
-    //}
-
-    // 인게임에서 사용하는 함수
-    //public void CharacterLoad(string table = "UserData")
-    //{
-    //    SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
-    //    {
-    //        BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"]);
-    //        for (int i = 0; i < (callback.Rows()[0]["NowCharacter"]["L"]).Count; i++)
-    //            BackEndServerManager.instance.myInfo.haveCharacters[i] = Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["N"]);
-    //        for (int i = 0; i < (callback.Rows()[0]["CharacterLevel"]["L"]).Count; i++)
-    //            BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["CharacterLevel"]["L"][i]["N"]);
-    //        for (int i = 0; i < (callback.Rows()[0]["LevelExp"]["L"]).Count; i++)
-    //            BackEndServerManager.instance.myInfo.charactersLevel[i] = Convert.ToInt32(callback.Rows()[0]["LevelExp"]["L"][i]["N"]);
-    //    });
-    //}
-
+   
     // 게임을 킬 때 사용하는 함수
-    public bool Load(string table = "UserData")
+    public void Load(string table = "UserData")
     {
-        bool state = false;
-
         SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 8, callback =>
         {
             if (callback.IsSuccess())
@@ -172,14 +143,21 @@ public class PlayerStats : MonoBehaviour
 
                         var errorLog = string.Format("로드완료 !\n이름 : {0}\n골드 : {1}\n광고 : {2}\nMMR : {3}", BackEndServerManager.instance.myNickName, BackEndServerManager.instance.myInfo.gold, BackEndServerManager.instance.myInfo.ads, BackEndServerManager.instance.myInfo.mmr);
                         Debug.Log(errorLog);
-
-                        state = true;
                     }
-                    else state = false;
                 });
             }
-            else state = false;
+            else
+            {
+                Debug.Log("로드 정보 실패");
+                Add();
+            }
         });
-        return state;
+    }
+
+    public void SaveMMR()
+    {
+        param = new Param();
+        param.Add("Score", BackEndServerManager.instance.myInfo.mmr);
+        Backend.GameSchemaInfo.Update("MMR", BackEndServerManager.instance.myIndate, param);
     }
 }

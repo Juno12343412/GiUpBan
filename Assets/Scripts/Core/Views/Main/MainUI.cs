@@ -5,8 +5,6 @@ using UnityEngine.UI;
 using BackEnd.Tcp;
 using BackEnd;
 using Manager.View;
-using Manager.Scene;
-using Manager.Dispatcher;
 
 public partial class MainUI : BaseScreen<MainUI>
 {
@@ -22,7 +20,9 @@ public partial class MainUI : BaseScreen<MainUI>
     [Header("Card")]
     [SerializeField] private GameObject cardUpgrade = null;
     [SerializeField] private GameObject cardPurchase = null;
-                     private int        characterNum = 0;
+
+    [Header("Chest")]
+    [SerializeField] private GameObject chestOpenObject = null;
 
     [Header("Main")]
     [SerializeField] private GameObject jaehwaObject = null;
@@ -44,7 +44,8 @@ public partial class MainUI : BaseScreen<MainUI>
         BackEndMatchManager.instance.HandlerSetting();
         SetNickName();
 
-        Init();
+        InventoryInit();
+        ShopInit();
     }
 
     private void SetNickName()
@@ -85,16 +86,6 @@ public partial class MainUI : BaseScreen<MainUI>
             matchReconnectMMR.text = BackEndServerManager.instance.myNickName + " (" + BackEndServerManager.instance.myInfo.mmr.ToString() + ")";
         
         matchReconnectObject.SetActive(state);
-    }
-
-    public void SetCardUpgradeUI(bool state)
-    {
-        cardUpgrade.SetActive(state);
-    }
-
-    public void SetCardUpgradeUiNum(int num)
-    {
-        characterNum = num;
     }
 
     public void CreateRoomResult(bool isSuccess, List<MatchMakingUserInfo> userList = null)
@@ -213,24 +204,14 @@ public partial class MainUI : BaseScreen<MainUI>
         GameManager.instance.ChangeState(GameManager.GameState.Login);
     }
 
-    public void OpenChest()
-    {
-        SendQueue.Enqueue(Backend.Probability.GetProbability, "634", callback =>
-        {
-            if (callback.IsSuccess())
-                Debug.Log(callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString());
-            else
-                Debug.Log("실패 !");
-        });
-    }
-
-    //public void GamePvpStart()
+    //public void OpenChest()
     //{
-    //    Loader.Load(Scene.Game);
+    //    SendQueue.Enqueue(Backend.Probability.GetProbability, "634", callback =>
+    //    {
+    //        if (callback.IsSuccess())
+    //            Debug.Log(callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString());
+    //        else
+    //            Debug.Log("실패 !");
+    //    });
     //}
-
-    public void CharacterChange()
-    {
-        BackEndServerManager.instance.myInfo.nowCharacter = characterNum;
-    }
 }

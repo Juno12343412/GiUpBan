@@ -36,6 +36,8 @@ public class GameUI : BaseScreen<GameUI>
             if (BackEndMatchManager.instance.IsMySessionId(user))
             {
                 BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
+                Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
+                PlayerStats.instance.SaveMMR();
             }
         }
 
@@ -45,6 +47,8 @@ public class GameUI : BaseScreen<GameUI>
             if (BackEndMatchManager.instance.IsMySessionId(user))
             {
                 BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
+                Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
+                PlayerStats.instance.SaveMMR();
             }
         }
         ShowScreen();
