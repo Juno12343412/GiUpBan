@@ -1,17 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Manager.View;
 
-public class GoldUI : BaseScreen<GoldUI>
+public partial class MainUI : BaseScreen<MainUI>
 {
-    public override void ShowScreen()
-    {
-        base.ShowScreen();
-    }
+    [Header("JaeHwa")]
+    [SerializeField] private Text goldText = null;
+    [SerializeField] private Text diamondText = null;
 
-    public override void HideScreen()
+    public void SetGoldUI()
     {
-        base.HideScreen();
+        goldText.text = BackEndServerManager.instance.myInfo.gold.ToString();
+        diamondText.text = "0";
     }
 }

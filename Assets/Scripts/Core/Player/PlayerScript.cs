@@ -123,10 +123,9 @@ public class PlayerScript : PoolingObject
         this.index = index;
         this.nickName = nickName;
 
-
         if (this.isMe)
         {
-            Anim = CharactersPrefab[stats.nowCharacter].GetComponent<Animator>();
+            //Anim = CharactersPrefab[stats.nowCharacter].GetComponent<Animator>();
 
             // 여기다가 자기 자신 캐릭터에 따라 캐릭터 레벨에 따라 스탯 변경되는거 넣기
             // ...
@@ -134,14 +133,12 @@ public class PlayerScript : PoolingObject
             {
                 prefab.SetActive(false);
             }
-            CharactersPrefab[stats.nowCharacter].SetActive(true);
-
             //CharactersPrefab[stats.nowCharacter].SetActive(true);
 
             stats = BackEndServerManager.instance.myInfo;
 
-            Debug.Log("현재 캐릭터들 개수 : " + stats.charactersLevel[stats.nowCharacter]);
-            Debug.Log("현재 캐릭터 : " + stats.nowCharacter);
+            //Debug.Log("현재 캐릭터들 개수 : " + stats.charactersLevel[stats.nowCharacter]);
+            //Debug.Log("현재 캐릭터 : " + stats.nowCharacter);
 
             if (stats.charactersLevel[stats.nowCharacter] == 1)
             {
@@ -163,7 +160,7 @@ public class PlayerScript : PoolingObject
             State = PlayerCurState.IDLE;
 
             Direction = Direction.NONE;
-            StartCoroutine(CR_StaminaHeal());
+            //StartCoroutine(CR_StaminaHeal());
         }
 
         isLive = true;

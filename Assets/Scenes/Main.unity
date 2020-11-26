@@ -218,6 +218,16 @@ PrefabInstance:
       propertyPath: chestOpenObject
       value: 
       objectReference: {fileID: 115326422}
+    - target: {fileID: 2034639674419883760, guid: cdfaf6f64f2bc4e4abc01b3c920fb5ea,
+        type: 3}
+      propertyPath: goldText
+      value: 
+      objectReference: {fileID: 489362121}
+    - target: {fileID: 2034639674419883760, guid: cdfaf6f64f2bc4e4abc01b3c920fb5ea,
+        type: 3}
+      propertyPath: diamondText
+      value: 
+      objectReference: {fileID: 489362120}
     - target: {fileID: 2034639674419883761, guid: cdfaf6f64f2bc4e4abc01b3c920fb5ea,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -351,6 +361,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa1f898b0eecf1f4da45cd2a5920b717, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &489362120 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8660922234504630141, guid: cdfaf6f64f2bc4e4abc01b3c920fb5ea,
+    type: 3}
+  m_PrefabInstance: {fileID: 489362117}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &489362121 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 21310703197674521, guid: cdfaf6f64f2bc4e4abc01b3c920fb5ea,
+    type: 3}
+  m_PrefabInstance: {fileID: 489362117}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &705507993
