@@ -482,8 +482,8 @@ public class WorldPackage : MonoBehaviour
         players[mySyncMessage.session].Stats.StaminaM = mySyncMessage.StaminaM;
         players[mySyncMessage.session].Stats.Damage = mySyncMessage.Damage;
         players[mySyncMessage.session].Stats.Penetration = mySyncMessage.Penetration;
-        players[mySyncMessage.session].CharactersPrefab[players[mySyncMessage.session].Stats.nowCharacter].SetActive(true);
-        players[mySyncMessage.session].Anim = players[mySyncMessage.session].CharactersPrefab[players[mySyncMessage.session].Stats.nowCharacter].GetComponent<Animator>();
+        //players[mySyncMessage.session].CharactersPrefab[players[mySyncMessage.session].Stats.nowCharacter].SetActive(true);
+        //players[mySyncMessage.session].Anim = players[mySyncMessage.session].CharactersPrefab[players[mySyncMessage.session].Stats.nowCharacter].GetComponent<Animator>();
     }
 
     private void ProcessCalData(CalculationMessage calMessage)

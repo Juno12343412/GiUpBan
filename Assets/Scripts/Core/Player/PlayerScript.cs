@@ -123,19 +123,21 @@ public class PlayerScript : PoolingObject
         this.index = index;
         this.nickName = nickName;
 
-        //Anim = CharactersPrefab[stats.nowCharacter].GetComponent<Animator>();
 
         if (this.isMe)
         {
+            Anim = CharactersPrefab[stats.nowCharacter].GetComponent<Animator>();
+
             // 여기다가 자기 자신 캐릭터에 따라 캐릭터 레벨에 따라 스탯 변경되는거 넣기
             // ...
             foreach (var prefab in CharactersPrefab)
             {
                 prefab.SetActive(false);
             }
+            CharactersPrefab[stats.nowCharacter].SetActive(true);
 
             //CharactersPrefab[stats.nowCharacter].SetActive(true);
-            
+
             stats = BackEndServerManager.instance.myInfo;
 
             Debug.Log("현재 캐릭터들 개수 : " + stats.charactersLevel[stats.nowCharacter]);

@@ -123,7 +123,7 @@ public class PlayerStats : MonoBehaviour
                     BackEndServerManager.instance.myInfo.levelExp.Add(Convert.ToInt32(callback.Rows()[0]["LevelExp"]["L"][i]["N"].ToString()));
 
                 // 모든 캐릭터 정보
-                SendQueue.Enqueue(Backend.Chart.GetChartContents, "10947", callback2 =>
+                SendQueue.Enqueue(Backend.Chart.GetChartContents, "10949", callback2 =>
                 {
                     if (callback2.IsSuccess())
                     {
@@ -133,10 +133,10 @@ public class PlayerStats : MonoBehaviour
                             BackEndServerManager.instance.myInfo.pName.Add(callback2.GetReturnValuetoJSON()["rows"][i]["Name"]["S"].ToString());
                             BackEndServerManager.instance.myInfo.pMaxHp.Add(Convert.ToDouble(callback2.GetReturnValuetoJSON()["rows"][i]["Hp"]["S"].ToString()));
                             BackEndServerManager.instance.myInfo.pCurHp.Add(BackEndServerManager.instance.myInfo.pMaxHp[i]);
-                            //BackEndServerManager.instance.myInfo.pStamina.Add(Convert.ToDouble(callback2.GetReturnValuetoJSON()["rows"][i]["Stamina"]["S"].ToString()));
+                            BackEndServerManager.instance.myInfo.pStamina.Add(Convert.ToDouble(callback2.GetReturnValuetoJSON()["rows"][i]["Stamina"]["S"].ToString()));
                             BackEndServerManager.instance.myInfo.pStaminaM.Add(Convert.ToDouble(callback2.GetReturnValuetoJSON()["rows"][i]["StaminaM"]["S"].ToString()));
                             BackEndServerManager.instance.myInfo.pDamage.Add(Convert.ToDouble(callback2.GetReturnValuetoJSON()["rows"][i]["Damage"]["S"].ToString()));
-                            //BackEndServerManager.instance.myInfo.pPenetration.Add(Convert.ToDouble(callback2.GetReturnValuetoJSON()["rows"][i]["Penetration"]["S"].ToString()));
+                            BackEndServerManager.instance.myInfo.pPenetration.Add(Convert.ToDouble(callback2.GetReturnValuetoJSON()["rows"][i]["Penetration"]["S"].ToString()));
                         }
 
                         SendQueue.Enqueue(Backend.GameSchemaInfo.Get, "MMR", BackEndServerManager.instance.myIndate, callback3 =>
