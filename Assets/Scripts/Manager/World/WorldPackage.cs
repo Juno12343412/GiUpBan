@@ -11,6 +11,7 @@ using Manager.Pooling;
 public class WorldPackage : MonoBehaviour
 {
     [SerializeField] private Image[] hpImages = null;
+    [SerializeField] private Image[] staminaImages = null;
 
     static public WorldPackage instance;
 
@@ -372,6 +373,9 @@ public class WorldPackage : MonoBehaviour
         Debug.Log("넣은후 체력" + players[data.playerSession].Stats.CurHp);
         hpImages[1].fillAmount = (float)(players[otherPlayerIndex].Stats.CurHp / players[otherPlayerIndex].Stats.MaxHp);
         hpImages[0].fillAmount = (float)(players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
+        staminaImages[1].fillAmount = (float)(players[otherPlayerIndex].Stats.Stamina / 100);
+        staminaImages[0].fillAmount = (float)(players[myPlayerIndex].Stats.Stamina / 100);
+        
     }
 
     public void OnRecieveForLocal(KeyMessage msg)

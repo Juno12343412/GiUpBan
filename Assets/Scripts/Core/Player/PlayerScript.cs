@@ -270,7 +270,7 @@ public class PlayerScript : PoolingObject
     {
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 10))
         {                       
-            stats.Stamina -= 10;
+            stats.Stamina -= stats.StaminaM;
             State = PlayerCurState.WEAK_ATTACK;
 
             if (BackEndMatchManager.instance.isHost)
@@ -294,7 +294,7 @@ public class PlayerScript : PoolingObject
         isSwipe = true;
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 20))
         {                
-            stats.Stamina -= 20;
+            stats.Stamina -= stats.StaminaM * 1.5f;
             State = PlayerCurState.STRONG_ATTACK;
 
             if (BackEndMatchManager.instance.isHost)
@@ -325,8 +325,8 @@ public class PlayerScript : PoolingObject
             }
             else
             {
-                PlayerStrongAttackMessage strongMsg = new PlayerStrongAttackMessage(index, Direction);
-                BackEndMatchManager.instance.SendDataToInGame(strongMsg);
+                PlayerDefenseMessage defenceMsg = new PlayerDefenseMessage(index, Direction);
+                BackEndMatchManager.instance.SendDataToInGame(defenceMsg);
             }
         }
     } // 긴 터치
