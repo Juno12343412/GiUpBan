@@ -40,7 +40,7 @@ public partial class MainUI : BaseScreen<MainUI>
         cardUpgrade.SetActive(false);
         cardPurchase.SetActive(false);
 
-        BackEndMatchManager.instance.JoinMatchServer();
+        //BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
         SetNickName();
 
