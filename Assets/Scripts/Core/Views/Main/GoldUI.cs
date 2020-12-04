@@ -13,6 +13,6 @@ public partial class MainUI : BaseScreen<MainUI>
     public void SetGoldUI()
     {
         goldText.text = BackEndServerManager.instance.myInfo.gold.ToString();
-        diamondText.text = "0";
+        diamondText.text = BackEndServerManager.instance.myInfo.diamond.ToString();
     }
 }

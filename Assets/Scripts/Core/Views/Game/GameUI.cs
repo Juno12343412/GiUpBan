@@ -30,6 +30,8 @@ public class GameUI : BaseScreen<GameUI>
     public void ShowResultBoard(MatchGameResult matchGameResult)
     {
         Debug.Log("Result Board : " + matchGameResult != null);
+        BackEndMatchManager.instance.GetMyMatchRecord((int)BackEndMatchManager.instance.nowMatchType, null);
+
         foreach (var user in matchGameResult.m_winners)
         {
             winnerText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user) + " (" + BackEndMatchManager.instance.GetMMRBySessionId(user) + ")";
@@ -37,7 +39,6 @@ public class GameUI : BaseScreen<GameUI>
             {
                 BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
                 Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
-                PlayerStats.instance.SaveMMR();
             }
         }
 
@@ -48,9 +49,9 @@ public class GameUI : BaseScreen<GameUI>
             {
                 BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
                 Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
-                PlayerStats.instance.SaveMMR();
             }
         }
+        PlayerStats.instance.SaveMMR();
         ShowScreen();
     }
 

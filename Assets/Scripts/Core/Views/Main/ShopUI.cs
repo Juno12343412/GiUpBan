@@ -4,6 +4,30 @@ using UnityEngine;
 using Manager.View;
 using UnityEngine.UI;
 
+public enum ChestKind : byte
+{
+    한승우,
+    조셉트,
+    폴,
+    브론즈,
+    실버,
+    골드,
+    굿,
+    예아,
+    NONE = 99
+}
+
+[System.Serializable]
+public class DiamondChest
+{
+    public GameObject obj = null;  // 상자 오브젝트
+    public Image chestImage = null; // 상자 이미지
+    public Text chestNameText = null, chestArenaText = null;
+    public Text chestPriceText = null;
+    public int chestPrice = 100; // 상자 가격
+    public ChestKind chestKind = 0; // 상자 종류
+}
+
 [System.Serializable]
 public class Item
 {
@@ -22,22 +46,26 @@ public partial class MainUI : BaseScreen<MainUI>
 {
     // Product
     [Header("Product")]
-    // 캐릭터 스프라이트
-    [SerializeField] private Sprite[] characterImgs = null;
+    [SerializeField] private Sprite[] characterImgs = null; // 캐릭터 스프라이트
+    [SerializeField] private Item[] items = null; // 상점에 배치되어 있는 아이템들
+    int curSelectItem = 0; // 현재 고른 아이템
 
-    // 상점에 배치되어 있는 아이템들
-    [SerializeField] private Item[] items = null;
-
-    // 현재 고른 아이템
-    int curSelectItem = 0;
+    [SerializeField] private Sprite[] chestImgs = null; // 상자 스프라이트
+    [SerializeField] private DiamondChest[] chests = null; // 상점에 배치되어 있는 상자들
+    int curSelectChest = 0; // 현재 고른 상자
     // Product
 
     // Purchase
     [Header("Purchase")]
-    [SerializeField] private Image purchaseCharacterImg = null;
+    [SerializeField] private Image purchaseCharacterImg = null; 
     [SerializeField] private Text itemNameText = null, itemCountText = null;
     [SerializeField] private Text itemPriceText = null;
     [SerializeField] private GameObject hideObj = null;
+
+    [SerializeField] private Image purchaseChestImg = null;
+    [SerializeField] private Text chestArenaText = null, chestKindText = null;
+    [SerializeField] private Text chestGoldText = null, chestCardText = null;
+    [SerializeField] private Text chestPriceText = null;
     // Purchase
 
     void ShopInit()
@@ -49,6 +77,14 @@ public partial class MainUI : BaseScreen<MainUI>
             item.itemNameText = item.obj.transform.GetChild(2).GetComponent<Text>();
             item.itemCountText = item.obj.transform.GetChild(3).GetComponent<Text>();
             item.itemPriceText = item.obj.transform.GetChild(4).GetComponent<Text>();
+        }
+
+        foreach (var chest in chests)
+        {
+            chest.chestImage = chest.obj.transform.GetChild(0).GetComponent<Image>();
+            chest.chestNameText = chest.obj.transform.GetChild(1).GetComponent<Text>();
+            chest.chestPriceText = chest.obj.transform.GetChild(2).GetComponent<Text>();
+            chest.chestArenaText = chest.obj.transform.GetChild(3).GetComponent<Text>();
         }
     }
 
@@ -69,8 +105,8 @@ public partial class MainUI : BaseScreen<MainUI>
             else
             {
                 item.hideObj.SetActive(false);
-                item.itemCountText.text = item.itemCount + "/" + item.itemMaxCount;
-                item.itemPriceText.text = item.itemPrice.ToString();
+                item.itemCountText.text = "x" + item.itemMaxCount;
+                item.itemPriceText.text = item.itemPrice.ToString() + "C";
             }
             item.itemNameText.text = ((CharacterKind)item.itemKind).ToString();
         }
@@ -78,7 +114,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
     // 카드 구매
     // 카드가 다 소모되면 회색으로 바꿔주고 카드 줄여주기
-    public void PurchaseItem(int index)
+    public void PurchaseItem()
     {
         //if (BackEndServerManager.instance.myInfo.gold >= items[index].itemPrice)
         //{
@@ -92,35 +128,48 @@ public partial class MainUI : BaseScreen<MainUI>
         {
             Debug.Log("캐릭터 있음");
 
-            BackEndServerManager.instance.myInfo.gold -= items[index].itemPrice;
-            BackEndServerManager.instance.myInfo.levelExp[items[index].itemKind] += items[index].itemCount;
-            items[index].itemCount = 0;
-            ShowShop();
+            BackEndServerManager.instance.myInfo.gold -= items[curSelectItem].itemPrice;
+            BackEndServerManager.instance.myInfo.levelExp[items[curSelectItem].itemKind] += items[curSelectItem].itemCount;
+            items[curSelectItem].itemCount = 0;
         }
         else
         {
-            Debug.Log("캐릭터 없음 : " + items[index].itemKind);
+            Debug.Log("캐릭터 없음 : " + items[curSelectItem].itemKind);
 
             BackEndServerManager.instance.myInfo.haveCharacters.Add(items[curSelectItem].itemKind);
             BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
             BackEndServerManager.instance.myInfo.levelExp.Add(-1);
-            BackEndServerManager.instance.myInfo.gold -= items[index].itemPrice;
+            BackEndServerManager.instance.myInfo.gold -= items[curSelectItem].itemPrice;
 
             var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == items[curSelectItem].itemKind);
-            BackEndServerManager.instance.myInfo.levelExp[value] += items[index].itemCount;
-            items[index].itemCount = 0;
-            ShowShop();
+            BackEndServerManager.instance.myInfo.levelExp[value] += items[curSelectItem].itemCount;
+            items[curSelectItem].itemCount = 0;
         }
+        ShowShop();
         SetInventory();
+        
+        BackEndServerManager.instance.myInfo.cardKind[curSelectItem] = items[curSelectItem].itemKind;
+        BackEndServerManager.instance.myInfo.cardCount[curSelectItem] = items[curSelectItem].itemCount;
+
+        SetGoldUI();
     }
 
-    // 상점 아이템 재설정
+    // 상점 아이템 설정
     public void SetShopItems()
     {
         hideObj.SetActive(false);
 
+        BackEndServerManager.instance.myInfo.cardKind.Clear();
+        BackEndServerManager.instance.myInfo.cardCount.Clear();
+        BackEndServerManager.instance.myInfo.cardKind.InsertRange(index: 0, collection: new List<int>() { 99, 99, 99 });
+        BackEndServerManager.instance.myInfo.cardCount.InsertRange(index: 0, collection: new List<int>() { 99, 99, 99 });
+
+        int index = 0;
+
         foreach(var item in items)
         {
+            Debug.Log(index);
+
             // 이미지 설정하는 코드 추가 [...]
             item.itemKind = Random.Range(0, 3);
 
@@ -131,11 +180,59 @@ public partial class MainUI : BaseScreen<MainUI>
 
             item.hideObj.SetActive(false);
             item.itemNameText.text = ((CharacterKind)item.itemKind).ToString();
-            item.itemCountText.text = item.itemMaxCount + "x";
+            item.itemCountText.text = "x" + item.itemMaxCount;
             item.itemPriceText.text = item.itemPrice.ToString() + "C";
 
             item.itemImage.sprite = characterImgs[0];
+
+            BackEndServerManager.instance.myInfo.cardKind[index] = item.itemKind;
+            BackEndServerManager.instance.myInfo.cardCount[index] = item.itemCount;
+
+            index++;
         }
+
+        foreach (var chest in chests)
+        {
+            chest.chestPrice = ((int)chest.chestKind + 1) * 10;
+
+            chest.chestNameText.text = chest.chestKind.ToString() + " 상자";
+            chest.chestPriceText.text = chest.chestPrice + "D";
+            // 아레나 설정 , 상자 이미지 설정 추가
+        }
+    }
+
+    // 상점 아이템 재설정
+    public void ResetShopItems()
+    {
+        hideObj.SetActive(false);
+
+        for (int i = 0; i < items.Length; i++)
+        {
+            items[i].itemKind = BackEndServerManager.instance.myInfo.cardKind[i];
+
+            items[i].itemMaxCount = BackEndServerManager.instance.myInfo.cardCount[i];
+            items[i].itemCount = items[i].itemMaxCount;
+
+            items[i].itemPrice = items[i].itemMaxCount * 10;
+
+            items[i].hideObj.SetActive(false);
+            items[i].itemNameText.text = ((CharacterKind)items[i].itemKind).ToString();
+            items[i].itemCountText.text = "x" + items[i].itemMaxCount;
+            items[i].itemPriceText.text = items[i].itemPrice.ToString() + "C";
+
+            items[i].itemImage.sprite = characterImgs[0];
+        }
+
+        foreach (var chest in chests)
+        {
+            chest.chestPrice = ((int)chest.chestKind + 1) * 10;
+
+            chest.chestNameText.text = chest.chestKind.ToString() + " 상자";
+            chest.chestPriceText.text = chest.chestPrice + "D";
+            // 아레나 설정 , 상자 이미지 설정 추가
+        }
+
+        ShowShop();
     }
 
     public void OpenPurchaseUI(int index)
@@ -146,7 +243,7 @@ public partial class MainUI : BaseScreen<MainUI>
             hideObj.SetActive(false);
             purchaseCharacterImg.sprite = characterImgs[0];
             itemNameText.text = ((CharacterKind)items[index].itemKind).ToString();
-            itemCountText.text = items[index].itemCount + "x";
+            itemCountText.text = "x" + items[index].itemCount;
             itemPriceText.text = items[index].itemPrice.ToString() + "C";
 
             cardPurchase.SetActive(true);
@@ -158,9 +255,46 @@ public partial class MainUI : BaseScreen<MainUI>
         cardPurchase.SetActive(false);
     }
 
-    public void OnPurchaseItem()
+    // 상자 구매
+    public void PurchaseChest()
     {
-        PurchaseItem(curSelectItem);
+        // 상자 열기
+        OpenDiamondChest(chests[curSelectChest].chestKind);
+    }
+
+    public void OpenPurchaseChestUI(int index)
+    {
+        curSelectChest = index;
+
+        chestKindText.text = chests[index].chestKind.ToString() + " 상자";
+        chestPriceText.text = chests[index].chestPrice + "D";
+
+        diamondChestDisObject.SetActive(true);
+    }
+
+    public void ClosePurchaseChestUI()
+    {
+        diamondChestDisObject.SetActive(false);
+    }
+
+    public IEnumerator CheckingDay()
+    {
+        System.DateTime midnight = new System.DateTime(System.DateTime.Now.Year, System.DateTime.Now.Month, System.DateTime.Now.Day);
+        midnight.AddDays(1);
+        Debug.Log("날짜 체크 시작 : " + (midnight - System.DateTime.Now).Hours);
+
+        while (GameManager.instance.gameState == GameManager.GameState.MatchLobby && (midnight - System.DateTime.Now).Hours <= 0)
+        {
+            System.TimeSpan timeCal = midnight - System.DateTime.Now;
+
+            if (timeCal.Hours >= 0)
+            {
+                // 자정이 되어서 아이템 초기화
+                SetShopItems();
+                break;
+            }
+            yield return new WaitForSeconds(100f);
+        }
     }
 }
 

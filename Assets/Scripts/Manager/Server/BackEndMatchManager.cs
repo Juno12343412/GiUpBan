@@ -478,14 +478,14 @@ public partial class BackEndMatchManager : MonoBehaviour
             if (!callback.IsSuccess())
             {
                 Debug.LogError("매칭 기록 조회 실패\n" + callback);
-                func(record, false);
+                func?.Invoke(record, false);
                 return;
             }
 
             if (callback.Rows().Count <= 0)
             {
                 Debug.Log("매칭 기록이 존재하지 않습니다.\n" + callback);
-                func(record, true);
+                func?.Invoke(record, true);
                 return;
             }
             var data = callback.Rows()[0];
@@ -511,8 +511,8 @@ public partial class BackEndMatchManager : MonoBehaviour
             record.numOfMatch = numOfMatch;
             record.winRate = Math.Round(((float)win / numOfMatch) * 100 * 100) / 100;
             record.score = point;
-
-            func(record, true);
+            
+            func?.Invoke(record, true);
         });
     }
 

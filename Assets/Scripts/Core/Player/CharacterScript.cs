@@ -25,13 +25,10 @@ public class CharacterScript : MonoBehaviour
     public void AttackPointFalse()
     {
         playerScript.AttackPointFalse();
-
     }
-
     public void CancelTrue()
     {
         playerScript.CancelTrue();
-
     }
     public void CancelFalse()
     {
@@ -41,7 +38,6 @@ public class CharacterScript : MonoBehaviour
     public void AnimationReset()
     {
         playerScript.AnimationReset();
-
     }
 }
 

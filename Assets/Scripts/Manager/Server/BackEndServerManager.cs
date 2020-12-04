@@ -22,19 +22,13 @@ public class BackEndServerManager : MonoBehaviour
     public string myIndate { get; private set; } = string.Empty;    // 로그인한 계정의 inDate
 
     public PlayerStats.Player myInfo = new PlayerStats.Player();
+    public string myUserDataIndate { get; set; } = string.Empty;
+    public string myMMRDataIndate { get; set; } = string.Empty;
+    public string myChestDataIndate { get; set; } = string.Empty;
+    public string myCardDataIndate { get; set; } = string.Empty;
 
     private Action<bool, string> loginSuccessFunc = null;
     private const string BackendError = "statusCode : {0}\nErrorCode : {1}\nMessage : {2}";
-
-    //void Awake()
-    //{
-    //    if (instance != null)
-    //    {
-    //        Destroy(instance);
-    //    }
-    //    instance = this;
-    //    DontDestroyOnLoad(gameObject);
-    //}
 
     /*
 	 * 서버 초기화
@@ -181,6 +175,11 @@ public class BackEndServerManager : MonoBehaviour
     void Update()
     {
         Poll();
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            BackEndMatchManager.instance.GetMyMatchRecord(1, null);
+        }
     }
 
     public void GuestLogin(Action<bool, string> func)

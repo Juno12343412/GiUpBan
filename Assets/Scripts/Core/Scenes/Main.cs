@@ -10,7 +10,6 @@ public class Main : MonoBehaviour
 {
     void Start()
     {
-        MainUI.instance.SetShopItems();
         MainUI.instance.SetGoldUI();
     }
 }

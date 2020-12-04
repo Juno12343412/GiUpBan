@@ -114,6 +114,8 @@ public partial class MainUI : BaseScreen<MainUI>
     // 모든 카드 관련 이벤트가 발생했을 때 호출하는 함수
     public void SetInventory()
     {
+        Debug.Log("인벤토리 설정");
+        
         int index = 0;
         foreach (var card in cards)
         {
@@ -162,7 +164,6 @@ public partial class MainUI : BaseScreen<MainUI>
                 card.levelBaseImg.gameObject.SetActive(true);
                 card.levelUpBaseImg.gameObject.SetActive(false);
             }
-
             index++;
         }
     }

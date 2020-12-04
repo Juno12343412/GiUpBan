@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,8 @@ public partial class MainUI : BaseScreen<MainUI>
 
     [Header("Chest")]
     [SerializeField] private GameObject chestOpenObject = null;
+    [SerializeField] private GameObject chestDisObject = null;
+    [SerializeField] private GameObject diamondChestDisObject = null;
 
     [Header("Main")]
     [SerializeField] private GameObject jaehwaObject = null;
@@ -46,6 +49,9 @@ public partial class MainUI : BaseScreen<MainUI>
 
         InventoryInit();
         ShopInit();
+        ChestInit();
+
+        Invoke("StartDataSetting", 0.25f);
     }
 
     private void SetNickName()
@@ -204,14 +210,20 @@ public partial class MainUI : BaseScreen<MainUI>
         GameManager.instance.ChangeState(GameManager.GameState.Login);
     }
 
-    //public void OpenChest()
-    //{
-    //    SendQueue.Enqueue(Backend.Probability.GetProbability, "634", callback =>
-    //    {
-    //        if (callback.IsSuccess())
-    //            Debug.Log(callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString());
-    //        else
-    //            Debug.Log("실패 !");
-    //    });
-    //}
+    public void StartDataSetting()
+    {
+        StartCoroutine(CheckingDay());
+
+        if (BackEndServerManager.instance.myInfo.haveChests > 0)
+        {
+            SettingMyChest();
+            if (curDisChest != -1)
+                StartCoroutine(CheckingChest(curDisChest));
+        }
+
+        if (!BackEndServerManager.instance.myInfo.cardKind.Contains(99))
+            ResetShopItems();
+        else
+            SetShopItems();
+    }
 }
