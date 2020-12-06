@@ -89,21 +89,7 @@ public class PlayerScript : PoolingObject
                 if (!isDelay)
                     PlayerControl();
             }
-            else 
-            { 
-                State = PlayerCurState.STUN;
-                if (BackEndMatchManager.instance.isHost)
-                {
-                    int keyCode = (int)State;
-                    KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
-                    BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
-                }
-                else
-                {
-                    PlayerStunMessage stunMsg = new PlayerStunMessage(index);
-                    BackEndMatchManager.instance.SendDataToInGame(stunMsg);
-                }
-            }
+            
             transform.position = WorldPackage.instance.startingPoint[0].position;
             transform.rotation = WorldPackage.instance.startingPoint[0].rotation;
         }
@@ -150,7 +136,7 @@ public class PlayerScript : PoolingObject
                 stats.Damage = stats.pDamage[stats.nowCharacter];
                 stats.Penetration = stats.pPenetration[stats.nowCharacter];
             }
-            else if(stats.charactersLevel[stats.nowCharacter] >= 2)
+            else if (stats.charactersLevel[stats.nowCharacter] >= 2)
             {
                 stats.MaxHp = stats.pMaxHp[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
                 stats.Stamina = stats.pStamina[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
@@ -176,15 +162,24 @@ public class PlayerScript : PoolingObject
 
     public IEnumerator CR_Stun(float Time)
     {
-        if (!isStun)
+        State = PlayerCurState.STUN;
+        if (BackEndMatchManager.instance.isHost)
         {
-            yield return new WaitForSeconds(Time);
-            isStun = false;
+            int keyCode = (int)State;
+            KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
+            BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
         }
+        else
+        {
+            PlayerStunMessage stunMsg = new PlayerStunMessage(index);
+            BackEndMatchManager.instance.SendDataToInGame(stunMsg);
+        }
+        yield return new WaitForSeconds(Time);
+        isStun = false;
     }// 스턴 코루틴
     public IEnumerator CR_StaminaHeal()
     {
-        while(GameManager.instance.gameState != GameManager.GameState.InGame || GameManager.instance.gameState != GameManager.GameState.GameStart)
+        while (GameManager.instance.gameState != GameManager.GameState.InGame || GameManager.instance.gameState != GameManager.GameState.GameStart)
         {
             if (!Anim.GetBool("isAttack") && !Anim.GetBool("isStun"))
             {
@@ -206,7 +201,7 @@ public class PlayerScript : PoolingObject
             firstPressPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             Ielong = CR_LongTouch();
             StartCoroutine(Ielong);
-            
+
             if (firstPressPos.x < Screen.width * 0.5)
             {
                 Direction = Direction.Left;
@@ -224,7 +219,7 @@ public class PlayerScript : PoolingObject
                 StopCoroutine(Ielong);
                 Ielong = null;
             }
-            
+
             secondPressPos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 
             currentSwipe = new Vector2(secondPressPos.x - firstPressPos.x, secondPressPos.y - firstPressPos.y);
@@ -254,9 +249,9 @@ public class PlayerScript : PoolingObject
                 if (!isLong && !isSwipe)
                     PlayerTouch();
             }
-            
+
         }
-        
+
 
     } // 화면 컨트롤
 
@@ -270,7 +265,7 @@ public class PlayerScript : PoolingObject
     public void PlayerTouch()
     {
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 10))
-        {                       
+        {
             stats.Stamina -= stats.StaminaM;
             State = PlayerCurState.WEAK_ATTACK;
 
@@ -294,7 +289,7 @@ public class PlayerScript : PoolingObject
     {
         isSwipe = true;
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 20))
-        {                
+        {
             stats.Stamina -= stats.StaminaM * 1.5f;
             State = PlayerCurState.STRONG_ATTACK;
 
@@ -315,7 +310,7 @@ public class PlayerScript : PoolingObject
     public void PlayerLongTouch()
     {
         if ((!Anim.GetBool("isAttack") || Cancel))
-        {            
+        {
             State = PlayerCurState.DEFENSE;
 
             if (BackEndMatchManager.instance.isHost)
@@ -361,6 +356,7 @@ public class PlayerScript : PoolingObject
 
     public void SufferDamage(double Damage)
     {
+        
         PlayerDamagedMessage damagedMsg = new PlayerDamagedMessage(index, Damage);
         BackEndMatchManager.instance.SendDataToInGame(damagedMsg);
     }
