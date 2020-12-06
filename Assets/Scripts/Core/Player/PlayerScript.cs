@@ -54,6 +54,8 @@ public class PlayerScript : PoolingObject
     private bool isStun = false;
     private bool isDelay = false;
     [HideInInspector] public Animator Anim;
+    public Camera characterCamera = null;
+    private CameraFuncs cameraFuncs = null;
     #endregion
 
     // New Var
@@ -134,7 +136,7 @@ public class PlayerScript : PoolingObject
                 prefab.SetActive(false);
             }
             //CharactersPrefab[stats.nowCharacter].SetActive(true);
-
+            cameraFuncs = characterCamera.GetComponent<CameraFuncs>();
             stats = BackEndServerManager.instance.myInfo;
 
             //Debug.Log("현재 캐릭터들 개수 : " + stats.charactersLevel[stats.nowCharacter]);
