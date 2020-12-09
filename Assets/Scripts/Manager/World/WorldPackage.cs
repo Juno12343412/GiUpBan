@@ -510,18 +510,31 @@ public class WorldPackage : MonoBehaviour
         if (players[otherPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
         {
             if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
-            {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.WeakAttackDamage * 0.1f);
+            {              
+                players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
+                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f)
+                    * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
 
-                //players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
+                players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.WeakAttackStun);
+
                 players[otherPlayerIndex].AttackPointFalse();
+                players[myPlayerIndex].AttackPointFalse();
+
+                players[myPlayerIndex].HitStop(2, 2);
+                players[otherPlayerIndex].HitStop(2, 2);
                 return;
             }
             else
             {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.WeakAttackDamage);
+                players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
+                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f));
 
+                players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.WeakAttackStun);
                 players[otherPlayerIndex].AttackPointFalse();
+                players[myPlayerIndex].AttackPointFalse();
+
+                players[myPlayerIndex].HitStop(2, 2);
+                players[otherPlayerIndex].HitStop(2, 2);
                 Debug.Log("약공 들어감");
                 return;
 
@@ -532,18 +545,29 @@ public class WorldPackage : MonoBehaviour
         {
             if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
             {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.StrongAttackDamage * 0.1f);
+                players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
+                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f)
+                    * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
 
-
-                //players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
+                players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.StrongAttackStun);
                 players[otherPlayerIndex].AttackPointFalse();
+                players[myPlayerIndex].AttackPointFalse();
 
+                players[myPlayerIndex].HitStop(2, 2);
+                players[otherPlayerIndex].HitStop(2, 2);
             }
             else
             {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.StrongAttackDamage * 1.5f);
+              
+                players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
+                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f));
 
+                players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.StrongAttackStun);
                 players[otherPlayerIndex].AttackPointFalse();
+                players[myPlayerIndex].AttackPointFalse();
+
+                players[myPlayerIndex].HitStop(2, 4);
+                players[otherPlayerIndex].HitStop(2, 4);
                 Debug.Log("강공 들어감");
 
             }

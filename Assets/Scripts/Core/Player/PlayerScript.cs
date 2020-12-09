@@ -376,12 +376,12 @@ public class PlayerScript : PoolingObject
     }
     #endregion
 
-    public IEnumerator CR_DelayOn(float _Time)
+    public IEnumerator CR_DelayOn(double _Time)
     {
-        yield return new WaitForSeconds(_Time);
+        yield return new WaitForSeconds((float)_Time);
         isDelay = false;
     } // 공격 딜레이 코루틴
-    public void DelayOn(float _Time)
+    public void DelayOn(double _Time)
     {
         if (!isDelay)
         {
@@ -390,4 +390,18 @@ public class PlayerScript : PoolingObject
         }
     } //공격 딜레이 함수
 
+    public void HitStop(float _Time, float _Scale)
+    {
+        cameraFuncs.SetShakeTime(_Time, _Scale);
+        StartCoroutine(CR_TimeStop(_Time * 0.2f));
+    }
+
+    public IEnumerator CR_TimeStop(float _Time)
+    {
+        Time.timeScale = 0;
+        yield return new WaitForSeconds(_Time);
+        Time.timeScale = 1;
+    }
+
+    //public void CameraMoving(bool )
 }
