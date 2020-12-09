@@ -8,7 +8,7 @@ public enum CharacterKind : byte
 {
     나이트 = 0,
     벤전스,
-    막시무스한,
+    듀얼,
     NONE = 99
 }
 
@@ -17,22 +17,15 @@ public class PlayerStats : MonoBehaviour
     [Serializable]
     public class Player
     {
+        [Header("ETC")]
         // ETC
         public int gold = 100;        // 게임 재화
         public int diamond = 100;     // 게임 유료재화
         public bool ads = false;      // 광고 유무
         public int mmr = 0;           // mmr
-        // ETC
-        
-        // Stats
-        public double CurHp;
-        public double MaxHp;
-        public double Stamina;
-        public double StaminaM;
-        public double Damage;
-        public double Penetration;
-        // Stats
+        // ETC 
 
+        [Header("Chracter")]
         // Chracter
         public int nowCharacter = 0;
         public List<int> haveCharacters = new List<int>();
@@ -40,16 +33,44 @@ public class PlayerStats : MonoBehaviour
         public List<int> levelExp = new List<int>();
         // Chracter
 
+        [Header("Stats")]
+        // Stats
+        public double CurHp;
+        public double MaxHp;
+        public double Armor;
+        public double Stamina;
+        public double MaxStamina;
+        public double ReductionStamina;
+        public double WeakAttackDamage;
+        public double WeakAttackStun;
+        public double WeakAttackPenetration;
+        public double StrongAttackDamage;
+        public double StrongAttackStun;
+        public double StrongAttackPenetration;
+        public double DefeneseReceivingDamage;
+        public double DefeneseReductionStun;
+        // Stats
+
+        [Header("Chart")]
         // Chart
-        [HideInInspector] public List<string> pName = new List<string>();
-        [HideInInspector] public List<double> pCurHp = new List<double>();
-        [HideInInspector] public List<double> pMaxHp = new List<double>();
-        [HideInInspector] public List<double> pStamina = new List<double>();
-        [HideInInspector] public List<double> pStaminaM = new List<double>();
-        [HideInInspector] public List<double> pDamage = new List<double>();
-        [HideInInspector] public List<double> pPenetration = new List<double>();
+        [HideInInspector] public List<string> pName = new List<string>();                           // 캐릭터 이름
+        [HideInInspector] public List<double> pCurHp = new List<double>();                          // 캐릭터 체력
+        [HideInInspector] public List<double> pMaxHp = new List<double>();                          // 캐릭터 최대 체력
+        [HideInInspector] public List<double> pArmor = new List<double>();                          // 캐릭터 방어력
+        [HideInInspector] public List<double> pStamina = new List<double>();                        // 캐릭터 스태미나
+        [HideInInspector] public List<double> pMaxStamina = new List<double>();                     // 캐릭터 최대 스태미나
+        [HideInInspector] public List<double> pReductionStamina = new List<double>();               // 캐릭터 스태미나 감소량
+        [HideInInspector] public List<double> pWeakAttackDamage = new List<double>();               // 캐릭터 약한 공격 데미지
+        [HideInInspector] public List<double> pWeakAttackStun = new List<double>();                 // 캐릭터 약한 공격 스턴시간
+        [HideInInspector] public List<double> pWeakAttackPenetration = new List<double>();          // 캐릭터 강한 공격 방무
+        [HideInInspector] public List<double> pStrongAttackDamage = new List<double>();             // 캐릭터 강한 공격 데미지
+        [HideInInspector] public List<double> pStrongAttackStun = new List<double>();               // 캐릭터 강한 공격 스턴시간
+        [HideInInspector] public List<double> pStrongAttackPenetration = new List<double>();        // 캐릭터 강한 공격 방무
+        [HideInInspector] public List<double> pDefenseReceivingDamage = new List<double>();         // 캐릭터 방어시 데미지 받는 %
+        [HideInInspector] public List<double> pDefenseReductionStun = new List<double>();           // 캐릭터 방어시 받는 스턴시간
         // Chart
 
+        [Header("Chest")]
         // Chest
         public List<int> haveChestKind = new List<int>();    // 가지고 있는 상자 종류
         public List<int> haveChestState = new List<int>();   // 가지고 있는 상자 상태
@@ -58,10 +79,16 @@ public class PlayerStats : MonoBehaviour
         public int haveChests = 0;                           // 가지고 있는 상자 개수
         // Chest
 
+        [Header("Card")]
         // Card
         public List<int> cardKind = new List<int>();         // 카드의 종류
         public List<int> cardCount = new List<int>();        // 카드의 개수
         // Card
+
+        public object Copy()
+        {
+            return this.MemberwiseClone();
+        }
     }
     public static PlayerStats instance = null;
     private Param param = new Param();
@@ -87,7 +114,6 @@ public class PlayerStats : MonoBehaviour
         BackEndServerManager.instance.myInfo.levelExp.InsertRange(index: 0, collection: new List<int>() { 1, 1 });
 
         param = new Param();
-        param.Add("Name", BackEndServerManager.instance.myNickName);
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Diamond", BackEndServerManager.instance.myInfo.diamond);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
@@ -104,6 +130,8 @@ public class PlayerStats : MonoBehaviour
                 AddCard();
             }
         });
+
+        LoadChart();
     }
 
     // 게임을 킬 때 사용하는 함수
@@ -112,7 +140,6 @@ public class PlayerStats : MonoBehaviour
         Debug.Log("세이브중");
 
         param = new Param();
-        param.Add("Name", BackEndServerManager.instance.myNickName);
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Diamond", BackEndServerManager.instance.myInfo.diamond);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
@@ -182,7 +209,7 @@ public class PlayerStats : MonoBehaviour
     public void LoadChart()
     {
         // 모든 캐릭터 정보
-        SendQueue.Enqueue(Backend.Chart.GetChartContents, "10949", callback =>
+        SendQueue.Enqueue(Backend.Chart.GetChartContents, "11411", callback =>
         {
             if (callback.IsSuccess())
             {
@@ -192,10 +219,18 @@ public class PlayerStats : MonoBehaviour
                     BackEndServerManager.instance.myInfo.pName.Add(callback.GetReturnValuetoJSON()["rows"][i]["Name"]["S"].ToString());
                     BackEndServerManager.instance.myInfo.pMaxHp.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Hp"]["S"].ToString()));
                     BackEndServerManager.instance.myInfo.pCurHp.Add(BackEndServerManager.instance.myInfo.pMaxHp[i]);
-                    BackEndServerManager.instance.myInfo.pStamina.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Stamina"]["S"].ToString()));
-                    BackEndServerManager.instance.myInfo.pStaminaM.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["StaminaM"]["S"].ToString()));
-                    BackEndServerManager.instance.myInfo.pDamage.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Damage"]["S"].ToString()));
-                    BackEndServerManager.instance.myInfo.pPenetration.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Penetration"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pArmor.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Armor"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pStamina.Add(100);
+                    BackEndServerManager.instance.myInfo.pMaxStamina.Add(100);
+                    BackEndServerManager.instance.myInfo.pReductionStamina.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["ReductionStamina"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pWeakAttackDamage.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["WeakAttack_Damage"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pWeakAttackStun.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["WeakAttack_Stun"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pWeakAttackPenetration.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["WeakAttack_ArmorPenetration"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pStrongAttackDamage.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["StrongAttack_Damage"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pStrongAttackStun.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["StrongAttack_Stun"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pStrongAttackPenetration.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["StrongAttack_ArmorPenetration"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pDefenseReceivingDamage.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Defense_ReceivingDamage"]["S"].ToString()));
+                    BackEndServerManager.instance.myInfo.pDefenseReductionStun.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Defense_ReductionStun"]["S"].ToString()));
                 }
             }
         });
@@ -290,13 +325,8 @@ public class PlayerStats : MonoBehaviour
 
     public void AddCard()
     {
-        BackEndServerManager.instance.myInfo.cardKind.Add(99);
-        BackEndServerManager.instance.myInfo.cardKind.Add(99);
-        BackEndServerManager.instance.myInfo.cardKind.Add(99);
-
-        BackEndServerManager.instance.myInfo.cardCount.Add(99);
-        BackEndServerManager.instance.myInfo.cardCount.Add(99);
-        BackEndServerManager.instance.myInfo.cardCount.Add(99);
+        BackEndServerManager.instance.myInfo.cardKind.InsertRange(index: 0, collection: new List<int>() { 99, 99, 99 });
+        BackEndServerManager.instance.myInfo.cardCount.InsertRange(index: 0, collection: new List<int>() { 99, 99, 99 });
 
         param = new Param();
         param.Add("CardKind", BackEndServerManager.instance.myInfo.cardKind);

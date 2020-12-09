@@ -1,67 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.UI;
 using Manager.View;
-using BackEnd.Tcp;
 
-public class GameUI : BaseScreen<GameUI>
+// InGame
+public partial class GameUI : BaseScreen<GameUI>
 {
-    [SerializeField] private Text winnerText = null, loserText = null;
-
-    public override void ShowScreen()
-    {
-        Debug.Log("ShowScreen");
-        base.ShowScreen();
-    }
-
-    public override void HideScreen()
-    {
-        Debug.Log("HideScreen");
-        base.HideScreen();
-    }
+    [SerializeField] private Text[] playerTexts = new Text[2] { null, null};
+    [SerializeField] private Text timerText = null;
 
     void Start()
     {
         HideScreen();
+
+        var myName = BackEndServerManager.instance.myNickName;
+        var enemyName = WorldPackage.instance.players[WorldPackage.instance.otherPlayerIndex].nickName;
+
+        playerTexts[0].text = myName;
+        playerTexts[1].text = enemyName;
+
+        StartCoroutine(gameTimeCheck(BackEndMatchManager.instance.matchInfos[0].matchMinute));
     }
 
-
-    public void ShowResultBoard(MatchGameResult matchGameResult)
+    IEnumerator gameTimeCheck(int time = 180)
     {
-        Debug.Log("Result Board : " + matchGameResult != null);
-        BackEndMatchManager.instance.GetMyMatchRecord((int)BackEndMatchManager.instance.nowMatchType, null);
-
-        foreach (var user in matchGameResult.m_winners)
+        int curTime = 0;
+        
+        while (curTime <= time)
         {
-            winnerText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user) + " (" + BackEndMatchManager.instance.GetMMRBySessionId(user) + ")";
-            if (BackEndMatchManager.instance.IsMySessionId(user))
-            {
-                BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
-                Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
-            }
+            curTime += 1;
+            timerText.text = curTime.ToString();
+            yield return new WaitForSeconds(1f);
         }
-
-        foreach (var user in matchGameResult.m_losers)
-        {
-            loserText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user) + " (" + BackEndMatchManager.instance.GetMMRBySessionId(user) + ")";
-            if (BackEndMatchManager.instance.IsMySessionId(user))
-            {
-                BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
-                Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
-            }
-        }
-        PlayerStats.instance.SaveMMR();
-        ShowScreen();
-    }
-
-    public void OnLeaveGameRoom()
-    {
-        Debug.Log("Game Result");
-
-        if (GameManager.instance.gameState != GameManager.GameState.MatchLobby)
-        {
-            GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
-        }
+        timerText.text = curTime.ToString();
     }
 }

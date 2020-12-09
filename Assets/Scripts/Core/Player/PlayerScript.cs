@@ -79,29 +79,19 @@ public class PlayerScript : PoolingObject
 
     void Update()
     {
-        if (stats.CurHp <= 0 && GameManager.instance.gameState == GameManager.GameState.InGame)
-            WorldPackage.instance.playerDie(index);
-
-        if (isMe)
+        if (GameManager.instance.gameState == GameManager.GameState.InGame)
         {
-            if (!isStun)
+            if (stats.CurHp <= 0)
+                WorldPackage.instance.playerDie(index);
+
+            if (isMe)
             {
-                if (!isDelay)
-                    PlayerControl();
+                if (!isStun)
+                {
+                    if (!isDelay)
+                        PlayerControl();
+                }
             }
-            
-            transform.position = WorldPackage.instance.startingPoint[0].position;
-            transform.rotation = WorldPackage.instance.startingPoint[0].rotation;
-        }
-        else
-        {
-            transform.position = WorldPackage.instance.startingPoint[1].position;
-            transform.rotation = WorldPackage.instance.startingPoint[1].rotation;
-        }
-
-        if (!BackEndMatchManager.instance.isHost)
-        {
-            return;
         }
     }
 
@@ -123,32 +113,42 @@ public class PlayerScript : PoolingObject
             }
             //CharactersPrefab[stats.nowCharacter].SetActive(true);
             cameraFuncs = characterCamera.GetComponent<CameraFuncs>();
-            stats = BackEndServerManager.instance.myInfo;
+            stats = (PlayerStats.Player)BackEndServerManager.instance.myInfo.Copy();
 
             //Debug.Log("현재 캐릭터들 개수 : " + stats.charactersLevel[stats.nowCharacter]);
             //Debug.Log("현재 캐릭터 : " + stats.nowCharacter);
 
             if (stats.charactersLevel[stats.nowCharacter] == 1)
             {
-                stats.MaxHp = stats.pMaxHp[stats.nowCharacter];
-                stats.Stamina = stats.pStamina[stats.nowCharacter];
-                stats.StaminaM = stats.pStaminaM[stats.nowCharacter];
-                stats.Damage = stats.pDamage[stats.nowCharacter];
-                stats.Penetration = stats.pPenetration[stats.nowCharacter];
+                // 여기 수정 ...
+                //stats.MaxHp = stats.pMaxHp[stats.nowCharacter];
+                //stats.Stamina = stats.pStamina[stats.nowCharacter];
+                //stats.StaminaM = stats.pStaminaM[stats.nowCharacter];
+                //stats.Damage = stats.pDamage[stats.nowCharacter];
+                //stats.Penetration = stats.pPenetration[stats.nowCharacter];
             }
             else if (stats.charactersLevel[stats.nowCharacter] >= 2)
             {
-                stats.MaxHp = stats.pMaxHp[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-                stats.Stamina = stats.pStamina[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-                stats.StaminaM = stats.pStaminaM[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-                stats.Damage = stats.pDamage[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-                stats.Penetration = stats.pPenetration[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                // 여기 수정 ...
+                //stats.MaxHp = stats.pMaxHp[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                //stats.Stamina = stats.pStamina[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                //stats.StaminaM = stats.pStaminaM[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                //stats.Damage = stats.pDamage[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+                //stats.Penetration = stats.pPenetration[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
             }
 
             State = PlayerCurState.IDLE;
 
             Direction = Direction.NONE;
             //StartCoroutine(CR_StaminaHeal());
+
+            transform.position = WorldPackage.instance.startingPoint[0].position;
+            transform.rotation = WorldPackage.instance.startingPoint[0].rotation;
+        }
+        else
+        {
+            transform.position = WorldPackage.instance.startingPoint[1].position;
+            transform.rotation = WorldPackage.instance.startingPoint[1].rotation;
         }
 
         isLive = true;
@@ -185,7 +185,10 @@ public class PlayerScript : PoolingObject
             {
                 yield return new WaitForSeconds(0.1f);
                 if (stats.Stamina < 100)
-                    stats.Stamina += 1;
+                {
+                    PlayerStaminaMessage staminaMsg = new PlayerStaminaMessage(index, stats.Stamina += 1);
+                    BackEndMatchManager.instance.SendDataToInGame(staminaMsg);
+                }
             }
             yield return null;
         }
@@ -266,7 +269,7 @@ public class PlayerScript : PoolingObject
     {
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 10))
         {
-            stats.Stamina -= stats.StaminaM;
+            stats.Stamina -= stats.ReductionStamina;
             State = PlayerCurState.WEAK_ATTACK;
 
             if (BackEndMatchManager.instance.isHost)
@@ -290,7 +293,7 @@ public class PlayerScript : PoolingObject
         isSwipe = true;
         if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 20))
         {
-            stats.Stamina -= stats.StaminaM * 1.5f;
+            stats.Stamina -= stats.ReductionStamina * 1.5f;
             State = PlayerCurState.STRONG_ATTACK;
 
             if (BackEndMatchManager.instance.isHost)
@@ -344,7 +347,6 @@ public class PlayerScript : PoolingObject
         AttackPoint = false;
     }
 
-
     public void isStunTrue()
     {
         isStun = true;
@@ -355,8 +357,7 @@ public class PlayerScript : PoolingObject
     }
 
     public void SufferDamage(double Damage)
-    {
-        
+    {    
         PlayerDamagedMessage damagedMsg = new PlayerDamagedMessage(index, Damage);
         BackEndMatchManager.instance.SendDataToInGame(damagedMsg);
     }

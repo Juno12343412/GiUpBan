@@ -150,7 +150,7 @@ public partial class BackEndMatchManager : MonoBehaviour
     // 1:1 게임 결과
     private MatchGameResult OneOnOneRecord(Stack<SessionId> record)
     {
-        Debug.Log("1대1 결과 도출");
+        Debug.Log("1대1 결과 도출 : " + record.Count);
         MatchGameResult nowGameResult = new MatchGameResult();
 
         nowGameResult.m_winners = new List<SessionId>();

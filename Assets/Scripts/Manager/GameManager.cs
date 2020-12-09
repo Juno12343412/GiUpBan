@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
                 Over();
                 break;
             case GameState.Result:
-                Result();
+                //Result();
                 break;
             case GameState.Reconnect:
                 Reconnect();

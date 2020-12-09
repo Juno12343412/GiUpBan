@@ -47,10 +47,6 @@ public partial class MainUI : BaseScreen<MainUI>
         BackEndMatchManager.instance.HandlerSetting();
         SetNickName();
 
-        InventoryInit();
-        ShopInit();
-        ChestInit();
-
         Invoke("StartDataSetting", 0.25f);
     }
 
@@ -212,6 +208,10 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void StartDataSetting()
     {
+        InventoryInit();
+        ShopInit();
+        ChestInit();
+
         StartCoroutine(CheckingDay());
 
         if (BackEndServerManager.instance.myInfo.haveChests > 0)

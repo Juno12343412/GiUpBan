@@ -16,6 +16,7 @@ namespace Protocol
         Stun,
         AttackEnd,
         Damaged,
+        Stamina,
 
         LoadRoomScene,      // 룸 씬으로 전환
         LoadGameScene,      // 인게임 씬으로 전환
@@ -129,6 +130,17 @@ namespace Protocol
         }
     }
 
+    public class PlayerStaminaMessage : Message
+    {
+        public SessionId playerSession;
+        public double stamina;
+        public PlayerStaminaMessage(SessionId session, double stamina) : base(Type.Stamina)
+        {
+            this.playerSession = session;
+            this.stamina = stamina;
+        }
+    }
+
     #endregion
 
     #region Scene
@@ -184,19 +196,36 @@ namespace Protocol
     {
         public SessionId session;
         public double MaxHp = 0f;
+        public double Armor = 0f;
         public double Stamina = 0f;
-        public double StaminaM = 0f;
-        public double Damage = 0f;
-        public double Penetration = 0f;
+        public double ReductionStamina = 0f;
+        public double WeakAttackDamage = 0f;
+        public double WeakAttackStun = 0f;
+        public double WeakAttackPenetration = 0f;
+        public double StrongAttackDamage = 0f;
+        public double StrongAttackStun = 0f;
+        public double StrongAttackPenetration = 0f;
+        public double DefeneseReceivingDamage = 0f;
+        public double DefeneseReductionStun = 0f;
 
-        public GameMySyncMessage(SessionId session, double maxHp, double stamina, double staminaM, double damage, double penetration) : base(Type.GameMySync)
+        public GameMySyncMessage(SessionId session, double maxHp, double armor, double stamina, double reductionStamina, 
+            double weakAttackDamage, double weakAttackStun, double weakAttackPenetration, 
+            double strongAttackDamage, double strongAttackStun, double strongAttackPenetration,
+            double defenseReceivingDamage, double defenseReductionStun) : base(Type.GameMySync)
         {
             this.session = session;
             this.MaxHp = maxHp;
+            this.Armor = armor;
             this.Stamina = stamina;
-            this.StaminaM = staminaM;
-            this.Damage = damage;
-            this.Penetration = penetration;
+            this.ReductionStamina = reductionStamina;
+            this.WeakAttackDamage = weakAttackDamage;
+            this.WeakAttackStun = weakAttackStun;
+            this.WeakAttackPenetration = weakAttackPenetration;
+            this.StrongAttackDamage = strongAttackDamage;
+            this.StrongAttackStun = strongAttackStun;
+            this.StrongAttackPenetration = strongAttackPenetration;
+            this.DefeneseReceivingDamage = defenseReceivingDamage;
+            this.DefeneseReductionStun = defenseReductionStun;
         }
     }
 
@@ -204,29 +233,62 @@ namespace Protocol
     {
         public SessionId host;
         public int count = 0;
-        public double[] MaxHp = null;
-        public double[] Stamina = null;
-        public double[] StaminaM = null;
-        public double[] Damage = null;
-        public double[] Penetration = null;
+        public double[] MaxHp                   = null;
+        public double[] Armor                   = null;
+        public double[] Stamina                 = null;
+        public double[] ReductionStamina        = null;
+        public double[] WeakAttackDamage        = null;
+        public double[] WeakAttackStun          = null;
+        public double[] WeakAttackPenetration   = null;
+        public double[] StrongAttackDamage      = null;
+        public double[] StrongAttackStun        = null;
+        public double[] StrongAttackPenetration = null;
+        public double[] DefeneseReceivingDamage = null;
+        public double[] DefeneseReductionStun   = null;
         public bool[] onlineInfo = null;
 
-        public GameSyncMessage(SessionId host, int count, double[] maxHp, double[] stamina, double[] staminaM, double[] damage, double[] penetration, bool[] online) : base(Type.GameSync)
+        public GameSyncMessage(SessionId host, int count, double[] maxHp, double[] armor, double[] stamina, double[] reductionStamina,
+            double[] weakAttackDamage, double[] weakAttackStun, double[] weakAttackPenetration,
+            double[] strongAttackDamage, double[] strongAttackStun, double[] strongAttackPenetration,
+            double[] defenseReceivingDamage, double[] defenseReductionStun, bool[] online) : base(Type.GameSync)
         {
             this.host = host;
-            this.count = count;
-            this.MaxHp = this.Stamina = this.StaminaM = this.Damage = this.Penetration = new double[count];
-            this.onlineInfo = new bool[count];
 
-            for (int i = 0; i < count; ++i)
-            {
-                this.MaxHp[i]      = maxHp[i];
-                this.Stamina[i]      = stamina[i];
-                this.StaminaM[i]      = staminaM[i];
-                this.Damage[i]      = damage[i];
-                this.Penetration[i]      = penetration[i];
-                onlineInfo[i]      = online[i];
-            }
+            this.MaxHp = maxHp;
+            this.Armor = armor;
+            this.Stamina = stamina;
+            this.ReductionStamina = reductionStamina;
+            this.WeakAttackDamage = weakAttackDamage;
+            this.WeakAttackStun = weakAttackStun;
+            this.WeakAttackPenetration = weakAttackPenetration;
+            this.StrongAttackDamage = strongAttackDamage;
+            this.StrongAttackStun = strongAttackStun;
+            this.StrongAttackPenetration = strongAttackPenetration;
+            this.DefeneseReceivingDamage = defenseReceivingDamage;
+            this.DefeneseReductionStun = defenseReductionStun;
+            onlineInfo = online;
+
+            //this.count = count;
+            //this.MaxHp = this.Armor = this.Stamina = this.ReductionStamina = this.WeakAttackDamage = this.WeakAttackStun = this.WeakAttackPenetration
+            //    = this.StrongAttackDamage = this.StrongAttackStun = this.StrongAttackPenetration = this.DefeneseReceivingDamage = this.DefeneseReductionStun = new double[count];
+            //this.onlineInfo = new bool[count];
+
+            //for (int i = 0; i < count; ++i)
+            //{
+            //    this.MaxHp                      = maxHp;
+            //    this.Armor                      = armor;
+            //    this.Stamina                    = stamina;
+            //    this.ReductionStamina           = reductionStamina;
+            //    this.WeakAttackDamage           = weakAttackDamage;
+            //    this.WeakAttackStun             = weakAttackStun;
+            //    this.WeakAttackPenetration      = weakAttackPenetration;
+            //    this.StrongAttackDamage         = strongAttackDamage;
+            //    this.StrongAttackStun           = strongAttackStun;
+            //    this.StrongAttackPenetration    = strongAttackPenetration;
+            //    this.DefeneseReceivingDamage    = defenseReceivingDamage;
+            //    this.DefeneseReductionStun      = defenseReductionStun;
+            //    onlineInfo = online;
+            //}
         }
     }
 
@@ -249,6 +311,7 @@ namespace Protocol
         public const int STUN          = 5;   // 스턴 메시지
         public const int ATTACK_END    = 6;   // 공격 종료 메세지
         public const int DAMAGED       = 7;   // 공격 받는 메세지
+        public const int STAMINA       = 8;   // 스태미나 받는 메세지
     }
 
     public class KeyMessage : Message

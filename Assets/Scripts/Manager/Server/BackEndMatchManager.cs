@@ -37,6 +37,7 @@ public partial class BackEndMatchManager : MonoBehaviour
         public MatchType matchType;         // 매치 타입
         public MatchModeType matchModeType; // 매치 모드 타입
         public string headCount;            // 매칭 인원
+        public int matchMinute;             // 게임 시간
     }
     public List<MatchInfo> matchInfos { get; private set; } = new List<MatchInfo>(); // 콘솔에서 생성한 매칭 카드들의 리스트
 
@@ -544,10 +545,13 @@ public partial class BackEndMatchManager : MonoBehaviour
 
             foreach (LitJson.JsonData row in callback.Rows())
             {
+                Debug.Log("매칭 카드 종류 : " + callback);
+
                 MatchInfo matchInfo = new MatchInfo();
                 matchInfo.title = row["matchTitle"]["S"].ToString();
                 matchInfo.inDate = row["inDate"]["S"].ToString();
                 matchInfo.headCount = row["matchHeadCount"]["N"].ToString();
+                matchInfo.matchMinute = Convert.ToInt32(row["match_timeout_m"]["N"].ToString());
 
                 foreach (MatchType type in Enum.GetValues(typeof(MatchType)))
                 {

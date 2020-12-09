@@ -25,7 +25,7 @@ public class WorldPackage : MonoBehaviour
     public ObjectPool<PlayerScript> playerPool = new ObjectPool<PlayerScript>();
     public GameObject playerObj = null;
 
-    private Dictionary<SessionId, PlayerScript> players = new Dictionary<SessionId, PlayerScript>();
+    public Dictionary<SessionId, PlayerScript> players = new Dictionary<SessionId, PlayerScript>();
     private const int MAX_PLAYER = 2;
     public int numOfPlayer = 0;
     public Transform[] startingPoint = null;
@@ -80,10 +80,13 @@ public class WorldPackage : MonoBehaviour
     {
         // 게임 종료 전환 메시지는 호스트에서만 보냄
         Debug.Log("Make GameResult & Send Game End Order");
+        GameManager.instance.gameState = GameManager.GameState.Over;
+
         foreach (SessionId session in BackEndMatchManager.instance.sessionIdList)
         {
             if (players[session].isActive && !gameRecord.Contains(session))
             {
+                Debug.Log(gameRecord.Count + " : " + session);
                 gameRecord.Push(session);
             }
         }
@@ -188,7 +191,7 @@ public class WorldPackage : MonoBehaviour
 
     public void OnGameOver()
     {
-        Debug.Log("Game End");
+        Debug.Log("Game End : " + gameRecord.Count);
         if (BackEndMatchManager.instance == null)
         {
             Debug.LogError("매치매니저가 null 입니다.");
@@ -235,7 +238,6 @@ public class WorldPackage : MonoBehaviour
             case Protocol.Type.GameEnd:
                 GameEndMessage endMessage = DataParser.ReadJsonData<GameEndMessage>(args.BinaryUserData);
                 SetGameRecord(endMessage.count, endMessage.sessionList);
-                GameManager.instance.ChangeState(GameManager.GameState.Over);
                 break;
             case Protocol.Type.Idle:
                 PlayerIdleMessage idleMsg = DataParser.ReadJsonData<PlayerIdleMessage>(args.BinaryUserData);
@@ -277,6 +279,10 @@ public class WorldPackage : MonoBehaviour
             case Protocol.Type.Damaged:
                 PlayerDamagedMessage damMessage = DataParser.ReadJsonData<PlayerDamagedMessage>(args.BinaryUserData);
                 ProcessPlayerData(damMessage);
+                break;
+            case Protocol.Type.Stamina:
+                PlayerStaminaMessage staMessage = DataParser.ReadJsonData<PlayerStaminaMessage>(args.BinaryUserData);
+                ProcessPlayerData(staMessage);
                 break;
             default:
                 Debug.Log("Unknown protocol type");
@@ -371,11 +377,18 @@ public class WorldPackage : MonoBehaviour
         Debug.Log("넣기전 체력" + players[data.playerSession].Stats.CurHp);
         players[data.playerSession].Stats.CurHp -= data.damage;
         Debug.Log("넣은후 체력" + players[data.playerSession].Stats.CurHp);
+
         hpImages[1].fillAmount = (float)(players[otherPlayerIndex].Stats.CurHp / players[otherPlayerIndex].Stats.MaxHp);
         hpImages[0].fillAmount = (float)(players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
-        staminaImages[1].fillAmount = (float)(players[otherPlayerIndex].Stats.Stamina / 100);
-        staminaImages[0].fillAmount = (float)(players[myPlayerIndex].Stats.Stamina / 100);
-        
+    }
+
+    private void ProcessPlayerData(PlayerStaminaMessage data)
+    {
+        Debug.Log("스태미나 변동 : " + data.stamina);
+        players[data.playerSession].Stats.Stamina = data.stamina;
+
+        staminaImages[1].fillAmount = (float)(players[otherPlayerIndex].Stats.Stamina / 100f);
+        staminaImages[0].fillAmount = (float)(players[myPlayerIndex].Stats.Stamina / 100f);
     }
 
     public void OnRecieveForLocal(KeyMessage msg)
@@ -424,11 +437,6 @@ public class WorldPackage : MonoBehaviour
             PlayerAttackEndMessage msg = new PlayerAttackEndMessage(index);
             BackEndMatchManager.instance.SendDataToInGame(msg);
         }
-        //if ((keyData & KeyEventCode.DAMAGED) == KeyEventCode.DAMAGED)
-        //{
-        //    PlayerDamagedMessage msg = new PlayerDamagedMessage(index);
-        //    BackEndMatchManager.instance.SendDataToInGame(msg);
-        //}
 
         Debug.Log("2-2 상태 : " + keyData);
     }
@@ -448,17 +456,21 @@ public class WorldPackage : MonoBehaviour
             if (!player.Value.isMe)
             {
                 Debug.Log(player.Value.gameObject.name + " : 셋팅");
-                Debug.Log(syncMessage.MaxHp[index]);
-                Debug.Log(syncMessage.Stamina[index]);
-                Debug.Log(syncMessage.Damage[index]);
 
                 // 그냥 여기에는 그 적의 모든 스탯을 대입만 해주면 됨 ㅇㅋ?
                 player.Value.Stats.MaxHp = syncMessage.MaxHp[index];
                 player.Value.Stats.CurHp = player.Value.Stats.MaxHp;
+                player.Value.Stats.Armor = syncMessage.Armor[index];
                 player.Value.Stats.Stamina = syncMessage.Stamina[index];
-                player.Value.Stats.StaminaM = syncMessage.StaminaM[index];
-                player.Value.Stats.Damage = syncMessage.Damage[index];
-                player.Value.Stats.Penetration = syncMessage.Penetration[index];
+                player.Value.Stats.ReductionStamina = syncMessage.ReductionStamina[index];
+                player.Value.Stats.WeakAttackDamage = syncMessage.WeakAttackDamage[index];
+                player.Value.Stats.WeakAttackStun = syncMessage.WeakAttackStun[index];
+                player.Value.Stats.WeakAttackPenetration = syncMessage.WeakAttackPenetration[index];
+                player.Value.Stats.StrongAttackDamage = syncMessage.StrongAttackDamage[index];
+                player.Value.Stats.StrongAttackStun = syncMessage.StrongAttackStun[index];
+                player.Value.Stats.StrongAttackPenetration = syncMessage.StrongAttackPenetration[index];
+                player.Value.Stats.DefeneseReceivingDamage = syncMessage.DefeneseReceivingDamage[index];
+                player.Value.Stats.DefeneseReductionStun = syncMessage.DefeneseReductionStun[index];
             }
 
             index++;
@@ -479,9 +491,15 @@ public class WorldPackage : MonoBehaviour
         players[mySyncMessage.session].Stats.MaxHp = mySyncMessage.MaxHp;
         players[mySyncMessage.session].Stats.CurHp = mySyncMessage.MaxHp;
         players[mySyncMessage.session].Stats.Stamina = mySyncMessage.Stamina;
-        players[mySyncMessage.session].Stats.StaminaM = mySyncMessage.StaminaM;
-        players[mySyncMessage.session].Stats.Damage = mySyncMessage.Damage;
-        players[mySyncMessage.session].Stats.Penetration = mySyncMessage.Penetration;
+        players[mySyncMessage.session].Stats.ReductionStamina = mySyncMessage.ReductionStamina;
+        players[mySyncMessage.session].Stats.WeakAttackDamage = mySyncMessage.WeakAttackDamage;
+        players[mySyncMessage.session].Stats.WeakAttackStun = mySyncMessage.WeakAttackStun;
+        players[mySyncMessage.session].Stats.WeakAttackPenetration = mySyncMessage.WeakAttackPenetration;
+        players[mySyncMessage.session].Stats.StrongAttackDamage = mySyncMessage.StrongAttackDamage;
+        players[mySyncMessage.session].Stats.StrongAttackStun = mySyncMessage.StrongAttackStun;
+        players[mySyncMessage.session].Stats.StrongAttackPenetration = mySyncMessage.StrongAttackPenetration;
+        players[mySyncMessage.session].Stats.DefeneseReceivingDamage = mySyncMessage.DefeneseReceivingDamage;
+        players[mySyncMessage.session].Stats.DefeneseReductionStun = mySyncMessage.DefeneseReductionStun;
         players[mySyncMessage.session].CharactersPrefab[players[mySyncMessage.session].Stats.nowCharacter].SetActive(true);
         players[mySyncMessage.session].Anim = players[mySyncMessage.session].CharactersPrefab[players[mySyncMessage.session].Stats.nowCharacter].GetComponent<Animator>();
         StartCoroutine(players[mySyncMessage.session].CR_StaminaHeal());
@@ -493,7 +511,7 @@ public class WorldPackage : MonoBehaviour
         {
             if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
             {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.Damage * 0.1f);
+                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.WeakAttackDamage * 0.1f);
 
                 //players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
                 players[otherPlayerIndex].AttackPointFalse();
@@ -501,7 +519,7 @@ public class WorldPackage : MonoBehaviour
             }
             else
             {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.Damage);
+                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.WeakAttackDamage);
 
                 players[otherPlayerIndex].AttackPointFalse();
                 Debug.Log("약공 들어감");
@@ -514,7 +532,7 @@ public class WorldPackage : MonoBehaviour
         {
             if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
             {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.Damage * 0.1f);
+                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.StrongAttackDamage * 0.1f);
 
 
                 //players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.curWeapon.AttackDelay);
@@ -523,7 +541,7 @@ public class WorldPackage : MonoBehaviour
             }
             else
             {
-                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.Damage * 1.5f);
+                players[myPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.StrongAttackDamage * 1.5f);
 
                 players[otherPlayerIndex].AttackPointFalse();
                 Debug.Log("강공 들어감");
@@ -538,13 +556,27 @@ public class WorldPackage : MonoBehaviour
         // 스택에 넣어야 하므로 제일 뒤에서 부터 스택에 push
         for (int i = count - 1; i >= 0; --i)
         {
+            Debug.Log("리코드 셋팅 : " + gameRecord.Count + "/ 세션 : " + (SessionId)arr[i]);
             gameRecord.Push((SessionId)arr[i]);
         }
+
+        Debug.Log("Game End : " + gameRecord.Count);
+        if (BackEndMatchManager.instance == null)
+        {
+            Debug.LogError("매치매니저가 null 입니다.");
+            return;
+        }
+        BackEndMatchManager.instance.MatchGameOver(gameRecord);
+
+        //GameManager.instance.ChangeState(GameManager.GameState.Over);
     }
 
     public GameMySyncMessage GetNowGameState(SessionId session)
     {
         return new GameMySyncMessage(session, players[myPlayerIndex].Stats.MaxHp
-            , players[myPlayerIndex].Stats.CurHp, players[myPlayerIndex].Stats.StaminaM, players[myPlayerIndex].Stats.Damage, players[myPlayerIndex].Stats.Penetration);
+            , players[myPlayerIndex].Stats.Armor, players[myPlayerIndex].Stats.Stamina, players[myPlayerIndex].Stats.ReductionStamina,
+            players[myPlayerIndex].Stats.WeakAttackDamage, players[myPlayerIndex].Stats.WeakAttackStun, players[myPlayerIndex].Stats.WeakAttackPenetration,
+            players[myPlayerIndex].Stats.StrongAttackDamage, players[myPlayerIndex].Stats.StrongAttackStun, players[myPlayerIndex].Stats.StrongAttackPenetration,
+            players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Stats.DefeneseReductionStun);
     }
 }
