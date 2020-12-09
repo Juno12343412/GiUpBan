@@ -181,7 +181,7 @@ public class PlayerScript : PoolingObject
     {
         while (GameManager.instance.gameState != GameManager.GameState.InGame || GameManager.instance.gameState != GameManager.GameState.GameStart)
         {
-            if (!Anim.GetBool("isAttack") && !Anim.GetBool("isStun"))
+            if (!Anim.GetBool("isAttack") && !Anim.GetBool("isGroggy"))
             {
                 yield return new WaitForSeconds(0.1f);
                 if (stats.Stamina < 100)
