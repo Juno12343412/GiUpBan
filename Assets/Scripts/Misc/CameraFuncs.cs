@@ -19,11 +19,12 @@ public class CameraFuncs : MonoBehaviour
     {
         initPos = transform.position;
     }
-    
+
     void Update()
     {
-        if(shakeTime > 0)
+        if (shakeTime > 0)
         {
+            Debug.Log("카메라 흔들리는 중 : " + Time.timeScale);
             transform.position = Random.insideUnitSphere * shakeAmount + initPos;
             shakeTime -= Time.deltaTime;
         }

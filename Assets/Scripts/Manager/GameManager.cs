@@ -104,7 +104,7 @@ public class GameManager : MonoBehaviour
                 GameStart();
                 break;
             case GameState.InGame:
-                InGame();
+                //InGame();
                 break;
             case GameState.Over:
                 Over();

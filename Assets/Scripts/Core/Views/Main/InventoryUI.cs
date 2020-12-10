@@ -115,7 +115,7 @@ public partial class MainUI : BaseScreen<MainUI>
     public void SetInventory()
     {
         Debug.Log("인벤토리 설정");
-        
+
         int index = 0;
         foreach (var card in cards)
         {
@@ -132,7 +132,7 @@ public partial class MainUI : BaseScreen<MainUI>
                 var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == (int)card.kind);
 
                 Debug.Log(value);
-                
+
                 card.upgradePrice = BackEndServerManager.instance.myInfo.charactersLevel[value] * 10;
                 card.upgradeNeedCard = BackEndServerManager.instance.myInfo.charactersLevel[value] * 5;
 
@@ -172,5 +172,7 @@ public partial class MainUI : BaseScreen<MainUI>
     {
         BackEndServerManager.instance.myInfo.nowCharacter = curSelectCard;
         cardUpgrade.SetActive(false);
+
+        PlayerStats.instance.SetStats();
     }
 }

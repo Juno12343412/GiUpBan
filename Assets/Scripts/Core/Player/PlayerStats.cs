@@ -128,10 +128,10 @@ public class PlayerStats : MonoBehaviour
                 AddMMR();
                 AddChest();
                 AddCard();
+
+                LoadChart();
             }
         });
-
-        LoadChart();
     }
 
     // 게임을 킬 때 사용하는 함수
@@ -158,8 +158,6 @@ public class PlayerStats : MonoBehaviour
     // 게임을 킬 때 사용하는 함수
     public void Load(string table = "UserData")
     {
-        LoadChart();
-
         SendQueue.Enqueue(Backend.GameInfo.GetPrivateContents, table, 7, callback =>
         {
             if (callback.IsSuccess())
@@ -168,6 +166,7 @@ public class PlayerStats : MonoBehaviour
                 {
                     Debug.Log("로드 정보 실패");
                     Add();
+                    return;
                 }
                 else
                 {
@@ -192,6 +191,8 @@ public class PlayerStats : MonoBehaviour
                     LoadMMR();
                     LoadChest();
                     LoadCard();
+
+                    LoadChart();
 
                     var errorLog = string.Format("로드완료 !\n이름 : {0}\n골드 : {1}\n광고 : {2}\nMMR : {3}", BackEndServerManager.instance.myNickName, BackEndServerManager.instance.myInfo.gold, BackEndServerManager.instance.myInfo.ads, BackEndServerManager.instance.myInfo.mmr);
                     Debug.Log(errorLog);
@@ -232,6 +233,8 @@ public class PlayerStats : MonoBehaviour
                     BackEndServerManager.instance.myInfo.pDefenseReceivingDamage.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Defense_ReceivingDamage"]["S"].ToString()));
                     BackEndServerManager.instance.myInfo.pDefenseReductionStun.Add(Convert.ToDouble(callback.GetReturnValuetoJSON()["rows"][i]["Defense_ReductionStun"]["S"].ToString()));
                 }
+
+                SetStats();
             }
         });
     }
@@ -374,5 +377,23 @@ public class PlayerStats : MonoBehaviour
                 }
             }
         });
+    }
+
+    public void SetStats()
+    {
+        Debug.Log("현재 캐릭터 : " + BackEndServerManager.instance.myInfo.nowCharacter);
+
+        BackEndServerManager.instance.myInfo.CurHp = BackEndServerManager.instance.myInfo.MaxHp = BackEndServerManager.instance.myInfo.pMaxHp[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.Armor = BackEndServerManager.instance.myInfo.pArmor[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.Stamina = BackEndServerManager.instance.myInfo.MaxStamina = 100;
+        BackEndServerManager.instance.myInfo.ReductionStamina = BackEndServerManager.instance.myInfo.pReductionStamina[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.WeakAttackDamage = BackEndServerManager.instance.myInfo.pWeakAttackDamage[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.WeakAttackStun = BackEndServerManager.instance.myInfo.pWeakAttackStun[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.WeakAttackPenetration = BackEndServerManager.instance.myInfo.pWeakAttackPenetration[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.StrongAttackDamage = BackEndServerManager.instance.myInfo.pStrongAttackDamage[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.StrongAttackStun = BackEndServerManager.instance.myInfo.pStrongAttackStun[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.StrongAttackPenetration = BackEndServerManager.instance.myInfo.pStrongAttackPenetration[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.DefeneseReceivingDamage = BackEndServerManager.instance.myInfo.pDefenseReceivingDamage[BackEndServerManager.instance.myInfo.nowCharacter];
+        BackEndServerManager.instance.myInfo.DefeneseReductionStun = BackEndServerManager.instance.myInfo.pDefenseReductionStun[BackEndServerManager.instance.myInfo.nowCharacter];
     }
 }

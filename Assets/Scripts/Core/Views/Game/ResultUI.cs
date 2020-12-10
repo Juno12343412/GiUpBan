@@ -29,22 +29,22 @@ public partial class GameUI : BaseScreen<GameUI>
 
         foreach (var user in matchGameResult.m_winners)
         {
-            winnerText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user) + "\n▲(" + BackEndMatchManager.instance.GetMMRBySessionId(user) + ")↑";
             if (BackEndMatchManager.instance.IsMySessionId(user))
             {
                 BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
                 Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
             }
+            winnerText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user);
         }
 
         foreach (var user in matchGameResult.m_losers)
         {
-            loserText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user) + "\n▼(" + BackEndMatchManager.instance.GetMMRBySessionId(user) + ")";
             if (BackEndMatchManager.instance.IsMySessionId(user))
             {
                 BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
                 Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
             }
+            loserText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user);
         }
         PlayerStats.instance.SaveMMR();
         ShowScreen();

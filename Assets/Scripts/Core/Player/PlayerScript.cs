@@ -154,10 +154,10 @@ public class PlayerScript : PoolingObject
         isLive = true;
     }
 
-    public void StunOn(float _Time)
+    public void StunOn(double _Time)
     {
         isStun = true;
-        StartCoroutine(CR_Stun(_Time));
+        StartCoroutine(CR_Stun((float)_Time));
     }
 
     public IEnumerator CR_Stun(float Time)
@@ -393,13 +393,13 @@ public class PlayerScript : PoolingObject
     public void HitStop(float _Time, float _Scale)
     {
         cameraFuncs.SetShakeTime(_Time, _Scale);
-        StartCoroutine(CR_TimeStop(_Time * 0.2f));
+        StartCoroutine(CR_TimeStop(_Time * 0.5f));
     }
 
     public IEnumerator CR_TimeStop(float _Time)
     {
         Time.timeScale = 0;
-        yield return new WaitForSeconds(_Time);
+        yield return new WaitForSecondsRealtime(_Time);
         Time.timeScale = 1;
     }
 

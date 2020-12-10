@@ -137,6 +137,8 @@ public class WorldPackage : MonoBehaviour
             index += 1;
         }
 
+        GameUI.instance.UISetting();
+
         var message = instance.GetNowGameState(myPlayerIndex);
         BackEndMatchManager.instance.SendDataToInGame(message);
 
@@ -234,6 +236,7 @@ public class WorldPackage : MonoBehaviour
             case Protocol.Type.GameStart:
                 // 플레이 가능하게 하기
                 GameManager.instance.ChangeState(GameManager.GameState.InGame);
+                StartCoroutine(GameUI.instance.gameTimeCheck(BackEndMatchManager.instance.matchInfos[0].matchMinute));
                 break;
             case Protocol.Type.GameEnd:
                 GameEndMessage endMessage = DataParser.ReadJsonData<GameEndMessage>(args.BinaryUserData);
@@ -342,6 +345,7 @@ public class WorldPackage : MonoBehaviour
 
         players[data.playerSession].Anim.SetInteger("AttackKind", 3);
         players[data.playerSession].Anim.SetBool("isAttack", true);
+
     }
 
     // 스턴 상태
@@ -374,6 +378,12 @@ public class WorldPackage : MonoBehaviour
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         Debug.Log("데미지넣음" + data.damage);
+
+        if(!BackEndMatchManager.instance.IsMySessionId(data.playerSession))
+        {
+            players[myPlayerIndex].HitStop(0.5f, 0.4f);
+        }
+
         Debug.Log("넣기전 체력" + players[data.playerSession].Stats.CurHp);
         players[data.playerSession].Stats.CurHp -= data.damage;
         Debug.Log("넣은후 체력" + players[data.playerSession].Stats.CurHp);
@@ -510,18 +520,16 @@ public class WorldPackage : MonoBehaviour
         if (players[otherPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
         {
             if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
-            {              
+            {
                 players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f)
                     * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
 
                 players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.WeakAttackStun);
 
-                players[otherPlayerIndex].AttackPointFalse();
                 players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(2, 2);
-                players[otherPlayerIndex].HitStop(2, 2);
+                players[myPlayerIndex].HitStop(0.5f, 0.3f);
                 return;
             }
             else
@@ -530,11 +538,11 @@ public class WorldPackage : MonoBehaviour
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f));
 
                 players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.WeakAttackStun);
-                players[otherPlayerIndex].AttackPointFalse();
+
                 players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(2, 2);
-                players[otherPlayerIndex].HitStop(2, 2);
+                players[myPlayerIndex].HitStop(0.5f, 0.3f);
+
                 Debug.Log("약공 들어감");
                 return;
 
@@ -550,24 +558,23 @@ public class WorldPackage : MonoBehaviour
                     * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
 
                 players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.StrongAttackStun);
-                players[otherPlayerIndex].AttackPointFalse();
+               
                 players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(2, 2);
-                players[otherPlayerIndex].HitStop(2, 2);
+                players[myPlayerIndex].HitStop(0.5f, 0.4f);
             }
             else
             {
-              
+
                 players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f));
 
                 players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.StrongAttackStun);
-                players[otherPlayerIndex].AttackPointFalse();
+               
                 players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(2, 4);
-                players[otherPlayerIndex].HitStop(2, 4);
+                players[myPlayerIndex].HitStop(0.5f, 0.4f);
+
                 Debug.Log("강공 들어감");
 
             }
