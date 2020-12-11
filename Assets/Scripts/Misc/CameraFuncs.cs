@@ -25,7 +25,8 @@ public class CameraFuncs : MonoBehaviour
         if (shakeTime > 0)
         {
             Debug.Log("카메라 흔들리는 중 : " + Time.timeScale);
-            transform.position = Random.insideUnitSphere * shakeAmount + initPos;
+            if(Time.deltaTime == 1)
+                transform.position = Random.insideUnitSphere * shakeAmount + initPos;
             shakeTime -= Time.deltaTime;
         }
         else

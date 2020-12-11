@@ -381,7 +381,7 @@ public class WorldPackage : MonoBehaviour
 
         if(!BackEndMatchManager.instance.IsMySessionId(data.playerSession))
         {
-            players[myPlayerIndex].HitStop(0.5f, 0.4f);
+            players[myPlayerIndex].HitStop(0.2f, 0.2f);
         }
 
         Debug.Log("넣기전 체력" + players[data.playerSession].Stats.CurHp);
@@ -529,7 +529,7 @@ public class WorldPackage : MonoBehaviour
 
                 players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(0.5f, 0.3f);
+                players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 return;
             }
             else
@@ -541,7 +541,7 @@ public class WorldPackage : MonoBehaviour
 
                 players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(0.5f, 0.3f);
+                players[myPlayerIndex].HitStop(0.2f, 0.2f);
 
                 Debug.Log("약공 들어감");
                 return;
@@ -561,7 +561,7 @@ public class WorldPackage : MonoBehaviour
                
                 players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(0.5f, 0.4f);
+                players[myPlayerIndex].HitStop(0.2f, 0.2f);
             }
             else
             {
@@ -573,7 +573,7 @@ public class WorldPackage : MonoBehaviour
                
                 players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(0.5f, 0.4f);
+                players[myPlayerIndex].HitStop(0.2f, 0.2f);
 
                 Debug.Log("강공 들어감");
 

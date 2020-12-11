@@ -212,7 +212,7 @@ public class PlayerStats : MonoBehaviour
     public void LoadChart()
     {
         // 모든 캐릭터 정보
-        SendQueue.Enqueue(Backend.Chart.GetChartContents, "11411", callback =>
+        SendQueue.Enqueue(Backend.Chart.GetChartContents, "11516", callback =>
         {
             if (callback.IsSuccess())
             {

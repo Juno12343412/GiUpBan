@@ -58,13 +58,13 @@ public partial class MainUI : BaseScreen<MainUI>
 
     // Purchase
     [Header("Purchase")]
-    [SerializeField] private Image purchaseCharacterImg = null; 
+    [SerializeField] private Image purchaseCharacterImg = null;
     [SerializeField] private Text itemNameText = null, itemCountText = null;
     [SerializeField] private Text itemPriceText = null;
     [SerializeField] private GameObject hideObj = null;
 
     [SerializeField] private Image purchaseChestImg = null;
-    [SerializeField] private Text chestArenaText = null, chestKindText = null;
+    [SerializeField] private Text chestKindText = null;
     [SerializeField] private Text chestGoldText = null, chestCardText = null;
     [SerializeField] private Text chestPriceText = null;
     // Purchase
@@ -92,7 +92,7 @@ public partial class MainUI : BaseScreen<MainUI>
     // 현재 카드 구매 가능여부 보여주기
     public void ShowShop()
     {
-        foreach(var item in items)
+        foreach (var item in items)
         {
             if (item.itemCount <= 0)
             {
@@ -123,7 +123,7 @@ public partial class MainUI : BaseScreen<MainUI>
         //    items[index].itemCount = 0;
         //    ShowShop();
         //}
-        
+
         if (CheckHaveCard(items[curSelectItem].itemKind))
         {
             Debug.Log("캐릭터 있음");
@@ -147,7 +147,7 @@ public partial class MainUI : BaseScreen<MainUI>
         }
         ShowShop();
         SetInventory();
-        
+
         BackEndServerManager.instance.myInfo.cardKind[curSelectItem] = items[curSelectItem].itemKind;
         BackEndServerManager.instance.myInfo.cardCount[curSelectItem] = items[curSelectItem].itemCount;
 
@@ -166,7 +166,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
         int index = 0;
 
-        foreach(var item in items)
+        foreach (var item in items)
         {
             Debug.Log(index);
 
@@ -269,6 +269,9 @@ public partial class MainUI : BaseScreen<MainUI>
         chestKindText.text = chests[index].chestKind.ToString() + " 상자";
         chestPriceText.text = chests[index].chestPrice + "D";
 
+        chestCardText.text = "x" + (index + 1) * 5;
+        chestGoldText.text = (index + 1) * 100 + "C" + "-" + (index + 1) * 999 + "C";
+
         diamondChestDisObject.SetActive(true);
     }
 
@@ -311,4 +314,3 @@ public partial class MainUI : BaseScreen<MainUI>
         }
     }
 }
-

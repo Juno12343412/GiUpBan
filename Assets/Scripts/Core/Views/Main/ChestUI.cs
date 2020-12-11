@@ -48,19 +48,19 @@ public partial class MainUI : BaseScreen<MainUI>
     // Dismissing
     [Header("Dismissing")]
     [SerializeField] private Image disChestImg = null;
-    [SerializeField] private Text disArenaText = null, disKindText = null;
+    [SerializeField] private Text disKindText = null;
     [SerializeField] private Text disGoldText = null, disCardText = null;
     [SerializeField] private Text disTimeText = null;
     [SerializeField] private Button disButton = null, openButton = null;
     // Dismissing
 
     // ChestOpen
-    [SerializeField] private Image chestImg           = null;                // 상자 종류 이미지
-    [SerializeField] private Image cardGradeImg       = null;                // 카드 등급 이미지
-    [SerializeField] private Image cardImg            = null, etcImg = null; // 카드 종류 이미지
-    [SerializeField] private Text  cardText           = null;                // 카드 이름
-    [SerializeField] private Text  cardCountText      = null;                // 카드 개수
-    [SerializeField] private Text  chestItemCountText = null;                // 상자 남은 아이템 개수 
+    [SerializeField] private Image chestImg = null;                // 상자 종류 이미지
+    [SerializeField] private Image cardGradeImg = null;                // 카드 등급 이미지
+    [SerializeField] private Image cardImg = null, etcImg = null; // 카드 종류 이미지
+    [SerializeField] private Text cardText = null;                // 카드 이름
+    [SerializeField] private Text cardCountText = null;                // 카드 개수
+    [SerializeField] private Text chestItemCountText = null;                // 상자 남은 아이템 개수 
     // ChestOpen
 
     // ETC
@@ -145,7 +145,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
         Debug.Log("시작 시간 : " + myChests[index].startTime + " / 현재 시간 : " + endTime + " / 남은 시간 : " + timeCal.Minutes + "분");
 
-        myChests[index].disTimeText.text = ((myChests[index].disTime - 1) - timeCal.Minutes) + "분" + (60 - timeCal.Seconds) + "초"; 
+        myChests[index].disTimeText.text = ((myChests[index].disTime - 1) - timeCal.Minutes) + "분" + (60 - timeCal.Seconds) + "초";
 
         if (myChests[index].disTime <= timeCal.Minutes && myChests[index].chestState == ChestState.Dismissing)
         {
@@ -195,6 +195,10 @@ public partial class MainUI : BaseScreen<MainUI>
             disButton.gameObject.SetActive(true);
             openButton.gameObject.SetActive(false);
             disTimeText.text = myChests[index].disTime.ToString() + "분";
+
+            // ...
+            disGoldText.text = (index + 1) * 100 + "C" + "-" + (index + 1) * 999 + "C";
+            disCardText.text = "x" + (index + 1) * 5;
         }
         else
         {
@@ -228,7 +232,7 @@ public partial class MainUI : BaseScreen<MainUI>
     {
         count = curSelectMyChest + 2;
         chestItemCountText.text = count.ToString();
-        
+
         chestDisObject.SetActive(false);
         chestOpenObject.SetActive(true);
 
@@ -290,7 +294,7 @@ public partial class MainUI : BaseScreen<MainUI>
                 // 다이아몬드
                 int diamond = Random.Range(index + 1, (index + 1) * 5);
                 BackEndServerManager.instance.myInfo.diamond += diamond;
-                
+
                 cardText.text = "다이아";
                 ShowResultCard(characterImgs.Length - 1, diamond);
             }
@@ -305,7 +309,7 @@ public partial class MainUI : BaseScreen<MainUI>
             // 중간 부분 카드 줌
             GiveCard(index);
         }
-        count--; 
+        count--;
         //OpenChest(index, count);
     }
 
@@ -366,7 +370,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
     void GiveCard(int index)
     {
-        SendQueue.Enqueue(Backend.Probability.GetProbability, "766", callback =>
+        SendQueue.Enqueue(Backend.Probability.GetProbability, "767", callback =>
         {
             // 그 다음 카드 부분
             if (callback.IsSuccess())
@@ -413,6 +417,8 @@ public partial class MainUI : BaseScreen<MainUI>
 
                 cardText.text = log;
                 ShowResultCard(card, count);
+
+                SetInventory();
             }
             else
                 Debug.Log("실패 !");
@@ -425,7 +431,7 @@ public partial class MainUI : BaseScreen<MainUI>
         Debug.Log("아이템 개수 : " + count);
 
         // 애니메이션 재생을 위함
-        cardGradeImg.gameObject.SetActive(false); 
+        cardGradeImg.gameObject.SetActive(false);
         cardGradeImg.gameObject.SetActive(true);
         // 애니메이션 재생을 위함
 
@@ -444,7 +450,7 @@ public partial class MainUI : BaseScreen<MainUI>
             etcImg.gameObject.SetActive(true);
         }
         else
-        { 
+        {
             cardCountText.text = "x" + count;
             cardImg.sprite = characterImgs[index];
             cardImg.gameObject.SetActive(true);
