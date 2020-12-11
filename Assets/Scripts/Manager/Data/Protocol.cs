@@ -62,7 +62,7 @@ namespace Protocol
 
     #region Event
 
-    public class PlayerIdleMessage : Message 
+    public class PlayerIdleMessage : Message
     {
         public SessionId playerSession;
         public PlayerIdleMessage(SessionId session) : base(Type.Idle) => this.playerSession = session;
@@ -207,11 +207,12 @@ namespace Protocol
         public double StrongAttackPenetration = 0f;
         public double DefeneseReceivingDamage = 0f;
         public double DefeneseReductionStun = 0f;
+        public int nowCharacter = 0;
 
-        public GameMySyncMessage(SessionId session, double maxHp, double armor, double stamina, double reductionStamina, 
-            double weakAttackDamage, double weakAttackStun, double weakAttackPenetration, 
+        public GameMySyncMessage(SessionId session, double maxHp, double armor, double stamina, double reductionStamina,
+            double weakAttackDamage, double weakAttackStun, double weakAttackPenetration,
             double strongAttackDamage, double strongAttackStun, double strongAttackPenetration,
-            double defenseReceivingDamage, double defenseReductionStun) : base(Type.GameMySync)
+            double defenseReceivingDamage, double defenseReductionStun, int nowCharacter) : base(Type.GameMySync)
         {
             this.session = session;
             this.MaxHp = maxHp;
@@ -226,6 +227,7 @@ namespace Protocol
             this.StrongAttackPenetration = strongAttackPenetration;
             this.DefeneseReceivingDamage = defenseReceivingDamage;
             this.DefeneseReductionStun = defenseReductionStun;
+            this.nowCharacter = nowCharacter;
         }
     }
 
@@ -233,24 +235,25 @@ namespace Protocol
     {
         public SessionId host;
         public int count = 0;
-        public double[] MaxHp                   = null;
-        public double[] Armor                   = null;
-        public double[] Stamina                 = null;
-        public double[] ReductionStamina        = null;
-        public double[] WeakAttackDamage        = null;
-        public double[] WeakAttackStun          = null;
-        public double[] WeakAttackPenetration   = null;
-        public double[] StrongAttackDamage      = null;
-        public double[] StrongAttackStun        = null;
+        public double[] MaxHp = null;
+        public double[] Armor = null;
+        public double[] Stamina = null;
+        public double[] ReductionStamina = null;
+        public double[] WeakAttackDamage = null;
+        public double[] WeakAttackStun = null;
+        public double[] WeakAttackPenetration = null;
+        public double[] StrongAttackDamage = null;
+        public double[] StrongAttackStun = null;
         public double[] StrongAttackPenetration = null;
         public double[] DefeneseReceivingDamage = null;
-        public double[] DefeneseReductionStun   = null;
+        public double[] DefeneseReductionStun = null;
+        public int[] nowCharacter = null;
         public bool[] onlineInfo = null;
 
         public GameSyncMessage(SessionId host, int count, double[] maxHp, double[] armor, double[] stamina, double[] reductionStamina,
             double[] weakAttackDamage, double[] weakAttackStun, double[] weakAttackPenetration,
             double[] strongAttackDamage, double[] strongAttackStun, double[] strongAttackPenetration,
-            double[] defenseReceivingDamage, double[] defenseReductionStun, bool[] online) : base(Type.GameSync)
+            double[] defenseReceivingDamage, double[] defenseReductionStun, int[] nowCharacter, bool[] online) : base(Type.GameSync)
         {
             this.host = host;
 
@@ -266,29 +269,8 @@ namespace Protocol
             this.StrongAttackPenetration = strongAttackPenetration;
             this.DefeneseReceivingDamage = defenseReceivingDamage;
             this.DefeneseReductionStun = defenseReductionStun;
+            this.nowCharacter = nowCharacter;
             onlineInfo = online;
-
-            //this.count = count;
-            //this.MaxHp = this.Armor = this.Stamina = this.ReductionStamina = this.WeakAttackDamage = this.WeakAttackStun = this.WeakAttackPenetration
-            //    = this.StrongAttackDamage = this.StrongAttackStun = this.StrongAttackPenetration = this.DefeneseReceivingDamage = this.DefeneseReductionStun = new double[count];
-            //this.onlineInfo = new bool[count];
-
-            //for (int i = 0; i < count; ++i)
-            //{
-            //    this.MaxHp                      = maxHp;
-            //    this.Armor                      = armor;
-            //    this.Stamina                    = stamina;
-            //    this.ReductionStamina           = reductionStamina;
-            //    this.WeakAttackDamage           = weakAttackDamage;
-            //    this.WeakAttackStun             = weakAttackStun;
-            //    this.WeakAttackPenetration      = weakAttackPenetration;
-            //    this.StrongAttackDamage         = strongAttackDamage;
-            //    this.StrongAttackStun           = strongAttackStun;
-            //    this.StrongAttackPenetration    = strongAttackPenetration;
-            //    this.DefeneseReceivingDamage    = defenseReceivingDamage;
-            //    this.DefeneseReductionStun      = defenseReductionStun;
-            //    onlineInfo = online;
-            //}
         }
     }
 
@@ -303,15 +285,15 @@ namespace Protocol
 
     public static class KeyEventCode
     {
-        public const int NONE          = 0;
-        public const int IDLE          = 1;   // 아무것도 안하는 메시지
-        public const int WEAK_ATTACK   = 2;   // 약한 공격 메시지
+        public const int NONE = 0;
+        public const int IDLE = 1;   // 아무것도 안하는 메시지
+        public const int WEAK_ATTACK = 2;   // 약한 공격 메시지
         public const int STRONG_ATTACK = 3;   // 강한 공격 메시지
-        public const int DEFENSE       = 4;   // 방어 메시지
-        public const int STUN          = 5;   // 스턴 메시지
-        public const int ATTACK_END    = 6;   // 공격 종료 메세지
-        public const int DAMAGED       = 7;   // 공격 받는 메세지
-        public const int STAMINA       = 8;   // 스태미나 받는 메세지
+        public const int DEFENSE = 4;   // 방어 메시지
+        public const int STUN = 5;   // 스턴 메시지
+        public const int ATTACK_END = 6;   // 공격 종료 메세지
+        public const int DAMAGED = 7;   // 공격 받는 메세지
+        public const int STAMINA = 8;   // 스태미나 받는 메세지
     }
 
     public class KeyMessage : Message

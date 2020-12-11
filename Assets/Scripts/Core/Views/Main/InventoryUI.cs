@@ -35,6 +35,7 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private Text characterExplainText = null, characterSpecialText = null;
     [SerializeField] private Text characterHPText = null, characterAttackText = null, characterArmorText = null, characterAttackSpeedText = null;
     [SerializeField] private Text characterPriceText = null;
+    [SerializeField] private GameObject[] charactersView = null;
 
     // 1.
     void InventoryInit()
@@ -50,6 +51,11 @@ public partial class MainUI : BaseScreen<MainUI>
             card.characterCountText = card.obj.transform.GetChild(4).GetComponent<Text>();
         }
         SetInventory();
+
+        foreach (var characters in charactersView)
+            characters.SetActive(false);
+
+        charactersView[BackEndServerManager.instance.myInfo.nowCharacter].SetActive(true);
     }
 
     // 5.
@@ -59,13 +65,24 @@ public partial class MainUI : BaseScreen<MainUI>
         {
             var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == (int)cards[curSelectCard].kind);
 
+            int level = BackEndServerManager.instance.myInfo.charactersLevel[value];
+
+            if (level == 1)
+            {
+                characterHPText.text = BackEndServerManager.instance.myInfo.pMaxHp[curSelectCard].ToString();
+                characterAttackText.text = BackEndServerManager.instance.myInfo.pWeakAttackDamage[curSelectCard] + "-" + BackEndServerManager.instance.myInfo.pStrongAttackDamage[curSelectCard];
+                characterArmorText.text = BackEndServerManager.instance.myInfo.pArmor[curSelectCard].ToString();
+            }
+            else
+            {
+                characterHPText.text = (BackEndServerManager.instance.myInfo.pMaxHp[curSelectCard] + BackEndServerManager.instance.myInfo.pMaxHp[curSelectCard] * (int)(level * 0.6)).ToString();
+                characterAttackText.text = BackEndServerManager.instance.myInfo.pWeakAttackDamage[curSelectCard] + BackEndServerManager.instance.myInfo.pWeakAttackDamage[curSelectCard] * (int)(level * 0.6) + "-" + (BackEndServerManager.instance.myInfo.pStrongAttackDamage[curSelectCard] + BackEndServerManager.instance.myInfo.pStrongAttackDamage[curSelectCard] * (int)(level * 0.6));
+                characterArmorText.text = (BackEndServerManager.instance.myInfo.pArmor[curSelectCard] + BackEndServerManager.instance.myInfo.pArmor[curSelectCard] * (int)(level * 0.6)).ToString();
+            }
+            characterCountText.text = BackEndServerManager.instance.myInfo.levelExp[value] + "/" + cards[curSelectCard].upgradeNeedCard;
             upgradeCharacterImg.sprite = characterImgs[curSelectCard];
             characterNameText.text = ((CharacterKind)curSelectCard).ToString();
-            characterCountText.text = BackEndServerManager.instance.myInfo.levelExp[value] + "/" + cards[curSelectCard].upgradeNeedCard;
-            characterLevelText.text = BackEndServerManager.instance.myInfo.charactersLevel[value].ToString();
-            characterHPText.text = BackEndServerManager.instance.myInfo.pMaxHp[curSelectCard].ToString();
-            characterAttackText.text = BackEndServerManager.instance.myInfo.pWeakAttackDamage[curSelectCard] + "-" + BackEndServerManager.instance.myInfo.pStrongAttackDamage[curSelectCard];
-            characterArmorText.text = BackEndServerManager.instance.myInfo.pArmor[curSelectCard].ToString();
+            characterLevelText.text = level.ToString();
             characterPriceText.text = cards[curSelectCard].upgradePrice + "C";
 
             switch (curSelectCard)
@@ -212,6 +229,11 @@ public partial class MainUI : BaseScreen<MainUI>
     {
         BackEndServerManager.instance.myInfo.nowCharacter = curSelectCard;
         cardUpgrade.SetActive(false);
+
+        foreach (var characters in charactersView)
+            characters.SetActive(false);
+
+        charactersView[curSelectCard].SetActive(true);
 
         PlayerStats.instance.SetStats();
     }

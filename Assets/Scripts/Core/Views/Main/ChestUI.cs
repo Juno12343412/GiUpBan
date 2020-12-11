@@ -218,13 +218,15 @@ public partial class MainUI : BaseScreen<MainUI>
     // 다이아몬드 체스트
     public void OpenDiamondChestUI(int index)
     {
+        count = index + 2;
+        chestItemCountText.text = count.ToString();
+
         chestDisObject.SetActive(false);
         chestOpenObject.SetActive(true);
 
         chestImg.gameObject.SetActive(true);
 
         Invoke("ContinueOpenChest", 1.5f);
-        count = index + 2;
     }
 
     // 메인에서 잠금해제가 완료된 상자 터치할 때

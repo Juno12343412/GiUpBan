@@ -379,7 +379,7 @@ public class WorldPackage : MonoBehaviour
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         Debug.Log("데미지넣음" + data.damage);
 
-        if(!BackEndMatchManager.instance.IsMySessionId(data.playerSession))
+        if (!BackEndMatchManager.instance.IsMySessionId(data.playerSession))
         {
             players[myPlayerIndex].HitStop(0.2f, 0.2f);
         }
@@ -481,6 +481,7 @@ public class WorldPackage : MonoBehaviour
                 player.Value.Stats.StrongAttackPenetration = syncMessage.StrongAttackPenetration[index];
                 player.Value.Stats.DefeneseReceivingDamage = syncMessage.DefeneseReceivingDamage[index];
                 player.Value.Stats.DefeneseReductionStun = syncMessage.DefeneseReductionStun[index];
+                player.Value.Stats.nowCharacter = syncMessage.nowCharacter[index];
             }
 
             index++;
@@ -510,6 +511,7 @@ public class WorldPackage : MonoBehaviour
         players[mySyncMessage.session].Stats.StrongAttackPenetration = mySyncMessage.StrongAttackPenetration;
         players[mySyncMessage.session].Stats.DefeneseReceivingDamage = mySyncMessage.DefeneseReceivingDamage;
         players[mySyncMessage.session].Stats.DefeneseReductionStun = mySyncMessage.DefeneseReductionStun;
+        players[mySyncMessage.session].Stats.nowCharacter = mySyncMessage.nowCharacter;
         players[mySyncMessage.session].CharactersPrefab[players[mySyncMessage.session].Stats.nowCharacter].SetActive(true);
         players[mySyncMessage.session].Anim = players[mySyncMessage.session].CharactersPrefab[players[mySyncMessage.session].Stats.nowCharacter].GetComponent<Animator>();
         StartCoroutine(players[mySyncMessage.session].CR_StaminaHeal());
@@ -558,7 +560,7 @@ public class WorldPackage : MonoBehaviour
                     * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
 
                 players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.StrongAttackStun);
-               
+
                 players[myPlayerIndex].AttackPointFalse();
 
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
@@ -570,7 +572,7 @@ public class WorldPackage : MonoBehaviour
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f));
 
                 players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.StrongAttackStun);
-               
+
                 players[myPlayerIndex].AttackPointFalse();
 
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
@@ -608,7 +610,7 @@ public class WorldPackage : MonoBehaviour
             , players[myPlayerIndex].Stats.Armor, players[myPlayerIndex].Stats.Stamina, players[myPlayerIndex].Stats.ReductionStamina,
             players[myPlayerIndex].Stats.WeakAttackDamage, players[myPlayerIndex].Stats.WeakAttackStun, players[myPlayerIndex].Stats.WeakAttackPenetration,
             players[myPlayerIndex].Stats.StrongAttackDamage, players[myPlayerIndex].Stats.StrongAttackStun, players[myPlayerIndex].Stats.StrongAttackPenetration,
-            players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Stats.DefeneseReductionStun);
+            players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Stats.DefeneseReductionStun, players[myPlayerIndex].Stats.nowCharacter);
     }
 
     public void TimeOutWinnerSetting()
