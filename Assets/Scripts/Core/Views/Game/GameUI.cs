@@ -26,7 +26,7 @@ public partial class GameUI : BaseScreen<GameUI>
 
     public IEnumerator gameTimeCheck(int time = 180)
     {
-        int curTime = time * 60;
+        int curTime = (time * 60) - 20;
 
         while (curTime > 0)
         {
@@ -34,6 +34,7 @@ public partial class GameUI : BaseScreen<GameUI>
             timerText.text = curTime.ToString();
             yield return new WaitForSecondsRealtime(1f);
         }
-        timerText.text = curTime.ToString();
+        timerText.text = "-";
+        WorldPackage.instance.TimeOutWinnerSetting();
     }
 }

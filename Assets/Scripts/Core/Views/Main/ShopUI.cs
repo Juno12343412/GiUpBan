@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public enum ChestKind : byte
 {
-    한승우,
+    한,
     조셉트,
     폴,
     브론즈,
@@ -14,6 +14,7 @@ public enum ChestKind : byte
     골드,
     굿,
     예아,
+    MAX,
     NONE = 99
 }
 
@@ -84,7 +85,6 @@ public partial class MainUI : BaseScreen<MainUI>
             chest.chestImage = chest.obj.transform.GetChild(0).GetComponent<Image>();
             chest.chestNameText = chest.obj.transform.GetChild(1).GetComponent<Text>();
             chest.chestPriceText = chest.obj.transform.GetChild(2).GetComponent<Text>();
-            chest.chestArenaText = chest.obj.transform.GetChild(3).GetComponent<Text>();
         }
     }
 
@@ -124,7 +124,7 @@ public partial class MainUI : BaseScreen<MainUI>
         //    ShowShop();
         //}
         
-        if (BackEndServerManager.instance.myInfo.haveCharacters.Contains(items[curSelectItem].itemKind))
+        if (CheckHaveCard(items[curSelectItem].itemKind))
         {
             Debug.Log("캐릭터 있음");
 
@@ -171,7 +171,7 @@ public partial class MainUI : BaseScreen<MainUI>
             Debug.Log(index);
 
             // 이미지 설정하는 코드 추가 [...]
-            item.itemKind = Random.Range(0, 3);
+            item.itemKind = Random.Range(0, (int)CharacterKind.MAX);
 
             item.itemMaxCount = Random.Range(1, 65);
             item.itemCount = item.itemMaxCount;
@@ -183,7 +183,7 @@ public partial class MainUI : BaseScreen<MainUI>
             item.itemCountText.text = "x" + item.itemMaxCount;
             item.itemPriceText.text = item.itemPrice.ToString() + "C";
 
-            item.itemImage.sprite = characterImgs[0];
+            item.itemImage.sprite = characterImgs[item.itemKind];
 
             BackEndServerManager.instance.myInfo.cardKind[index] = item.itemKind;
             BackEndServerManager.instance.myInfo.cardCount[index] = item.itemCount;
@@ -220,7 +220,7 @@ public partial class MainUI : BaseScreen<MainUI>
             items[i].itemCountText.text = "x" + items[i].itemMaxCount;
             items[i].itemPriceText.text = items[i].itemPrice.ToString() + "C";
 
-            items[i].itemImage.sprite = characterImgs[0];
+            items[i].itemImage.sprite = characterImgs[items[i].itemKind];
         }
 
         foreach (var chest in chests)
@@ -241,7 +241,7 @@ public partial class MainUI : BaseScreen<MainUI>
         if (items[curSelectItem].itemCount > 0)
         {
             hideObj.SetActive(false);
-            purchaseCharacterImg.sprite = characterImgs[0];
+            purchaseCharacterImg.sprite = characterImgs[items[curSelectItem].itemKind];
             itemNameText.text = ((CharacterKind)items[index].itemKind).ToString();
             itemCountText.text = "x" + items[index].itemCount;
             itemPriceText.text = items[index].itemPrice.ToString() + "C";
@@ -294,6 +294,20 @@ public partial class MainUI : BaseScreen<MainUI>
                 break;
             }
             yield return new WaitForSeconds(100f);
+        }
+    }
+
+    public bool CheckHaveCard(int index)
+    {
+        if (BackEndServerManager.instance.myInfo.haveCharacters.Contains(index))
+        {
+            Debug.Log("캐릭터 있음");
+            return true;
+        }
+        else
+        {
+            Debug.Log("캐릭터 없음 : " + index);
+            return false;
         }
     }
 }

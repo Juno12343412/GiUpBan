@@ -252,10 +252,7 @@ public class PlayerScript : PoolingObject
                 if (!isLong && !isSwipe)
                     PlayerTouch();
             }
-
         }
-
-
     } // 화면 컨트롤
 
     IEnumerator CR_LongTouch()
@@ -402,6 +399,4 @@ public class PlayerScript : PoolingObject
         yield return new WaitForSecondsRealtime(_Time);
         Time.timeScale = 1;
     }
-
-    //public void CameraMoving(bool )
 }

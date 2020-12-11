@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +13,7 @@ public enum ChestState : byte
     NONE = 99
 }
 
-[Serializable]
+[System.Serializable]
 public class Chest
 {
     public GameObject idleChest = null;
@@ -32,7 +31,7 @@ public class Chest
     public int disTime = 0;
     public int diamondPrice = 0;
 
-    public DateTime startTime = DateTime.Now;
+    public System.DateTime startTime = System.DateTime.Now;
 }
 
 // 메인상자
@@ -55,14 +54,17 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private Button disButton = null, openButton = null;
     // Dismissing
 
-    // 아이템 리스트
-    [SerializeField] private Text itemList = null;
+    // ChestOpen
+    [SerializeField] private Image chestImg           = null;                // 상자 종류 이미지
+    [SerializeField] private Image cardGradeImg       = null;                // 카드 등급 이미지
+    [SerializeField] private Image cardImg            = null, etcImg = null; // 카드 종류 이미지
+    [SerializeField] private Text  cardText           = null;                // 카드 이름
+    [SerializeField] private Text  cardCountText      = null;                // 카드 개수
+    [SerializeField] private Text  chestItemCountText = null;                // 상자 남은 아이템 개수 
+    // ChestOpen
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-            AddChest(ChestKind.예아, ChestState.Idle, "", curHaveChests);
-    }
+    // ETC
+    int count = 0;
 
     public void ChestInit()
     {
@@ -90,14 +92,15 @@ public partial class MainUI : BaseScreen<MainUI>
         myChests[index].chestState = state;
 
         if (startTime == "")
-            myChests[index].startTime = DateTime.Now;
+            myChests[index].startTime = System.DateTime.Now;
         else
-            myChests[index].startTime = DateTime.Parse(startTime);
+            myChests[index].startTime = System.DateTime.Parse(startTime);
 
         myChests[index].disTime = 1;
         myChests[index].diamondPrice = ((int)kind + 1) * 10;
 
         myChests[index].idleTimeText.text = myChests[index].disTime + "분";
+        myChests[index].idleArenaText.text = myChests[index].chestKind.ToString();
 
         myChests[index].disTimeText.text = myChests[index].disTime + "분";
         myChests[index].disDiamondText.text = myChests[index].diamondPrice + "D";
@@ -137,8 +140,8 @@ public partial class MainUI : BaseScreen<MainUI>
     // 해당 인덱스의 상자 체킹 (열 시간이 지났는가 안지났는가)
     public void CheckMyChest(int index)
     {
-        DateTime endTime = DateTime.Now;
-        TimeSpan timeCal = endTime - myChests[index].startTime;
+        System.DateTime endTime = System.DateTime.Now;
+        System.TimeSpan timeCal = endTime - myChests[index].startTime;
 
         Debug.Log("시작 시간 : " + myChests[index].startTime + " / 현재 시간 : " + endTime + " / 남은 시간 : " + timeCal.Minutes + "분");
 
@@ -167,7 +170,7 @@ public partial class MainUI : BaseScreen<MainUI>
             curDisChest = curSelectMyChest;
 
             myChests[curSelectMyChest].chestState = ChestState.Dismissing;
-            myChests[curSelectMyChest].startTime = DateTime.Now;
+            myChests[curSelectMyChest].startTime = System.DateTime.Now;
 
             myChests[curSelectMyChest].idleChest.SetActive(false);
             myChests[curSelectMyChest].disChest.SetActive(true);
@@ -208,69 +211,113 @@ public partial class MainUI : BaseScreen<MainUI>
         chestDisObject.SetActive(false);
     }
 
+    // 다이아몬드 체스트
+    public void OpenDiamondChestUI(int index)
+    {
+        chestDisObject.SetActive(false);
+        chestOpenObject.SetActive(true);
+
+        chestImg.gameObject.SetActive(true);
+
+        Invoke("ContinueOpenChest", 1.5f);
+        count = index + 2;
+    }
+
+    // 메인에서 잠금해제가 완료된 상자 터치할 때
     public void OpenChestUI()
+    {
+        count = curSelectMyChest + 2;
+        chestItemCountText.text = count.ToString();
+        
+        chestDisObject.SetActive(false);
+        chestOpenObject.SetActive(true);
+
+        chestImg.gameObject.SetActive(true);
+
+        Invoke("ContinueOpenChest", 1.5f);
+    }
+
+    // 그 다음에 상자를 열고 있을 때 남은 아이템들을 열어볼 때
+    public void ContinueOpenChest()
     {
         OpenChest(curSelectMyChest);
     }
 
     public void OpenChest(int index)
     {
-        curHaveChests--;
+        chestItemCountText.text = (count - 1).ToString();
 
-        chestDisObject.SetActive(false);
-        chestOpenObject.SetActive(true);
-
-        myChests[index].idleChest.SetActive(false);
-        myChests[index].disChest.SetActive(false);
-        myChests[index].openChest.SetActive(false);
-
-        myChests[index].chestState = ChestState.NONE;
-
-        BackEndServerManager.instance.myInfo.haveChestKind[index] = 99;
-        BackEndServerManager.instance.myInfo.haveChestState[index] = 99;
-        BackEndServerManager.instance.myInfo.disChest = curDisChest;
-        BackEndServerManager.instance.myInfo.haveChests = curHaveChests;
-        BackEndServerManager.instance.myInfo.disStartTime = "";
-
-        CheckDis();
-
-        SendQueue.Enqueue(Backend.Probability.GetProbability, "634", callback =>
+        if (count <= 0)
         {
-            if (callback.IsSuccess())
+            chestItemCountText.text = "0";
+
+            chestImg.gameObject.SetActive(false);
+            cardGradeImg.gameObject.SetActive(false);
+
+            curHaveChests--;
+
+            myChests[index].idleChest.SetActive(false);
+            myChests[index].disChest.SetActive(false);
+            myChests[index].openChest.SetActive(false);
+
+            myChests[index].chestState = ChestState.NONE;
+
+            BackEndServerManager.instance.myInfo.haveChestKind[index] = 99;
+            BackEndServerManager.instance.myInfo.haveChestState[index] = 99;
+            BackEndServerManager.instance.myInfo.disChest = curDisChest;
+            BackEndServerManager.instance.myInfo.haveChests = curHaveChests;
+            BackEndServerManager.instance.myInfo.disStartTime = "";
+
+            CheckDis();
+
+            CloseChest();
+            return;
+        }
+        else if (count == index + 2)
+        {
+            // 맨 처음 골드 부분
+            int gold = Random.Range((index + 1) * 100, (index + 1) * 999);
+            BackEndServerManager.instance.myInfo.gold += gold;
+
+            cardText.text = "클로버";
+            ShowResultCard(characterImgs.Length - 2, gold);
+        }
+        else if (count == 1)
+        {
+            // 확률적으로 다이아몬드
+            if (Random.Range(0f, 101f) <= 30f)
             {
-                var log = callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString();
-                Debug.Log(log);
-                itemList.text = log;
+                // 다이아몬드
+                int diamond = Random.Range(index + 1, (index + 1) * 5);
+                BackEndServerManager.instance.myInfo.diamond += diamond;
+                
+                cardText.text = "다이아";
+                ShowResultCard(characterImgs.Length - 1, diamond);
             }
             else
-                Debug.Log("실패 !");
-        });
+            {
+                // 카드
+                GiveCard(index);
+            }
+        }
+        else
+        {
+            // 중간 부분 카드 줌
+            GiveCard(index);
+        }
+        count--; 
+        //OpenChest(index, count);
     }
 
     public void OpenDiamondChest(ChestKind kind)
     {
         diamondChestDisObject.SetActive(false);
-        chestOpenObject.SetActive(true);
-
-        BackEndServerManager.instance.myInfo.diamond -= chests[curSelectChest].chestPrice;
-
-        SendQueue.Enqueue(Backend.Probability.GetProbability, "634", callback =>
-        {
-            if (callback.IsSuccess())
-            {
-                var log = callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString();
-                Debug.Log(log);
-                itemList.text = log;
-            }
-            else
-                Debug.Log("실패 !");
-        });
+        OpenDiamondChestUI((int)kind);
         SetGoldUI();
     }
 
     public void CloseChest()
     {
-        itemList.text = "";
         chestOpenObject.SetActive(false);
     }
 
@@ -315,5 +362,94 @@ public partial class MainUI : BaseScreen<MainUI>
             if (BackEndServerManager.instance.myInfo.haveChestKind[i] != 99)
                 AddChest((ChestKind)BackEndServerManager.instance.myInfo.haveChestKind[i], (ChestState)BackEndServerManager.instance.myInfo.haveChestState[i], BackEndServerManager.instance.myInfo.disStartTime, i);
         }
+    }
+
+    void GiveCard(int index)
+    {
+        SendQueue.Enqueue(Backend.Probability.GetProbability, "766", callback =>
+        {
+            // 그 다음 카드 부분
+            if (callback.IsSuccess())
+            {
+                int card = -1;
+                int count = Random.Range((index + 1) * 2, (index + 1) * 5);
+
+                var log = callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString();
+                Debug.Log(log);
+
+                switch (log)
+                {
+                    case "나이트":
+                        card = 0;
+                        break;
+                    case "벤전스":
+                        card = 1;
+                        break;
+                    case "듀얼":
+                        card = 2;
+                        break;
+                    case "도끼":
+                        card = 3;
+                        break;
+                    default:
+                        break;
+                }
+
+                if (CheckHaveCard(card))
+                {
+                    Debug.Log("캐릭터 있음 : " + card);
+                    BackEndServerManager.instance.myInfo.levelExp[card] += count;
+                }
+                else
+                {
+                    Debug.Log("캐릭터 없음");
+                    BackEndServerManager.instance.myInfo.haveCharacters.Add(card);
+                    BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
+                    BackEndServerManager.instance.myInfo.levelExp.Add(-1);
+
+                    var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
+                    BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                }
+
+                cardText.text = log;
+                ShowResultCard(card, count);
+            }
+            else
+                Debug.Log("실패 !");
+        });
+    }
+
+    // 상자 열때 무슨 아이템 나왔는지 보여주는 함수
+    void ShowResultCard(int index, int count)
+    {
+        Debug.Log("아이템 개수 : " + count);
+
+        // 애니메이션 재생을 위함
+        cardGradeImg.gameObject.SetActive(false); 
+        cardGradeImg.gameObject.SetActive(true);
+        // 애니메이션 재생을 위함
+
+        cardImg.gameObject.SetActive(false);
+        etcImg.gameObject.SetActive(false);
+        if (index == characterImgs.Length - 2) // 골드 일경우
+        {
+            cardCountText.text = count + "C";
+            etcImg.sprite = characterImgs[index];
+            etcImg.gameObject.SetActive(true);
+        }
+        else if (index == characterImgs.Length - 1)
+        {
+            cardCountText.text = count + "D";
+            etcImg.sprite = characterImgs[index];
+            etcImg.gameObject.SetActive(true);
+        }
+        else
+        { 
+            cardCountText.text = "x" + count;
+            cardImg.sprite = characterImgs[index];
+            cardImg.gameObject.SetActive(true);
+        }
+
+        // 상자랑 희귀도 차이도 나중에 나눠야됨
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,6 +33,8 @@ public partial class MainUI : BaseScreen<MainUI>
     
     void Start()
     {
+        Time.timeScale = 1;
+
         matchlookingObject.SetActive(false);
         matchFoundObject.SetActive(false);
         matchReconnectObject.SetActive(false);
@@ -48,6 +49,14 @@ public partial class MainUI : BaseScreen<MainUI>
         SetNickName();
 
         Invoke("StartDataSetting", 0.25f);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+            AddChest((ChestKind)Random.Range((int)ChestKind.한, (int)ChestKind.MAX), ChestState.Idle, "", curHaveChests);
+        if (Input.GetKeyDown(KeyCode.Q))
+            SetShopItems();
     }
 
     private void SetNickName()

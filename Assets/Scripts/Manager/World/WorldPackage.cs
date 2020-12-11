@@ -30,7 +30,7 @@ public class WorldPackage : MonoBehaviour
     public int numOfPlayer = 0;
     public Transform[] startingPoint = null;
 
-    private Stack<SessionId> gameRecord = new Stack<SessionId>();
+    public Stack<SessionId> gameRecord = new Stack<SessionId>();
     public Action<SessionId> playerDie = null;
 
     void Awake()
@@ -609,5 +609,19 @@ public class WorldPackage : MonoBehaviour
             players[myPlayerIndex].Stats.WeakAttackDamage, players[myPlayerIndex].Stats.WeakAttackStun, players[myPlayerIndex].Stats.WeakAttackPenetration,
             players[myPlayerIndex].Stats.StrongAttackDamage, players[myPlayerIndex].Stats.StrongAttackStun, players[myPlayerIndex].Stats.StrongAttackPenetration,
             players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Stats.DefeneseReductionStun);
+    }
+
+    public void TimeOutWinnerSetting()
+    {
+        Debug.Log("시간 종료 게임결과 강제셋팅");
+
+        if (players[myPlayerIndex].Stats.CurHp < players[otherPlayerIndex].Stats.CurHp)
+        {
+            PlayerDieEvent(myPlayerIndex);
+        }
+        else if (players[myPlayerIndex].Stats.CurHp > players[otherPlayerIndex].Stats.CurHp)
+        {
+            PlayerDieEvent(otherPlayerIndex);
+        }
     }
 }

@@ -29,8 +29,11 @@ public partial class MainUI : BaseScreen<MainUI>
 
     [Header("Upgrade")]
     [SerializeField] private Image upgradeCharacterImg = null;
+    [SerializeField] private Image levelBaseImg = null;
     [SerializeField] private Image levelUpBaseImg = null;
-    [SerializeField] private Text characterNameText = null, characterLevelText = null, characterCountText = null;
+    [SerializeField] private Text characterNameText = null, characterLevelText = null, characterGradeText = null, characterCountText = null;
+    [SerializeField] private Text characterExplainText = null, characterSpecialText = null;
+    [SerializeField] private Text characterHPText = null, characterAttackText = null, characterArmorText = null, characterAttackSpeedText = null;
     [SerializeField] private Text characterPriceText = null;
 
     // 1.
@@ -39,10 +42,10 @@ public partial class MainUI : BaseScreen<MainUI>
         foreach (var card in cards)
         {
             card.characterImg = card.obj.transform.GetChild(0).GetComponent<Image>();
-            card.levelBaseImg = card.obj.transform.GetChild(1).GetComponent<Image>();
-            card.levelArrowImg = card.levelBaseImg.transform.GetChild(0).GetComponent<Image>();
+            card.levelBaseImg = card.obj.transform.GetChild(1).GetChild(0).GetComponent<Image>();
+            card.levelArrowImg = card.obj.transform.GetChild(1).GetChild(1).GetComponent<Image>();
             card.levelUpBaseImg = card.obj.transform.GetChild(2).GetComponent<Image>();
-            card.levelUpArrowImg = card.levelBaseImg.transform.GetChild(0).GetComponent<Image>();
+            card.levelUpArrowImg = card.levelUpBaseImg.transform.GetChild(0).GetComponent<Image>();
             card.characterNameText = card.obj.transform.GetChild(3).GetComponent<Text>();
             card.characterCountText = card.obj.transform.GetChild(4).GetComponent<Text>();
         }
@@ -56,11 +59,44 @@ public partial class MainUI : BaseScreen<MainUI>
         {
             var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == (int)cards[curSelectCard].kind);
 
-            upgradeCharacterImg.sprite = characterImgs[0];
+            upgradeCharacterImg.sprite = characterImgs[curSelectCard];
             characterNameText.text = ((CharacterKind)curSelectCard).ToString();
             characterCountText.text = BackEndServerManager.instance.myInfo.levelExp[value] + "/" + cards[curSelectCard].upgradeNeedCard;
-            characterLevelText.text = "레벨 " + BackEndServerManager.instance.myInfo.charactersLevel[value];
+            characterLevelText.text = BackEndServerManager.instance.myInfo.charactersLevel[value].ToString();
+            characterHPText.text = BackEndServerManager.instance.myInfo.pMaxHp[curSelectCard].ToString();
+            characterAttackText.text = BackEndServerManager.instance.myInfo.pWeakAttackDamage[curSelectCard] + "-" + BackEndServerManager.instance.myInfo.pStrongAttackDamage[curSelectCard];
+            characterArmorText.text = BackEndServerManager.instance.myInfo.pArmor[curSelectCard].ToString();
             characterPriceText.text = cards[curSelectCard].upgradePrice + "C";
+
+            switch (curSelectCard)
+            {
+                case 0: // 나이트
+                    characterExplainText.text = "교양있는 근접 전사입니다.\n그렇기 때문에 몸에 많은 상처가 있죠.\n하지만 마음 속은 따뜻한 사람이라구요.";
+                    characterSpecialText.text = "-";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "일반";
+                    break;
+                case 1: // 벤전스
+                    characterExplainText.text = "터프한 광전사입니다. \n몹집이 크고 느린데다 성깔도 사납기 그지없습니다 !";
+                    characterSpecialText.text = "-";
+                    characterAttackSpeedText.text = "느림";
+                    characterGradeText.text = "일반";
+                    break;
+                case 2: // 듀얼
+                    characterExplainText.text = "브릿지 내에서 가장 빠른 전사입니다.\n그의 공격은 눈으로 보기 힘들죠 !";
+                    characterSpecialText.text = "-";
+                    characterAttackSpeedText.text = "빠름";
+                    characterGradeText.text = "일반";
+                    break;
+                case 3: // 도끼
+                    characterExplainText.text = "도끼를 사용하는 무서운 전사입니다.\n가끔씩 나무꾼과 토목을 하러 간다는 소문이...";
+                    characterSpecialText.text = "-";
+                    characterAttackSpeedText.text = "느림";
+                    characterGradeText.text = "일반";
+                    break;
+                default:
+                    break;
+            }
 
             if (BackEndServerManager.instance.myInfo.levelExp[value] >= cards[curSelectCard].upgradeNeedCard)
             {
@@ -69,6 +105,8 @@ public partial class MainUI : BaseScreen<MainUI>
             else
             {
                 levelUpBaseImg.gameObject.SetActive(false);
+                levelBaseImg.fillAmount = (float)BackEndServerManager.instance.myInfo.levelExp[value] / cards[curSelectCard].upgradeNeedCard;
+
             }
         }
     }
@@ -124,7 +162,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
             card.kind = (CharacterKind)index;
 
-            card.characterImg.sprite = characterImgs[0];
+            card.characterImg.sprite = characterImgs[index];
             card.characterNameText.text = card.kind.ToString();
 
             if (card.isHave)
@@ -151,6 +189,8 @@ public partial class MainUI : BaseScreen<MainUI>
                 {
                     card.levelBaseImg.gameObject.SetActive(true);
                     card.levelUpBaseImg.gameObject.SetActive(false);
+
+                    card.levelBaseImg.fillAmount = (float)BackEndServerManager.instance.myInfo.levelExp[value] / card.upgradeNeedCard;
                 }
             }
             else
