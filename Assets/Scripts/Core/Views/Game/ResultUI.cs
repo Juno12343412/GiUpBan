@@ -52,10 +52,16 @@ public partial class GameUI : BaseScreen<GameUI>
         }
 
         PlayerStats.instance.SavePoint();
+        Invoke("StartShowResult", 2f);
+    }
+
+    void StartShowResult()
+    {
         ShowScreen();
         resultObject.SetActive(true);
         StartCoroutine(TimeCheck());
     }
+
 
     IEnumerator TimeCheck(float time = 3f)
     {
