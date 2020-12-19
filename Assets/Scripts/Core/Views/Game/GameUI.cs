@@ -7,34 +7,35 @@ using Manager.View;
 // InGame
 public partial class GameUI : BaseScreen<GameUI>
 {
-    [SerializeField] private Text[] playerTexts = new Text[2] { null, null };
+    public GameObject baseObj = null;
+    public GameObject fadeObj = null;
+    
     [SerializeField] private Text timerText = null;
+    [SerializeField] private Text matchText = null;
 
     void Start()
     {
         HideScreen();
     }
 
-    public void UISetting()
-    {
-        var myName = BackEndServerManager.instance.myNickName;
-        var enemyName = BackEndMatchManager.instance.GetNickNameBySessionId(WorldPackage.instance.otherPlayerIndex);
-
-        playerTexts[0].text = myName;
-        playerTexts[1].text = enemyName;
-    }
-
     public IEnumerator gameTimeCheck(int time = 180)
     {
         int curTime = (time * 60) - 20;
+        int curSec = 60;
 
         while (curTime > 0)
         {
-            curTime -= 1;
-            timerText.text = curTime.ToString();
+            if (curSec == 0 && curTime / 60 != 0) curSec = 60;
+
+            curTime -= curSec -= 1;
+            if (curSec > 9)
+                timerText.text = curTime / 60 + ":" + curSec;
+            else
+                timerText.text = curTime / 60 + ":0" + curSec;
+
             yield return new WaitForSecondsRealtime(1f);
         }
-        timerText.text = "-";
+        timerText.text = "종료";
         WorldPackage.instance.TimeOutWinnerSetting();
     }
 }

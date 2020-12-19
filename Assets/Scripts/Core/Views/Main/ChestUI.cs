@@ -103,7 +103,7 @@ public partial class MainUI : BaseScreen<MainUI>
         myChests[index].idleArenaText.text = myChests[index].chestKind.ToString();
 
         myChests[index].disTimeText.text = myChests[index].disTime + "분";
-        myChests[index].disDiamondText.text = myChests[index].diamondPrice + "D";
+        myChests[index].disDiamondText.text = myChests[index].diamondPrice.ToString();
 
         // 아레나 설정 등등 해주기 ...
 
@@ -197,7 +197,7 @@ public partial class MainUI : BaseScreen<MainUI>
             disTimeText.text = myChests[index].disTime.ToString() + "분";
 
             // ...
-            disGoldText.text = (index + 1) * 100 + "C" + "-" + (index + 1) * 999 + "C";
+            disGoldText.text = (index + 1) * 100 + "-" + (index + 1) * 999;
             disCardText.text = "x" + (index + 1) * 5;
         }
         else
@@ -240,6 +240,10 @@ public partial class MainUI : BaseScreen<MainUI>
 
         chestImg.gameObject.SetActive(true);
 
+        myChests[curSelectMyChest].idleChest.SetActive(false);
+        myChests[curSelectMyChest].disChest.SetActive(false);
+        myChests[curSelectMyChest].openChest.SetActive(false);
+
         Invoke("ContinueOpenChest", 1.5f);
     }
 
@@ -253,7 +257,7 @@ public partial class MainUI : BaseScreen<MainUI>
     {
         chestItemCountText.text = (count - 1).ToString();
 
-        if (count <= 0)
+        if (count == 0)
         {
             chestItemCountText.text = "0";
 
@@ -262,9 +266,9 @@ public partial class MainUI : BaseScreen<MainUI>
 
             curHaveChests--;
 
-            myChests[index].idleChest.SetActive(false);
-            myChests[index].disChest.SetActive(false);
-            myChests[index].openChest.SetActive(false);
+            //myChests[index].idleChest.SetActive(false);
+            //myChests[index].disChest.SetActive(false);
+            //myChests[index].openChest.SetActive(false);
 
             myChests[index].chestState = ChestState.NONE;
 
@@ -441,13 +445,13 @@ public partial class MainUI : BaseScreen<MainUI>
         etcImg.gameObject.SetActive(false);
         if (index == characterImgs.Length - 2) // 골드 일경우
         {
-            cardCountText.text = count + "C";
+            cardCountText.text = count.ToString();
             etcImg.sprite = characterImgs[index];
             etcImg.gameObject.SetActive(true);
         }
         else if (index == characterImgs.Length - 1)
         {
-            cardCountText.text = count + "D";
+            cardCountText.text = count.ToString();
             etcImg.sprite = characterImgs[index];
             etcImg.gameObject.SetActive(true);
         }

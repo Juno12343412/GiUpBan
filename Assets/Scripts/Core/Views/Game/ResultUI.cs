@@ -8,7 +8,11 @@ using BackEnd.Tcp;
 // Result
 public partial class GameUI : BaseScreen<GameUI>
 {
-    [SerializeField] private Text winnerText = null, loserText = null, drawText = null;
+    [SerializeField] private Text ResultText = null;
+    [SerializeField] private Text ScoreText = null;
+
+    [SerializeField] private Image timerImage = null;
+    [SerializeField] private GameObject resultObject = null;
 
     public override void ShowScreen()
     {
@@ -31,35 +35,39 @@ public partial class GameUI : BaseScreen<GameUI>
         {
             if (BackEndMatchManager.instance.IsMySessionId(user))
             {
-                BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
-                Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
+                BackEndServerManager.instance.myInfo.point += 30;
+                ResultText.text = "승리";
+                ScoreText.text = BackEndServerManager.instance.myInfo.point + "+(30)";
             }
-            winnerText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user);
-            drawText.gameObject.SetActive(false);
         }
 
         foreach (var user in matchGameResult.m_losers)
         {
             if (BackEndMatchManager.instance.IsMySessionId(user))
             {
-                BackEndServerManager.instance.myInfo.mmr = BackEndMatchManager.instance.GetMMRBySessionId(user);
-                Debug.Log("MMR : " + BackEndMatchManager.instance.GetMMRBySessionId(user));
+                BackEndServerManager.instance.myInfo.point += 18;
+                ResultText.text = "패배";
+                ScoreText.text = BackEndServerManager.instance.myInfo.point + "+(18)";
             }
-            loserText.text = BackEndMatchManager.instance.GetNickNameBySessionId(user);
-            drawText.gameObject.SetActive(false);
         }
 
-        PlayerStats.instance.SaveMMR();
+        PlayerStats.instance.SavePoint();
         ShowScreen();
+        resultObject.SetActive(true);
+        StartCoroutine(TimeCheck());
     }
 
-    public void ShowDrawBoard()
+    IEnumerator TimeCheck(float time = 3f)
     {
-        loserText.gameObject.SetActive(false);
-        winnerText.gameObject.SetActive(false);
-        drawText.gameObject.SetActive(true);
+        float progress = time;
 
-        ShowScreen();
+        while (progress <= time)
+        {
+            progress -= Time.unscaledDeltaTime;
+            timerImage.fillAmount = progress / time;
+            yield return null;
+        }
+        OnLeaveGameRoom();
     }
 
     public void OnLeaveGameRoom()

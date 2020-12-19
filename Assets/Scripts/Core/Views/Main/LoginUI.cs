@@ -15,7 +15,7 @@ public class LoginUI : BaseScreen<LoginUI>
 
     private InputField nicknameField = null;
 
-    private const string VERSION_STR = "Ang gi mo ddi ver {0}";
+    private const string VERSION_STR = "ver {0}";
 
     void Start()
     {
@@ -26,7 +26,7 @@ public class LoginUI : BaseScreen<LoginUI>
         errorObject.SetActive(false);
 
         nicknameField = nicknameObject.GetComponentInChildren<InputField>();
-        titleObject.GetComponentInChildren<Text>().text = string.Format(VERSION_STR, Application.version);
+        titleObject.transform.GetChild(0).GetComponent<Text>().text = string.Format(VERSION_STR, Application.version);
 
         StartGame();
     }

@@ -23,7 +23,7 @@ public class BackEndServerManager : MonoBehaviour
 
     public PlayerStats.Player myInfo = new PlayerStats.Player();
     public string myUserDataIndate { get; set; } = string.Empty;
-    public string myMMRDataIndate { get; set; } = string.Empty;
+    public string myPointDataIndate { get; set; } = string.Empty;
     public string myChestDataIndate { get; set; } = string.Empty;
     public string myCardDataIndate { get; set; } = string.Empty;
 

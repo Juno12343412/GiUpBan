@@ -62,7 +62,7 @@ public class WorldPackage : MonoBehaviour
         OnGameStart();
     }
 
-    private void PlayerDieEvent(SessionId index)
+    public void PlayerDieEvent(SessionId index)
     {
         players[index].gameObject.SetActive(false);
         gameRecord.Push(index);
@@ -137,8 +137,6 @@ public class WorldPackage : MonoBehaviour
             index += 1;
         }
 
-        GameUI.instance.UISetting();
-
         var message = instance.GetNowGameState(myPlayerIndex);
         BackEndMatchManager.instance.SendDataToInGame(message);
 
@@ -180,6 +178,17 @@ public class WorldPackage : MonoBehaviour
         // 카운트 다운
         for (int i = 0; i < START_COUNT + 1; ++i)
         {
+            if (i == 2)
+            {
+                Camera.main.transform.position = startingPoint[1].position;
+                Camera.main.transform.rotation = startingPoint[1].rotation;
+            }
+            else if (i == 4)
+            {
+                Camera.main.transform.position = startingPoint[0].position;
+                Camera.main.transform.rotation = startingPoint[0].rotation;
+            } 
+
             msg.time = START_COUNT - i;
             BackEndMatchManager.instance.SendDataToInGame(msg);
             yield return new WaitForSeconds(1); //1초 단위
@@ -187,6 +196,7 @@ public class WorldPackage : MonoBehaviour
         }
 
         // 게임 시작 메시지를 전송
+        Camera.main.transform.position = new Vector3(3.69f, -0.65f, 46.94f); Camera.main.transform.rotation = new Quaternion(0f, -9f, 0f, 0f);
         GameStartMessage gameStartMessage = new GameStartMessage();
         BackEndMatchManager.instance.SendDataToInGame(gameStartMessage);
     }
@@ -237,6 +247,8 @@ public class WorldPackage : MonoBehaviour
                 // 플레이 가능하게 하기
                 GameManager.instance.ChangeState(GameManager.GameState.InGame);
                 StartCoroutine(GameUI.instance.gameTimeCheck(BackEndMatchManager.instance.matchInfos[0].matchMinute));
+                GameUI.instance.baseObj.SetActive(true);
+                GameUI.instance.fadeObj.SetActive(false);
                 break;
             case Protocol.Type.GameEnd:
                 GameEndMessage endMessage = DataParser.ReadJsonData<GameEndMessage>(args.BinaryUserData);

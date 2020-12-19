@@ -27,7 +27,9 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private GameObject diamondChestDisObject = null;
 
     [Header("Main")]
-    [SerializeField] private GameObject jaehwaObject = null;
+    [SerializeField] private Text nameText = null;
+    [SerializeField] private GameObject textObject = null;
+    [SerializeField] private Text tearText = null;
 
     [HideInInspector] public List<string> readyUserList = new List<string>();
     
@@ -46,9 +48,8 @@ public partial class MainUI : BaseScreen<MainUI>
 
         BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
-        SetNickName();
 
-        Invoke("StartDataSetting", 0.25f);
+        Invoke("StartDataSetting", 0.025f);
     }
 
     void Update()
@@ -67,7 +68,7 @@ public partial class MainUI : BaseScreen<MainUI>
             Debug.LogError("닉네임 불러오기 실패");
             name = "test123";
         }
-        //nameText.text = name;
+        nameText.text = name + " | " + (CharacterKind)BackEndServerManager.instance.myInfo.nowCharacter;
     }
 
     public void OpenMatchUI()
@@ -86,15 +87,15 @@ public partial class MainUI : BaseScreen<MainUI>
         MatchCancelCallback();
     }
 
-    public void SetJaehwaUI(bool state)
+    public void SetTextUI(bool state)
     {
-        jaehwaObject.SetActive(state);
+        textObject.SetActive(state);
     }
 
     public void SetReconnectUI(bool state)
     {
         if (state)
-            matchReconnectMMR.text = BackEndServerManager.instance.myNickName + " (" + BackEndServerManager.instance.myInfo.mmr.ToString() + ")";
+            matchReconnectMMR.text = BackEndServerManager.instance.myNickName + " (" + BackEndServerManager.instance.myInfo.point.ToString() + ")";
         
         matchReconnectObject.SetActive(state);
     }
@@ -106,7 +107,7 @@ public partial class MainUI : BaseScreen<MainUI>
         {
             Debug.Log("방 생성 성공 !");
             loadingObject.SetActive(false);
-            SetJaehwaUI(false);
+            SetTextUI(false);
             ResetReadyPlayer();
             AddReadyPlayer(BackEndServerManager.instance.myNickName);
             ResetMatchRoom(userList);
@@ -234,5 +235,8 @@ public partial class MainUI : BaseScreen<MainUI>
             ResetShopItems();
         else
             SetShopItems();
+
+        SetNickName();
+        tearText.text = BackEndServerManager.instance.myInfo.point.ToString();
     }
 }

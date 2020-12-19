@@ -263,7 +263,7 @@ public partial class BackEndMatchManager : MonoBehaviour
                 if (args.UserInfo.m_nickName.Equals(BackEndServerManager.instance.myNickName))
                 {
                     MainUI.instance.CloseMatchUI();
-                    MainUI.instance.SetJaehwaUI(true);
+                    MainUI.instance.SetTextUI(true);
                     MainUI.instance.RemoveReadyPlayer(args.UserInfo.m_nickName);
                     return;
                 }
@@ -295,6 +295,8 @@ public partial class BackEndMatchManager : MonoBehaviour
                 {
                     // 패배했다는 결과만 알려줌
                     // ...
+                    Debug.Log("재접속... 성공 !");
+
                     GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
                     MainUI.instance.SetReconnectUI(true);
                     isConnectInGameServer = false;
@@ -311,9 +313,6 @@ public partial class BackEndMatchManager : MonoBehaviour
                 return;
             }
             Debug.Log("인게임 서버 접속 성공");
-            
-            // 유저 캐릭터 데이터 세이브
-            //PlayerStats.instance.CharacterSave();
             
             isJoinGameRoom = true;
             AccessInGameRoom(inGameRoomToken);
@@ -362,9 +361,9 @@ public partial class BackEndMatchManager : MonoBehaviour
             else
             {
                 Debug.Log("게임 결과 업로드 실패 : " + args.ErrInfo);
-                GameUI.instance.ShowDrawBoard();
-                GameManager.instance.ChangeState(GameManager.GameState.Result);
                 LeaveInGameRoom();
+                GameManager.instance.ChangeState(GameManager.GameState.Result);
+                GameUI.instance.OnLeaveGameRoom();
             }
             // 세션리스트 초기화
             sessionIdList = null;
@@ -413,6 +412,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             // 다른 유저 혹은 자기자신이 접속이 끊어졌을 때 호출
             Debug.Log(string.Format("[{0}] 오프라인되었습니다. - {1} : {2}", args.GameRecord.m_nickname, args.ErrInfo, args.Reason));
             // 인증 오류가 아니면 오프라인 프로세스 실행
+            WorldPackage.instance.PlayerDieEvent(args.GameRecord.m_sessionId);
             if (args.ErrInfo != ErrorCode.AuthenticationFailed)
             {
                 ProcessSessionOffline(args.GameRecord.m_sessionId);

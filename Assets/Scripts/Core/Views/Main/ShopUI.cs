@@ -106,7 +106,7 @@ public partial class MainUI : BaseScreen<MainUI>
             {
                 item.hideObj.SetActive(false);
                 item.itemCountText.text = "x" + item.itemMaxCount;
-                item.itemPriceText.text = item.itemPrice.ToString() + "C";
+                item.itemPriceText.text = item.itemPrice.ToString();
             }
             item.itemNameText.text = ((CharacterKind)item.itemKind).ToString();
         }
@@ -181,7 +181,7 @@ public partial class MainUI : BaseScreen<MainUI>
             item.hideObj.SetActive(false);
             item.itemNameText.text = ((CharacterKind)item.itemKind).ToString();
             item.itemCountText.text = "x" + item.itemMaxCount;
-            item.itemPriceText.text = item.itemPrice.ToString() + "C";
+            item.itemPriceText.text = item.itemPrice.ToString();
 
             item.itemImage.sprite = characterImgs[item.itemKind];
 
@@ -196,7 +196,7 @@ public partial class MainUI : BaseScreen<MainUI>
             chest.chestPrice = ((int)chest.chestKind + 1) * 10;
 
             chest.chestNameText.text = chest.chestKind.ToString() + " 상자";
-            chest.chestPriceText.text = chest.chestPrice + "D";
+            chest.chestPriceText.text = chest.chestPrice.ToString();
             // 아레나 설정 , 상자 이미지 설정 추가
         }
     }
@@ -218,7 +218,7 @@ public partial class MainUI : BaseScreen<MainUI>
             items[i].hideObj.SetActive(false);
             items[i].itemNameText.text = ((CharacterKind)items[i].itemKind).ToString();
             items[i].itemCountText.text = "x" + items[i].itemMaxCount;
-            items[i].itemPriceText.text = items[i].itemPrice.ToString() + "C";
+            items[i].itemPriceText.text = items[i].itemPrice.ToString();
 
             items[i].itemImage.sprite = characterImgs[items[i].itemKind];
         }
@@ -228,7 +228,7 @@ public partial class MainUI : BaseScreen<MainUI>
             chest.chestPrice = ((int)chest.chestKind + 1) * 10;
 
             chest.chestNameText.text = chest.chestKind.ToString() + " 상자";
-            chest.chestPriceText.text = chest.chestPrice + "D";
+            chest.chestPriceText.text = chest.chestPrice.ToString();
             // 아레나 설정 , 상자 이미지 설정 추가
         }
 
@@ -244,7 +244,7 @@ public partial class MainUI : BaseScreen<MainUI>
             purchaseCharacterImg.sprite = characterImgs[items[curSelectItem].itemKind];
             itemNameText.text = ((CharacterKind)items[index].itemKind).ToString();
             itemCountText.text = "x" + items[index].itemCount;
-            itemPriceText.text = items[index].itemPrice.ToString() + "C";
+            itemPriceText.text = items[index].itemPrice.ToString();
 
             cardPurchase.SetActive(true);
         }
@@ -267,10 +267,10 @@ public partial class MainUI : BaseScreen<MainUI>
         curSelectChest = index;
 
         chestKindText.text = chests[index].chestKind.ToString() + " 상자";
-        chestPriceText.text = chests[index].chestPrice + "D";
+        chestPriceText.text = chests[index].chestPrice.ToString();
 
         chestCardText.text = "x" + (index + 1) * 5;
-        chestGoldText.text = (index + 1) * 100 + "C" + "-" + (index + 1) * 999 + "C";
+        chestGoldText.text = (index + 1) * 100 + "-" + (index + 1) * 999;
 
         diamondChestDisObject.SetActive(true);
     }
@@ -282,21 +282,22 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public IEnumerator CheckingDay()
     {
-        System.DateTime midnight = new System.DateTime(System.DateTime.Now.Year, System.DateTime.Now.Month, System.DateTime.Now.Day);
-        midnight.AddDays(1);
-        Debug.Log("날짜 체크 시작 : " + (midnight - System.DateTime.Now).Hours);
+        System.DateTime midnight = System.DateTime.Parse(BackEndServerManager.instance.myInfo.joinTime);
+        Debug.Log("날짜 체크 시작 \n현재 시각 : " + System.DateTime.Now + "\n이전 접속 시각 : " + midnight);
 
-        while (GameManager.instance.gameState == GameManager.GameState.MatchLobby && (midnight - System.DateTime.Now).Hours <= 0)
+        while (GameManager.instance.gameState == GameManager.GameState.MatchLobby && midnight.Day <= 0)
         {
-            System.TimeSpan timeCal = midnight - System.DateTime.Now;
+            Debug.Log("날짜 체크 중 : " + midnight.Day + "\n날짜 체크 중 : " + System.DateTime.Now.Day);
 
-            if (timeCal.Hours >= 0)
+            if (midnight.Day <= System.DateTime.Now.Day)
             {
+                Debug.Log("아이템 셋팅 완료");
                 // 자정이 되어서 아이템 초기화
                 SetShopItems();
+                BackEndServerManager.instance.myInfo.joinTime = System.DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
                 break;
             }
-            yield return new WaitForSeconds(100f);
+            yield return new WaitForSeconds(1f);
         }
     }
 

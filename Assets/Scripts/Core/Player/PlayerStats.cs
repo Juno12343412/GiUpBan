@@ -24,7 +24,8 @@ public class PlayerStats : MonoBehaviour
         public int gold = 100;        // 게임 재화
         public int diamond = 100;     // 게임 유료재화
         public bool ads = false;      // 광고 유무
-        public int mmr = 0;           // mmr
+        public int point = 0;         // 포인트 (티어 제도)
+        public string joinTime = "";  // 접속 시간
         // ETC 
 
         [Header("Chracter")]
@@ -114,6 +115,7 @@ public class PlayerStats : MonoBehaviour
         BackEndServerManager.instance.myInfo.haveCharacters.Add(1);
         BackEndServerManager.instance.myInfo.charactersLevel.InsertRange(index: 0, collection: new List<int>() { 1, 1 });
         BackEndServerManager.instance.myInfo.levelExp.InsertRange(index: 0, collection: new List<int>() { 1, 1 });
+        BackEndServerManager.instance.myInfo.joinTime = System.DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
 
         param = new Param();
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
@@ -123,15 +125,18 @@ public class PlayerStats : MonoBehaviour
         param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
         param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.charactersLevel);
         param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
+        param.Add("JoinTime", BackEndServerManager.instance.myInfo.joinTime);
         SendQueue.Enqueue(Backend.GameInfo.Insert, table, param, callback =>
         {
             if (callback.IsSuccess())
             {
-                AddMMR();
+                AddPoint();
                 AddChest();
                 AddCard();
 
                 LoadChart();
+                
+                // 튜토리얼 시작 ...
             }
         });
     }
@@ -149,9 +154,10 @@ public class PlayerStats : MonoBehaviour
         param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
         param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.charactersLevel);
         param.Add("LevelExp", BackEndServerManager.instance.myInfo.levelExp);
+        param.Add("JoinTime", BackEndServerManager.instance.myInfo.joinTime);
         Backend.GameInfo.Update(table, BackEndServerManager.instance.myUserDataIndate, param);
 
-        SaveMMR();
+        SavePoint();
         SaveChest();
         SaveCard();
     }
@@ -176,6 +182,7 @@ public class PlayerStats : MonoBehaviour
                     BackEndServerManager.instance.myInfo.diamond = Convert.ToInt32(callback.Rows()[0]["Diamond"]["N"].ToString());
                     BackEndServerManager.instance.myInfo.ads = Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"].ToString());
                     BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"].ToString());
+                    BackEndServerManager.instance.myInfo.joinTime = callback.Rows()[0]["JoinTime"]["S"].ToString();
                     for (int i = 0; i < callback.Rows()[0]["HaveCharacters"]["L"].Count; i++)
                     {
                         BackEndServerManager.instance.myInfo.haveCharacters.Add(Convert.ToInt32(callback.Rows()[0]["HaveCharacters"]["L"][i]["N"].ToString()));
@@ -190,13 +197,13 @@ public class PlayerStats : MonoBehaviour
                     }
                     BackEndServerManager.instance.myUserDataIndate = callback.Rows()[0]["inDate"]["S"].ToString();
 
-                    LoadMMR();
+                    LoadPoint();
                     LoadChest();
                     LoadCard();
 
                     LoadChart();
 
-                    var errorLog = string.Format("로드완료 !\n이름 : {0}\n골드 : {1}\n광고 : {2}\nMMR : {3}", BackEndServerManager.instance.myNickName, BackEndServerManager.instance.myInfo.gold, BackEndServerManager.instance.myInfo.ads, BackEndServerManager.instance.myInfo.mmr);
+                    var errorLog = string.Format("로드완료 !\n이름 : {0}\n골드 : {1}\n광고 : {2}\nMMR : {3}", BackEndServerManager.instance.myNickName, BackEndServerManager.instance.myInfo.gold, BackEndServerManager.instance.myInfo.ads, BackEndServerManager.instance.myInfo.point);
                     Debug.Log(errorLog);
 
                 }
@@ -241,27 +248,27 @@ public class PlayerStats : MonoBehaviour
         });
     }
 
-    public void AddMMR()
+    public void AddPoint()
     {
         param = new Param();
-        param.Add("Score", BackEndServerManager.instance.myInfo.mmr);
-        Backend.GameSchemaInfo.Insert("MMR", param);
+        param.Add("Score", BackEndServerManager.instance.myInfo.point);
+        Backend.GameSchemaInfo.Insert("Point", param);
     }
 
-    public void SaveMMR()
+    public void SavePoint()
     {
         param = new Param();
-        param.Add("Score", BackEndServerManager.instance.myInfo.mmr);
-        Backend.GameSchemaInfo.Update("MMR", BackEndServerManager.instance.myMMRDataIndate, param);
+        param.Add("Score", BackEndServerManager.instance.myInfo.point);
+        Backend.GameSchemaInfo.Update("Point", BackEndServerManager.instance.myPointDataIndate, param);
     }
 
-    public void LoadMMR()
+    public void LoadPoint()
     {
-        SendQueue.Enqueue(Backend.GameSchemaInfo.Get, "MMR", BackEndServerManager.instance.myUserDataIndate, callback =>
+        SendQueue.Enqueue(Backend.GameSchemaInfo.Get, "Point", BackEndServerManager.instance.myUserDataIndate, callback =>
         {
-            Debug.Log("MMR : " + Convert.ToInt32(callback.Rows()[0]["Score"]["N"].ToString()));
-            BackEndServerManager.instance.myInfo.mmr = Convert.ToInt32(callback.Rows()[0]["Score"]["N"].ToString());
-            BackEndServerManager.instance.myMMRDataIndate = callback.Rows()[0]["inDate"]["S"].ToString();
+            Debug.Log("Point : " + Convert.ToInt32(callback.Rows()[0]["Score"]["N"].ToString()));
+            BackEndServerManager.instance.myInfo.point = Convert.ToInt32(callback.Rows()[0]["Score"]["N"].ToString());
+            BackEndServerManager.instance.myPointDataIndate = callback.Rows()[0]["inDate"]["S"].ToString();
         });
     }
 

@@ -10,9 +10,9 @@ public class Card
     public CharacterKind kind = CharacterKind.NONE;
     public GameObject obj = null;  // 아이템 오브젝트
     [HideInInspector] public Image characterImg = null;
-    [HideInInspector] public Image levelBaseImg = null, levelArrowImg = null;
-    [HideInInspector] public Image levelUpBaseImg = null, levelUpArrowImg = null;
-    [HideInInspector] public Text characterNameText = null, characterCountText = null;
+    [HideInInspector] public Image levelBaseImg = null;
+    [HideInInspector] public Image levelUpBaseImg = null;
+    [HideInInspector] public Text characterNameText = null, characterLevelText = null, characterCountText = null;
     [HideInInspector] public int upgradePrice = 100, upgradeNeedCard = 10;
 
     public bool isHave = false;
@@ -32,7 +32,7 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private Image levelBaseImg = null;
     [SerializeField] private Image levelUpBaseImg = null;
     [SerializeField] private Text characterNameText = null, characterLevelText = null, characterGradeText = null, characterCountText = null;
-    [SerializeField] private Text characterExplainText = null, characterSpecialText = null;
+    [SerializeField] private Text characterExplainText = null;
     [SerializeField] private Text characterHPText = null, characterAttackText = null, characterArmorText = null, characterAttackSpeedText = null;
     [SerializeField] private Text characterPriceText = null;
     [SerializeField] private GameObject[] charactersView = null;
@@ -43,12 +43,11 @@ public partial class MainUI : BaseScreen<MainUI>
         foreach (var card in cards)
         {
             card.characterImg = card.obj.transform.GetChild(0).GetComponent<Image>();
-            card.levelBaseImg = card.obj.transform.GetChild(1).GetChild(0).GetComponent<Image>();
-            card.levelArrowImg = card.obj.transform.GetChild(1).GetChild(1).GetComponent<Image>();
-            card.levelUpBaseImg = card.obj.transform.GetChild(2).GetComponent<Image>();
-            card.levelUpArrowImg = card.levelUpBaseImg.transform.GetChild(0).GetComponent<Image>();
-            card.characterNameText = card.obj.transform.GetChild(3).GetComponent<Text>();
-            card.characterCountText = card.obj.transform.GetChild(4).GetComponent<Text>();
+            card.levelBaseImg = card.obj.transform.GetChild(4).GetComponent<Image>();
+            card.levelUpBaseImg = card.obj.transform.GetChild(5).GetComponent<Image>();
+            card.characterNameText = card.obj.transform.GetChild(1).GetComponent<Text>();
+            card.characterLevelText = card.obj.transform.GetChild(2).GetComponent<Text>();
+            card.characterCountText = card.levelBaseImg.gameObject.transform.GetChild(0).GetComponent<Text>();
         }
         SetInventory();
 
@@ -82,32 +81,28 @@ public partial class MainUI : BaseScreen<MainUI>
             characterCountText.text = BackEndServerManager.instance.myInfo.levelExp[value] + "/" + cards[curSelectCard].upgradeNeedCard;
             upgradeCharacterImg.sprite = characterImgs[curSelectCard];
             characterNameText.text = ((CharacterKind)curSelectCard).ToString();
-            characterLevelText.text = level.ToString();
-            characterPriceText.text = cards[curSelectCard].upgradePrice + "C";
+            characterLevelText.text = "Lv." + level;
+            characterPriceText.text = cards[curSelectCard].upgradePrice.ToString();
 
             switch (curSelectCard)
             {
                 case 0: // 나이트
                     characterExplainText.text = "교양있는 근접 전사입니다.\n그렇기 때문에 몸에 많은 상처가 있죠.\n하지만 마음 속은 따뜻한 사람이라구요.";
-                    characterSpecialText.text = "-";
                     characterAttackSpeedText.text = "보통";
                     characterGradeText.text = "일반";
                     break;
                 case 1: // 벤전스
-                    characterExplainText.text = "터프한 광전사입니다. \n몹집이 크고 느린데다 성깔도 사납기 그지없습니다 !";
-                    characterSpecialText.text = "-";
+                    characterExplainText.text = "터프한 광전사입니다. \n몹집이 크고 느린데다 성깔도 사납기 그지없습니다 !";;
                     characterAttackSpeedText.text = "느림";
                     characterGradeText.text = "일반";
                     break;
                 case 2: // 듀얼
                     characterExplainText.text = "브릿지 내에서 가장 빠른 전사입니다.\n그의 공격은 눈으로 보기 힘들죠 !";
-                    characterSpecialText.text = "-";
                     characterAttackSpeedText.text = "빠름";
                     characterGradeText.text = "일반";
                     break;
                 case 3: // 도끼
                     characterExplainText.text = "도끼를 사용하는 무서운 전사입니다.\n가끔씩 나무꾼과 토목을 하러 간다는 소문이...";
-                    characterSpecialText.text = "-";
                     characterAttackSpeedText.text = "느림";
                     characterGradeText.text = "일반";
                     break;
@@ -192,8 +187,8 @@ public partial class MainUI : BaseScreen<MainUI>
                 card.upgradeNeedCard = BackEndServerManager.instance.myInfo.charactersLevel[value] * 5;
 
                 card.characterImg.color = new Color(255f / 255f, 255f / 255f, 255f / 255f, 255f / 255f);
-                card.levelBaseImg.color = new Color(255f / 255f, 255f / 255f, 255f / 255f, 255f / 255f);
-                card.levelArrowImg.color = new Color(255f / 255f, 255f / 255f, 255f / 255f, 255f / 255f);
+                card.levelBaseImg.color = new Color(63f / 255f, 123f / 255f, 161f / 255f, 255f / 255f);
+                card.characterLevelText.text = "Lv ." + BackEndServerManager.instance.myInfo.charactersLevel[value];
 
                 card.characterCountText.text = BackEndServerManager.instance.myInfo.levelExp[value] + "/" + card.upgradeNeedCard;
 
@@ -216,10 +211,10 @@ public partial class MainUI : BaseScreen<MainUI>
 
                 card.characterImg.color = new Color(160f / 255f, 160f / 255f, 160f / 255f, 160f / 255f);
                 card.levelBaseImg.color = new Color(160f / 255f, 160f / 255f, 160f / 255f, 160f / 255f);
-                card.levelArrowImg.color = new Color(160f / 255f, 160f / 255f, 160f / 255f, 160f / 255f);
 
                 card.levelBaseImg.gameObject.SetActive(true);
                 card.levelUpBaseImg.gameObject.SetActive(false);
+                card.levelBaseImg.fillAmount = 0f;
             }
             index++;
         }
@@ -236,5 +231,6 @@ public partial class MainUI : BaseScreen<MainUI>
         charactersView[curSelectCard].SetActive(true);
 
         PlayerStats.instance.SetStats();
+        SetNickName();
     }
 }
