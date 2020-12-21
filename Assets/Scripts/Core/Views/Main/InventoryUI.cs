@@ -130,12 +130,26 @@ public partial class MainUI : BaseScreen<MainUI>
 
         if (BackEndServerManager.instance.myInfo.levelExp[value] >= cards[curSelectCard].upgradeNeedCard)
         {
-            BackEndServerManager.instance.myInfo.levelExp[value] -= cards[curSelectCard].upgradeNeedCard;
-            if (BackEndServerManager.instance.myInfo.levelExp[value] == 0)
-                BackEndServerManager.instance.myInfo.levelExp[value] = 1;
-            BackEndServerManager.instance.myInfo.charactersLevel[value]++;
-            SetInventory();
-            UpdateUpgradeUI();
+            if (BackEndServerManager.instance.myInfo.gold >= cards[curSelectCard].upgradePrice)
+            {
+                BackEndServerManager.instance.myInfo.gold -= cards[curSelectCard].upgradePrice;
+                BackEndServerManager.instance.myInfo.levelExp[value] -= cards[curSelectCard].upgradeNeedCard;
+                
+                if (BackEndServerManager.instance.myInfo.levelExp[value] == 0)
+                    BackEndServerManager.instance.myInfo.levelExp[value] = 1;
+                BackEndServerManager.instance.myInfo.charactersLevel[value]++;
+                
+                SetInventory();
+                UpdateUpgradeUI();
+            }
+            else
+            {
+                StartCoroutine(OnShowBroadCast("클로버 부족"));
+            }
+        }
+        else
+        {
+            StartCoroutine(OnShowBroadCast("카드 부족"));
         }
     }
 

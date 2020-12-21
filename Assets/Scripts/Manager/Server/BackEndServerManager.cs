@@ -5,11 +5,17 @@ using UnityEngine;
 // Include Backend
 using BackEnd;
 using static BackEnd.SendQueue;
+// Include Backend
 
+//  Include GPGS namespace
+//using GooglePlayGames;
+//using GooglePlayGames.BasicApi;
+using UnityEngine.SocialPlatforms;
+//  Include GPGS namespace
 
 //서버의 접속까지의 기능이 구현되어있는 매니저
 //- 게스트 로그인
-//- 구글 로그인 / 미구현
+//- 구글 로그인 / 구현중
 //- 애플 로그인 / 미구현
 
 public class BackEndServerManager : MonoBehaviour
@@ -41,6 +47,18 @@ public class BackEndServerManager : MonoBehaviour
         }
         instance = this;
         DontDestroyOnLoad(gameObject);
+
+#if UNITY_ANDROID
+        //PlayGamesClientConfiguration config = new PlayGamesClientConfiguration
+        //    .Builder()
+        //    .RequestServerAuthCode(false)
+        //    .RequestIdToken()
+        //    .Build();
+        //PlayGamesPlatform.InitializeInstance(config);
+        //PlayGamesPlatform.DebugLogEnabled = true;
+
+        //PlayGamesPlatform.Activate();
+#endif
 
         isLogin = true;
         Backend.Initialize(() =>
@@ -109,6 +127,98 @@ public class BackEndServerManager : MonoBehaviour
 
             func(false, string.Empty);
         });
+    }
+
+    // 구글 페더레이션 로그인/회원가입
+    public void GoogleAuthorizeFederation(Action<bool, string> func)
+    {
+#if UNITY_ANDROID
+        // 이미 gpgs 로그인이 된 경우
+        if (Social.localUser.authenticated == true)
+        {
+            var token = GetFederationToken();
+            if (token.Equals(string.Empty))
+            {
+                Debug.LogError("GPGS 토큰이 존재하지 않습니다.");
+                func(false, "GPGS 인증을 실패하였습니다.\nGPGS 토큰이 존재하지 않습니다.");
+                return;
+            }
+
+            Enqueue(Backend.BMember.AuthorizeFederation, token, FederationType.Google, "gpgs 인증", callback =>
+            {
+                if (callback.IsSuccess())
+                {
+                    Debug.Log("GPGS 인증 성공");
+                    loginSuccessFunc = func;
+
+                    OnPrevBackendAuthorized();
+                    return;
+                }
+
+                Debug.LogError("GPGS 인증 실패\n" + callback.ToString());
+                func(false, string.Format(BackendError,
+                    callback.GetStatusCode(), callback.GetErrorCode(), callback.GetMessage()));
+            });
+        }
+        // gpgs 로그인을 해야하는 경우
+        else
+        {
+            Social.localUser.Authenticate((bool success) =>
+            {
+                if (success)
+                {
+                    var token = GetFederationToken();
+                    if (token.Equals(string.Empty))
+                    {
+                        Debug.LogError("GPGS 토큰이 존재하지 않습니다.");
+                        func(false, "GPGS 인증을 실패하였습니다.\nGPGS 토큰이 존재하지 않습니다.");
+                        return;
+                    }
+
+                    Enqueue(Backend.BMember.AuthorizeFederation, token, FederationType.Google, "gpgs 인증", callback =>
+                    {
+                        if (callback.IsSuccess())
+                        {
+                            Debug.Log("GPGS 인증 성공");
+                            loginSuccessFunc = func;
+
+                            OnPrevBackendAuthorized();
+                            return;
+                        }
+
+                        Debug.LogError("GPGS 인증 실패\n" + callback.ToString());
+                        func(false, string.Format(BackendError,
+                            callback.GetStatusCode(), callback.GetErrorCode(), callback.GetMessage()));
+                    });
+                }
+                else
+                {
+                    Debug.LogError("GPGS 로그인 실패");
+                    func(false, "GPGS 인증을 실패하였습니다.\nGPGS 로그인을 실패하였습니다.");
+                    return;
+                }
+            });
+        }
+#endif
+    }
+
+    private string GetFederationToken()
+    {
+#if UNITY_ANDROID
+        //if (!PlayGamesPlatform.Instance.localUser.authenticated)
+        //{
+        //    Debug.LogError("GPGS에 접속되어있지 않습니다. PlayGamesPlatform.Instance.localUser.authenticated :  fail");
+        //    return string.Empty;
+        //}
+        //// 유저 토큰 받기
+        //string _IDtoken = PlayGamesPlatform.Instance.GetIdToken();
+        //tempNickName = PlayGamesPlatform.Instance.GetUserDisplayName();
+        //Debug.Log(tempNickName);
+        //return _IDtoken;
+        return name;
+#else
+        return string.Empty;
+#endif
     }
 
     public void UpdateNickname(string nickname, Action<bool, string> func)

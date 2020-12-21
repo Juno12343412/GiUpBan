@@ -276,7 +276,7 @@ public partial class BackEndMatchManager : MonoBehaviour
             Debug.Log(string.Format("OnMatchMakingRoomDestory : {0} : {1}", args.ErrInfo, args.Reason));
             MainUI.instance.CloseMatchUI();
             MainUI.instance.ResetReadyPlayer();
-            MainUI.instance.SetErrorLog("방장이 대기방을 파기하였습니다.");
+            StartCoroutine(MainUI.instance.OnShowBroadCast("매칭 취소"));
         };
     }
 

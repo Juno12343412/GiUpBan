@@ -229,10 +229,38 @@ public partial class MainUI : BaseScreen<MainUI>
         Invoke("ContinueOpenChest", 1.5f);
     }
 
-    // 메인에서 잠금해제가 완료된 상자 터치할 때
-    public void OpenChestUI()
+    public void OpenChestDiamondUI()
     {
-        count = curSelectMyChest + 2;
+        if (BackEndServerManager.instance.myInfo.diamond >= myChests[curSelectChest].diamondPrice)
+        {
+            Debug.Log("다이아몬드로 상자 열음");
+
+            BackEndServerManager.instance.myInfo.diamond -= myChests[curSelectChest].diamondPrice;
+
+            count = (int)myChests[curSelectMyChest].chestKind + 2;
+            chestItemCountText.text = count.ToString();
+
+            chestDisObject.SetActive(false);
+            chestOpenObject.SetActive(true);
+
+            chestImg.gameObject.SetActive(true);
+
+            myChests[curSelectMyChest].idleChest.SetActive(false);
+            myChests[curSelectMyChest].disChest.SetActive(false);
+            myChests[curSelectMyChest].openChest.SetActive(false);
+
+            Invoke("ContinueOpenChest", 1.5f);
+        }
+        else
+        {
+            StartCoroutine(OnShowBroadCast("보석 부족"));
+        }
+    }
+
+    // 메인에서 잠금해제가 완료된 상자 터치할 때
+    public void OpenChestUI(int index)
+    {
+        count = (int)myChests[curSelectMyChest].chestKind + 2;
         chestItemCountText.text = count.ToString();
 
         chestDisObject.SetActive(false);
@@ -248,7 +276,7 @@ public partial class MainUI : BaseScreen<MainUI>
     }
 
     // 그 다음에 상자를 열고 있을 때 남은 아이템들을 열어볼 때
-    public void ContinueOpenChest()
+    void ContinueOpenChest()
     {
         OpenChest(curSelectMyChest);
     }
@@ -266,10 +294,6 @@ public partial class MainUI : BaseScreen<MainUI>
 
             curHaveChests--;
 
-            //myChests[index].idleChest.SetActive(false);
-            //myChests[index].disChest.SetActive(false);
-            //myChests[index].openChest.SetActive(false);
-
             myChests[index].chestState = ChestState.NONE;
 
             BackEndServerManager.instance.myInfo.haveChestKind[index] = 99;
@@ -278,6 +302,7 @@ public partial class MainUI : BaseScreen<MainUI>
             BackEndServerManager.instance.myInfo.haveChests = curHaveChests;
             BackEndServerManager.instance.myInfo.disStartTime = "";
 
+            SetGoldUI();
             CheckDis();
 
             CloseChest();

@@ -35,6 +35,7 @@ public class Item
     public GameObject obj = null;  // 아이템 오브젝트
     public GameObject hideObj = null; // 아이템 품절 시 가리기용 오브젝트
     public Image itemImage = null; // 아이템 이미지
+    public Image cloverImage = null;
     public Text itemNameText = null, itemCountText = null; // 아이템 이름과 개수
     public Text itemPriceText = null;
     public int itemPrice = 100; // 아이템 가격
@@ -78,6 +79,7 @@ public partial class MainUI : BaseScreen<MainUI>
             item.itemNameText = item.obj.transform.GetChild(2).GetComponent<Text>();
             item.itemCountText = item.obj.transform.GetChild(3).GetComponent<Text>();
             item.itemPriceText = item.obj.transform.GetChild(4).GetComponent<Text>();
+            item.cloverImage = item.obj.transform.GetChild(5).GetComponent<Image>();
         }
 
         foreach (var chest in chests)
@@ -101,12 +103,14 @@ public partial class MainUI : BaseScreen<MainUI>
                 item.hideObj.SetActive(true);
                 item.itemCountText.text = itemCountText.text = "판매 종료";
                 item.itemPriceText.text = itemPriceText.text = "";
+                item.cloverImage.gameObject.SetActive(false);
             }
             else
             {
                 item.hideObj.SetActive(false);
                 item.itemCountText.text = "x" + item.itemMaxCount;
                 item.itemPriceText.text = item.itemPrice.ToString();
+                item.cloverImage.gameObject.SetActive(true);
             }
             item.itemNameText.text = ((CharacterKind)item.itemKind).ToString();
         }
@@ -116,42 +120,40 @@ public partial class MainUI : BaseScreen<MainUI>
     // 카드가 다 소모되면 회색으로 바꿔주고 카드 줄여주기
     public void PurchaseItem()
     {
-        //if (BackEndServerManager.instance.myInfo.gold >= items[index].itemPrice)
-        //{
-        //    BackEndServerManager.instance.myInfo.gold -= items[index].itemPrice;
-        //    BackEndServerManager.instance.myInfo.levelExp[items[index].itemKind] += items[index].itemCount;
-        //    items[index].itemCount = 0;
-        //    ShowShop();
-        //}
-
-        if (CheckHaveCard(items[curSelectItem].itemKind))
+        if (BackEndServerManager.instance.myInfo.gold >= items[curSelectItem].itemPrice)
         {
-            Debug.Log("캐릭터 있음");
-
             BackEndServerManager.instance.myInfo.gold -= items[curSelectItem].itemPrice;
-            BackEndServerManager.instance.myInfo.levelExp[items[curSelectItem].itemKind] += items[curSelectItem].itemCount;
+            if (CheckHaveCard(items[curSelectItem].itemKind))
+            {
+                Debug.Log("캐릭터 있음");
+
+                BackEndServerManager.instance.myInfo.levelExp[items[curSelectItem].itemKind] += items[curSelectItem].itemCount;
+            }
+            else
+            {
+                Debug.Log("캐릭터 없음 : " + items[curSelectItem].itemKind);
+
+                BackEndServerManager.instance.myInfo.haveCharacters.Add(items[curSelectItem].itemKind);
+                BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
+                BackEndServerManager.instance.myInfo.levelExp.Add(-1);
+
+                var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == items[curSelectItem].itemKind);
+                BackEndServerManager.instance.myInfo.levelExp[value] += items[curSelectItem].itemCount;
+            }
             items[curSelectItem].itemCount = 0;
+            
+            ShowShop();
+            SetInventory();
+
+            BackEndServerManager.instance.myInfo.cardKind[curSelectItem] = items[curSelectItem].itemKind;
+            BackEndServerManager.instance.myInfo.cardCount[curSelectItem] = items[curSelectItem].itemCount;
+
+            SetGoldUI();
         }
         else
         {
-            Debug.Log("캐릭터 없음 : " + items[curSelectItem].itemKind);
-
-            BackEndServerManager.instance.myInfo.haveCharacters.Add(items[curSelectItem].itemKind);
-            BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
-            BackEndServerManager.instance.myInfo.levelExp.Add(-1);
-            BackEndServerManager.instance.myInfo.gold -= items[curSelectItem].itemPrice;
-
-            var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == items[curSelectItem].itemKind);
-            BackEndServerManager.instance.myInfo.levelExp[value] += items[curSelectItem].itemCount;
-            items[curSelectItem].itemCount = 0;
+            StartCoroutine(OnShowBroadCast("쿨로버 부족"));
         }
-        ShowShop();
-        SetInventory();
-
-        BackEndServerManager.instance.myInfo.cardKind[curSelectItem] = items[curSelectItem].itemKind;
-        BackEndServerManager.instance.myInfo.cardCount[curSelectItem] = items[curSelectItem].itemCount;
-
-        SetGoldUI();
     }
 
     // 상점 아이템 설정
@@ -199,6 +201,7 @@ public partial class MainUI : BaseScreen<MainUI>
             chest.chestPriceText.text = chest.chestPrice.ToString();
             // 아레나 설정 , 상자 이미지 설정 추가
         }
+        ShowShop();
     }
 
     // 상점 아이템 재설정
@@ -259,7 +262,15 @@ public partial class MainUI : BaseScreen<MainUI>
     public void PurchaseChest()
     {
         // 상자 열기
-        OpenDiamondChest(chests[curSelectChest].chestKind);
+        if (BackEndServerManager.instance.myInfo.diamond >= chests[curSelectChest].chestPrice)
+        {
+            BackEndServerManager.instance.myInfo.diamond -= chests[curSelectChest].chestPrice;
+            OpenDiamondChest(chests[curSelectChest].chestKind);
+        }
+        else
+        {
+            StartCoroutine(OnShowBroadCast("보석 부족"));
+        }
     }
 
     public void OpenPurchaseChestUI(int index)

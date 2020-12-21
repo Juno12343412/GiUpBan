@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using Manager.Dispatcher;
 using Manager.View;
-using Manager.Scene;
+using System.Collections;
 
 public class LoginUI : BaseScreen<LoginUI>
 {
@@ -12,6 +12,7 @@ public class LoginUI : BaseScreen<LoginUI>
     [SerializeField] private GameObject loadingObject = null;
     [SerializeField] private GameObject errorObject = null;
     [SerializeField] private Text       errorText = null;
+    [SerializeField] private Text broadcastText = null;
 
     private InputField nicknameField = null;
 
@@ -50,8 +51,7 @@ public class LoginUI : BaseScreen<LoginUI>
                 if (!error.Equals(string.Empty))
                 {
                     Debug.Log("유저 정보 불러오기 실패 ..!");
-                    errorText.text = "유저 정보 불러오기 실패\n\n" + error;
-                    errorObject.SetActive(true);                    
+                    StartCoroutine(OnShowBroadCast("다시시도 해주세요"));
                     return;
                 }
             });
@@ -78,8 +78,7 @@ public class LoginUI : BaseScreen<LoginUI>
         string nickname = nicknameField.text;
         if (nickname.Equals(string.Empty))
         {
-            errorText.text = "닉네임을 먼저 입력해주세요";
-            errorObject.SetActive(true);
+            StartCoroutine(OnShowBroadCast("닉네임을 입력해주세요"));
             return;
         }
         loadingObject.SetActive(true);
@@ -90,8 +89,30 @@ public class LoginUI : BaseScreen<LoginUI>
                 if (!result)
                 {
                     loadingObject.SetActive(false);
-                    errorText.text = "닉네임 생성 오류\n\n" + error;
-                    errorObject.SetActive(true);
+                    StartCoroutine(OnShowBroadCast("닉네임 생성 오류"));
+                    return;
+                }
+                GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
+            });
+        });
+    }
+
+    public void GoogleFederation()
+    {
+        if (errorObject.activeSelf)
+        {
+            return;
+        }
+
+        loadingObject.SetActive(true);
+        BackEndServerManager.instance.GoogleAuthorizeFederation((bool result, string error) =>
+        {
+            Dispatcher.Current.BeginInvoke(() =>
+            {
+                loadingObject.SetActive(false);
+                if (!result)
+                {
+                    StartCoroutine(OnShowBroadCast("다시시도 해주세요"));
                     return;
                 }
                 GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
@@ -114,8 +135,7 @@ public class LoginUI : BaseScreen<LoginUI>
                 loadingObject.SetActive(false);
                 if (!result)
                 {
-                    errorText.text = "로그인 에러\n\n" + error;
-                    errorObject.SetActive(true);
+                    StartCoroutine(OnShowBroadCast("다시시도 해주세요"));
                     return;
                 }
                 GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
@@ -132,6 +152,18 @@ public class LoginUI : BaseScreen<LoginUI>
         //}
     }
 
+    public IEnumerator OnShowBroadCast(string text = "")
+    {
+        if (!broadcastText.gameObject.activeSelf)
+        {
+            broadcastText.text = text;
+            broadcastText.gameObject.SetActive(true);
+
+            yield return new WaitForSeconds(1f);
+            broadcastText.gameObject.SetActive(false);
+        }
+    }
+
     public override void ShowScreen()
     {
         base.ShowScreen();
@@ -141,4 +173,5 @@ public class LoginUI : BaseScreen<LoginUI>
     {
         base.HideScreen();
     }
+
 }

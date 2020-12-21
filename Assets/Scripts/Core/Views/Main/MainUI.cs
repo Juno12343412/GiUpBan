@@ -30,6 +30,7 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private Text nameText = null;
     [SerializeField] private GameObject textObject = null;
     [SerializeField] private Text tearText = null;
+    [SerializeField] private Text broadcastText = null;
 
     [HideInInspector] public List<string> readyUserList = new List<string>();
     
@@ -49,7 +50,7 @@ public partial class MainUI : BaseScreen<MainUI>
         BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
 
-        Invoke("StartDataSetting", 0.025f);
+        Invoke("StartDataSetting", 0.05f);
     }
 
     void Update()
@@ -238,5 +239,17 @@ public partial class MainUI : BaseScreen<MainUI>
 
         SetNickName();
         tearText.text = BackEndServerManager.instance.myInfo.point.ToString();
+    }
+
+    public IEnumerator OnShowBroadCast(string text = "")
+    {
+        if (!broadcastText.gameObject.activeSelf)
+        {
+            broadcastText.text = text;
+            broadcastText.gameObject.SetActive(true);
+
+            yield return new WaitForSeconds(1f);
+            broadcastText.gameObject.SetActive(false);
+        }
     }
 }
