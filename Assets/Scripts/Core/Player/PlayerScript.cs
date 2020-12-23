@@ -82,7 +82,14 @@ public class PlayerScript : PoolingObject
         if (GameManager.instance.gameState == GameManager.GameState.InGame)
         {
             if (stats.CurHp <= 0)
+            {
+                if (BackEndMatchManager.instance.IsMySessionId(index))
+                    cameraFuncs.SetShakeTime(0, 0);
+
+                Time.timeScale = 1;
+
                 WorldPackage.instance.playerDie(index);
+            }
 
             if (isMe)
             {
@@ -264,7 +271,7 @@ public class PlayerScript : PoolingObject
 
     public void PlayerTouch()
     {
-        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 10))
+        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= stats.ReductionStamina))
         {
             stats.Stamina -= stats.ReductionStamina;
             State = PlayerCurState.WEAK_ATTACK;
@@ -288,7 +295,7 @@ public class PlayerScript : PoolingObject
     public void PlayerSwipe()
     {
         isSwipe = true;
-        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 20))
+        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= (stats.ReductionStamina * 1.5f)))
         {
             stats.Stamina -= stats.ReductionStamina * 1.5f;
             State = PlayerCurState.STRONG_ATTACK;
@@ -354,7 +361,7 @@ public class PlayerScript : PoolingObject
     }
 
     public void SufferDamage(double Damage)
-    {    
+    {
         PlayerDamagedMessage damagedMsg = new PlayerDamagedMessage(index, Damage);
         BackEndMatchManager.instance.SendDataToInGame(damagedMsg);
     }
@@ -400,5 +407,3 @@ public class PlayerScript : PoolingObject
         Time.timeScale = 1;
     }
 }
-
-

@@ -66,8 +66,9 @@ public partial class GameUI : BaseScreen<GameUI>
     IEnumerator TimeCheck(float time = 3f)
     {
         float progress = time;
+        yield return new WaitForSeconds(1f);
 
-        while (progress <= time)
+        while (progress >= 0f)
         {
             progress -= Time.unscaledDeltaTime;
             timerImage.fillAmount = progress / time;

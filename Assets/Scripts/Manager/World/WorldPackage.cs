@@ -172,8 +172,9 @@ public class WorldPackage : MonoBehaviour
 
     IEnumerator StartCount()
     {
-        StartCountMessage msg = new StartCountMessage(START_COUNT);
         Debug.Log("현재 상태 : " + GameManager.instance.gameState);
+        StartCountMessage msg = new StartCountMessage(START_COUNT);
+        
 
         // 카운트 다운
         for (int i = 0; i < START_COUNT + 1; ++i)
@@ -183,11 +184,6 @@ public class WorldPackage : MonoBehaviour
                 Camera.main.transform.position = startingPoint[1].position;
                 Camera.main.transform.rotation = startingPoint[1].rotation;
             }
-            else if (i == 4)
-            {
-                Camera.main.transform.position = startingPoint[0].position;
-                Camera.main.transform.rotation = startingPoint[0].rotation;
-            } 
 
             msg.time = START_COUNT - i;
             BackEndMatchManager.instance.SendDataToInGame(msg);
@@ -196,7 +192,8 @@ public class WorldPackage : MonoBehaviour
         }
 
         // 게임 시작 메시지를 전송
-        Camera.main.transform.position = new Vector3(3.69f, -0.65f, 46.94f); Camera.main.transform.rotation = new Quaternion(0f, -9f, 0f, 0f);
+        Camera.main.transform.position = startingPoint[0].position;
+        Camera.main.transform.rotation = startingPoint[0].rotation;
         GameStartMessage gameStartMessage = new GameStartMessage();
         BackEndMatchManager.instance.SendDataToInGame(gameStartMessage);
     }
@@ -246,9 +243,9 @@ public class WorldPackage : MonoBehaviour
             case Protocol.Type.GameStart:
                 // 플레이 가능하게 하기
                 GameManager.instance.ChangeState(GameManager.GameState.InGame);
-                StartCoroutine(GameUI.instance.gameTimeCheck(BackEndMatchManager.instance.matchInfos[0].matchMinute));
                 GameUI.instance.baseObj.SetActive(true);
                 GameUI.instance.fadeObj.SetActive(false);
+                StartCoroutine(GameUI.instance.gameTimeCheck(BackEndMatchManager.instance.matchInfos[0].matchMinute));
                 break;
             case Protocol.Type.GameEnd:
                 GameEndMessage endMessage = DataParser.ReadJsonData<GameEndMessage>(args.BinaryUserData);
@@ -545,6 +542,7 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].AttackPointFalse();
 
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
+                players[otherPlayerIndex].AttackPointFalse();
                 return;
             }
             else
@@ -557,6 +555,7 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].AttackPointFalse();
 
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
+                players[otherPlayerIndex].AttackPointFalse();
 
                 Debug.Log("약공 들어감");
                 return;
@@ -577,6 +576,8 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].AttackPointFalse();
 
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
+                players[otherPlayerIndex].AttackPointFalse();
+
             }
             else
             {
@@ -589,6 +590,7 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].AttackPointFalse();
 
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
+                players[otherPlayerIndex].AttackPointFalse();
 
                 Debug.Log("강공 들어감");
 
@@ -637,6 +639,10 @@ public class WorldPackage : MonoBehaviour
         else if (players[myPlayerIndex].Stats.CurHp > players[otherPlayerIndex].Stats.CurHp)
         {
             PlayerDieEvent(otherPlayerIndex);
+        }
+        else
+        {
+            PlayerDieEvent(myPlayerIndex);
         }
     }
 }
