@@ -367,6 +367,7 @@ public class WorldPackage : MonoBehaviour
         players[data.playerSession].State = PlayerCurState.STUN;
 
         players[data.playerSession].Anim.SetBool("isGroggy", true);
+        players[data.playerSession].Anim.SetBool("isAttack", false);
 
 
         //players[data.playerSession].Anim.SetInteger("AttackKind", 3);
@@ -539,7 +540,7 @@ public class WorldPackage : MonoBehaviour
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f)
                     * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
 
-                players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.WeakAttackStun);
+                players[otherPlayerIndex].StunOn(players[otherPlayerIndex].Stats.WeakAttackStun);
 
                 players[myPlayerIndex].AttackPointFalse();
 
@@ -551,7 +552,7 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f));
 
-                players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.WeakAttackStun);
+                players[myPlayerIndex].StunOn(players[otherPlayerIndex].Stats.WeakAttackStun);
 
                 players[myPlayerIndex].AttackPointFalse();
 
@@ -571,7 +572,7 @@ public class WorldPackage : MonoBehaviour
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f)
                     * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
 
-                players[otherPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.StrongAttackStun);
+                players[otherPlayerIndex].StunOn(players[otherPlayerIndex].Stats.StrongAttackStun);
 
                 players[myPlayerIndex].AttackPointFalse();
 
@@ -583,7 +584,7 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f));
 
-                players[myPlayerIndex].DelayOn(players[otherPlayerIndex].Stats.StrongAttackStun);
+                players[myPlayerIndex].StunOn(players[otherPlayerIndex].Stats.StrongAttackStun);
 
                 players[myPlayerIndex].AttackPointFalse();
 
