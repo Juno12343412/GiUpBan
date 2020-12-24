@@ -12,10 +12,10 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private GameObject matchlookingObject = null;
     [SerializeField] private GameObject matchFoundObject = null;
     [SerializeField] private GameObject matchReconnectObject = null;
-    [SerializeField] private Text       matchReconnectMMR = null;
+    [SerializeField] private Text matchReconnectMMR = null;
     [SerializeField] private GameObject loadingObject = null;
     [SerializeField] private GameObject errorObject = null;
-    [SerializeField] private Text       errorText = null;
+    [SerializeField] private Text errorText = null;
 
     [Header("Card")]
     [SerializeField] private GameObject cardUpgrade = null;
@@ -33,7 +33,7 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private Text broadcastText = null;
 
     [HideInInspector] public List<string> readyUserList = new List<string>();
-    
+
     void Start()
     {
         Time.timeScale = 1;
@@ -50,7 +50,7 @@ public partial class MainUI : BaseScreen<MainUI>
         BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
 
-        Invoke("StartDataSetting", 0.05f);
+        Invoke("StartDataSetting", 0.1f);
     }
 
     void Update()
@@ -97,7 +97,7 @@ public partial class MainUI : BaseScreen<MainUI>
     {
         if (state)
             matchReconnectMMR.text = BackEndServerManager.instance.myNickName + " (" + BackEndServerManager.instance.myInfo.point.ToString() + ")";
-        
+
         matchReconnectObject.SetActive(state);
     }
 

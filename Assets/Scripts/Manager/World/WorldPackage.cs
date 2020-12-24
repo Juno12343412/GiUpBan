@@ -174,7 +174,8 @@ public class WorldPackage : MonoBehaviour
     {
         Debug.Log("현재 상태 : " + GameManager.instance.gameState);
         StartCountMessage msg = new StartCountMessage(START_COUNT);
-        
+        Camera.main.transform.position = startingPoint[2].position;
+        Camera.main.transform.rotation = startingPoint[2].rotation;
 
         // 카운트 다운
         for (int i = 0; i < START_COUNT + 1; ++i)
@@ -184,6 +185,11 @@ public class WorldPackage : MonoBehaviour
                 Camera.main.transform.position = startingPoint[1].position;
                 Camera.main.transform.rotation = startingPoint[1].rotation;
             }
+            else if (i == 4)
+            {
+                Camera.main.transform.position = startingPoint[0].position;
+                Camera.main.transform.rotation = startingPoint[0].rotation;
+            }
 
             msg.time = START_COUNT - i;
             BackEndMatchManager.instance.SendDataToInGame(msg);
@@ -192,8 +198,6 @@ public class WorldPackage : MonoBehaviour
         }
 
         // 게임 시작 메시지를 전송
-        Camera.main.transform.position = startingPoint[0].position;
-        Camera.main.transform.rotation = startingPoint[0].rotation;
         GameStartMessage gameStartMessage = new GameStartMessage();
         BackEndMatchManager.instance.SendDataToInGame(gameStartMessage);
     }
@@ -543,6 +547,8 @@ public class WorldPackage : MonoBehaviour
 
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 players[otherPlayerIndex].AttackPointFalse();
+
+                StartCoroutine(players[myPlayerIndex].DefenseEffect(1f));
                 return;
             }
             else
@@ -557,6 +563,7 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 players[otherPlayerIndex].AttackPointFalse();
 
+                StartCoroutine(players[myPlayerIndex].AttackEffect(1f));
                 Debug.Log("약공 들어감");
                 return;
 
@@ -578,6 +585,7 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 players[otherPlayerIndex].AttackPointFalse();
 
+                StartCoroutine(players[myPlayerIndex].DefenseEffect(1f));
             }
             else
             {
@@ -592,6 +600,7 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 players[otherPlayerIndex].AttackPointFalse();
 
+                StartCoroutine(players[myPlayerIndex].AttackEffect(1f));
                 Debug.Log("강공 들어감");
 
             }
@@ -615,8 +624,6 @@ public class WorldPackage : MonoBehaviour
             return;
         }
         BackEndMatchManager.instance.MatchGameOver(gameRecord);
-
-        //GameManager.instance.ChangeState(GameManager.GameState.Over);
     }
 
     public GameMySyncMessage GetNowGameState(SessionId session)

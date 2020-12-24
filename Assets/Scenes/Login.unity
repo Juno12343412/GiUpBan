@@ -1970,7 +1970,7 @@ MonoBehaviour:
   loadingObject: {fileID: 1065262524671680910}
   errorObject: {fileID: 1065262523981192747}
   errorText: {fileID: 1065262524682897773}
-  broadcastText: {fileID: 0}
+  broadcastText: {fileID: 1496390769}
 --- !u!225 &1065262524348803515
 CanvasGroup:
   m_ObjectHideFlags: 0

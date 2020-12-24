@@ -8,6 +8,7 @@ namespace Manager.Scene
     public enum Scene
     {
         Login,
+        Tutorial,
         Main,
         Loading,
         Game,

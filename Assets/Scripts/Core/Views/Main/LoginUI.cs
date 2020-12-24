@@ -92,7 +92,7 @@ public class LoginUI : BaseScreen<LoginUI>
                     StartCoroutine(OnShowBroadCast("닉네임 생성 오류"));
                     return;
                 }
-                GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
+                GameManager.instance.ChangeState(GameManager.GameState.Tutorial);
             });
         });
     }
@@ -115,7 +115,7 @@ public class LoginUI : BaseScreen<LoginUI>
                     StartCoroutine(OnShowBroadCast("다시시도 해주세요"));
                     return;
                 }
-                GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
+                GameManager.instance.ChangeState(GameManager.GameState.Tutorial);
             });
         });
     }
@@ -138,7 +138,7 @@ public class LoginUI : BaseScreen<LoginUI>
                     StartCoroutine(OnShowBroadCast("다시시도 해주세요"));
                     return;
                 }
-                GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
+                GameManager.instance.ChangeState(GameManager.GameState.Tutorial);
             });
         });
     }

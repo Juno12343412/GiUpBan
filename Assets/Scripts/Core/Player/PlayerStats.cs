@@ -135,8 +135,6 @@ public class PlayerStats : MonoBehaviour
                 AddCard();
 
                 LoadChart();
-                
-                // 튜토리얼 시작 ...
             }
         });
     }

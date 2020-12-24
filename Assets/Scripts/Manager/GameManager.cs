@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     private static bool isCreate = false;
 
-    public enum GameState { Login, MatchLobby, Ready, GameStart, InGame, Over, Result, Reconnect };
+    public enum GameState { Login, Tutorial, MatchLobby, Ready, GameStart, InGame, Over, Result, Reconnect };
     [HideInInspector] public GameState gameState;
 
     public event Action OnReady = null;
@@ -48,6 +48,11 @@ public class GameManager : MonoBehaviour
     void Login()
     {
         Loader.Load(Scene.Login);
+    }
+    
+    void Tutorial()
+    {
+        Loader.Load(Scene.Tutorial);
     }
 
     void MatchLobby()
@@ -93,6 +98,9 @@ public class GameManager : MonoBehaviour
         {
             case GameState.Login:
                 Login();
+                break;
+            case GameState.Tutorial:
+                Tutorial();
                 break;
             case GameState.MatchLobby:
                 MatchLobby();

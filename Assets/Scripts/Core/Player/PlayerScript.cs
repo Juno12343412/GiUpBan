@@ -56,6 +56,8 @@ public class PlayerScript : PoolingObject
     [HideInInspector] public Animator Anim;
     public Camera characterCamera = null;
     private CameraFuncs cameraFuncs = null;
+
+    [SerializeField] private GameObject[] effectObjs = null;
     #endregion
 
     // New Var
@@ -271,7 +273,7 @@ public class PlayerScript : PoolingObject
 
     public void PlayerTouch()
     {
-        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= stats.ReductionStamina))
+        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 10))
         {
             stats.Stamina -= stats.ReductionStamina;
             State = PlayerCurState.WEAK_ATTACK;
@@ -295,7 +297,7 @@ public class PlayerScript : PoolingObject
     public void PlayerSwipe()
     {
         isSwipe = true;
-        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= (stats.ReductionStamina * 1.5f)))
+        if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 20))
         {
             stats.Stamina -= stats.ReductionStamina * 1.5f;
             State = PlayerCurState.STRONG_ATTACK;
@@ -406,4 +408,25 @@ public class PlayerScript : PoolingObject
         yield return new WaitForSecondsRealtime(_Time);
         Time.timeScale = 1;
     }
+
+    public IEnumerator AttackEffect(float _delay)
+    {
+        if (!effectObjs[0].activeSelf)
+        {
+            effectObjs[0].gameObject.SetActive(true);
+            yield return new WaitForSeconds(_delay);
+            effectObjs[0].gameObject.SetActive(false);
+        }
+    }
+
+    public IEnumerator DefenseEffect(float _delay)
+    {
+        if (!effectObjs[1].activeSelf)
+        {
+            effectObjs[1].gameObject.SetActive(true);
+            yield return new WaitForSeconds(_delay);
+            effectObjs[1].gameObject.SetActive(false);
+        }
+    }
 }
+

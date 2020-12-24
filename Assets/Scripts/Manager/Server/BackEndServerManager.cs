@@ -8,8 +8,8 @@ using static BackEnd.SendQueue;
 // Include Backend
 
 //  Include GPGS namespace
-//using GooglePlayGames;
-//using GooglePlayGames.BasicApi;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 using UnityEngine.SocialPlatforms;
 //  Include GPGS namespace
 
@@ -49,15 +49,15 @@ public class BackEndServerManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
 #if UNITY_ANDROID
-        //PlayGamesClientConfiguration config = new PlayGamesClientConfiguration
-        //    .Builder()
-        //    .RequestServerAuthCode(false)
-        //    .RequestIdToken()
-        //    .Build();
-        //PlayGamesPlatform.InitializeInstance(config);
-        //PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesClientConfiguration config = new PlayGamesClientConfiguration
+            .Builder()
+            .RequestServerAuthCode(false)
+            .RequestIdToken()
+            .Build();
+        PlayGamesPlatform.InitializeInstance(config);
+        PlayGamesPlatform.DebugLogEnabled = true;
 
-        //PlayGamesPlatform.Activate();
+        PlayGamesPlatform.Activate();
 #endif
 
         isLogin = true;
@@ -205,17 +205,16 @@ public class BackEndServerManager : MonoBehaviour
     private string GetFederationToken()
     {
 #if UNITY_ANDROID
-        //if (!PlayGamesPlatform.Instance.localUser.authenticated)
-        //{
-        //    Debug.LogError("GPGS에 접속되어있지 않습니다. PlayGamesPlatform.Instance.localUser.authenticated :  fail");
-        //    return string.Empty;
-        //}
-        //// 유저 토큰 받기
-        //string _IDtoken = PlayGamesPlatform.Instance.GetIdToken();
-        //tempNickName = PlayGamesPlatform.Instance.GetUserDisplayName();
-        //Debug.Log(tempNickName);
-        //return _IDtoken;
-        return name;
+        if (!PlayGamesPlatform.Instance.localUser.authenticated)
+        {
+            Debug.LogError("GPGS에 접속되어있지 않습니다. PlayGamesPlatform.Instance.localUser.authenticated :  fail");
+            return string.Empty;
+        }
+        // 유저 토큰 받기
+        string _IDtoken = PlayGamesPlatform.Instance.GetIdToken();
+        tempNickName = PlayGamesPlatform.Instance.GetUserDisplayName();
+        Debug.Log(tempNickName);
+        return _IDtoken;
 #else
         return string.Empty;
 #endif
@@ -280,7 +279,7 @@ public class BackEndServerManager : MonoBehaviour
                 BackEndMatchManager.instance.GetMatchList(loginSuccessFunc);
             }
         });
-    } 
+    }
 
     void Update()
     {
