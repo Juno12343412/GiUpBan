@@ -26,6 +26,8 @@ public class PlayerStats : MonoBehaviour
         public bool ads = false;      // 광고 유무
         public int point = 0;         // 포인트 (티어 제도)
         public string joinTime = "";  // 접속 시간
+
+        public bool giveChest = false; // 나중에 체스트 변수로 바뀔 예정 저장 X
         // ETC 
 
         [Header("Chracter")]

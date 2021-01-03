@@ -277,14 +277,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 119766336, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
-      propertyPath: m_Name
-      value: SFXSound
-      objectReference: {fileID: 0}
-    - target: {fileID: 1214011525, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
-      propertyPath: m_Name
-      value: BGMSound
-      objectReference: {fileID: 0}
     - target: {fileID: 9131468558171056924, guid: d12ca0fe0e6fd2747961d99c9dbf6025,
         type: 3}
       propertyPath: m_Name

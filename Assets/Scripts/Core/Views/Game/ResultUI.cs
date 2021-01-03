@@ -13,6 +13,7 @@ public partial class GameUI : BaseScreen<GameUI>
 
     [SerializeField] private Image timerImage = null;
     [SerializeField] private GameObject resultObject = null;
+    [SerializeField] private GameObject rewardObject = null;
 
     public override void ShowScreen()
     {
@@ -59,6 +60,14 @@ public partial class GameUI : BaseScreen<GameUI>
     {
         ShowScreen();
         resultObject.SetActive(true);
+        if (BackEndServerManager.instance.myInfo.haveChests < 2 && ResultText.text == "승리")
+        {
+            Debug.Log("보상 지급");
+
+            rewardObject.SetActive(true);
+            BackEndServerManager.instance.myInfo.giveChest = true;
+        }
+
         StartCoroutine(TimeCheck());
     }
 
@@ -84,6 +93,7 @@ public partial class GameUI : BaseScreen<GameUI>
         if (GameManager.instance.gameState != GameManager.GameState.MatchLobby)
         {
             GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
+            AdsManager.instance.ShowAd();
         }
     }
 }

@@ -50,15 +50,7 @@ public partial class MainUI : BaseScreen<MainUI>
         BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
 
-        Invoke("StartDataSetting", 0.1f);
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-            AddChest((ChestKind)Random.Range((int)ChestKind.한, (int)ChestKind.MAX), ChestState.Idle, "", curHaveChests);
-        if (Input.GetKeyDown(KeyCode.Q))
-            SetShopItems();
+        Invoke("StartDataSetting", 0.25f);
     }
 
     private void SetNickName()
@@ -222,6 +214,14 @@ public partial class MainUI : BaseScreen<MainUI>
         InventoryInit();
         ShopInit();
         ChestInit();
+
+        if (BackEndServerManager.instance.myInfo.giveChest)
+        {
+            Debug.Log("보상 : " + BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
+
+            BackEndServerManager.instance.myInfo.giveChest = false;
+            AddChest((ChestKind)Random.Range((int)ChestKind.한, (int)ChestKind.MAX), ChestState.Idle, "", BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
+        }
 
         StartCoroutine(CheckingDay());
 

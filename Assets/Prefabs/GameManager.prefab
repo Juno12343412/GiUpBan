@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 119766337}
   - component: {fileID: 119766338}
   m_Layer: 0
-  m_Name: SFXPlayer
+  m_Name: SFXSound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 1214011526}
   - component: {fileID: 1214011527}
   m_Layer: 0
-  m_Name: BGMPlayer
+  m_Name: BGMSound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -270,6 +270,7 @@ GameObject:
   - component: {fileID: 1700226387}
   - component: {fileID: 4757603113380422441}
   - component: {fileID: 1205683695}
+  - component: {fileID: 8506292418470372087}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -306,27 +307,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myInfo:
-    name: Ghest
     gold: 100
+    diamond: 100
     ads: 0
-    mmr: 0
-    CurHp: 100
-    MaxHp: 100
-    Stamina: 100
-    StaminaM: 0
-    Damage: 0
-    Penetration: 0
-    pName: []
-    pCurHp: []
-    pMaxHp: []
-    pStamina: []
-    pStaminaM: []
-    pDamage: []
-    pPenetration: []
+    point: 0
+    joinTime: 
     nowCharacter: 0
     haveCharacters: 
     charactersLevel: 
     levelExp: 
+    CurHp: 100
+    MaxHp: 100
+    Armor: 0
+    Stamina: 100
+    MaxStamina: 0
+    ReductionStamina: 0
+    WeakAttackDamage: 0
+    WeakAttackStun: 0
+    WeakAttackPenetration: 0
+    StrongAttackDamage: 0
+    StrongAttackStun: 0
+    StrongAttackPenetration: 0
+    DefeneseReceivingDamage: 0
+    DefeneseReductionStun: 0
+    pName: []
+    pCurHp: []
+    pMaxHp: []
+    pArmor: []
+    pStamina: []
+    pMaxStamina: []
+    pReductionStamina: []
+    pWeakAttackDamage: []
+    pWeakAttackStun: []
+    pWeakAttackPenetration: []
+    pStrongAttackDamage: []
+    pStrongAttackStun: []
+    pStrongAttackPenetration: []
+    pDefenseReceivingDamage: []
+    pDefenseReductionStun: []
+    haveChestKind: 
+    haveChestState: 
+    disStartTime: 
+    disChest: 0
+    haveChests: 0
+    cardKind: 
+    cardCount: 
 --- !u!114 &1700226383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -401,3 +426,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clips: []
+--- !u!114 &8506292418470372087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9131468558171056924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaabe508dac3dab489988c5ee93719da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
