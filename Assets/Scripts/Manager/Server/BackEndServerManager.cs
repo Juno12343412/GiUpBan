@@ -297,17 +297,17 @@ public class BackEndServerManager : MonoBehaviour
         {
             if (callback.IsSuccess())
             {
-                Debug.Log("게스트 로그인 성공");
+                Debug.Log("Guest Login Success");
                 loginSuccessFunc = func;
 
                 OnPrevBackendAuthorized();
                 return;
             }
-
-            Debug.Log("게스트 로그인 실패\n" + callback);
-            Backend.BMember.DeleteGuestInfo();
-            func(false, string.Format(BackendError,
-                callback.GetStatusCode(), callback.GetErrorCode(), callback.GetMessage()));
+            else
+            {
+                Backend.BMember.DeleteGuestInfo();
+                func(false, "Guest Login Failed");
+            }
         });
     }
 }

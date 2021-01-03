@@ -12,6 +12,7 @@ public partial class GameUI : BaseScreen<GameUI>
 
     [SerializeField] private Text timerText = null;
     [SerializeField] private Text matchText = null;
+    [SerializeField] private Text startText = null;
 
     void Start()
     {
@@ -43,5 +44,10 @@ public partial class GameUI : BaseScreen<GameUI>
         }
         timerText.text = "종료";
         WorldPackage.instance.TimeOutWinnerSetting();
+    }
+
+    public void SetStartText(string text = "")
+    {
+        startText.text = text;
     }
 }

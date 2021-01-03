@@ -112,7 +112,7 @@ public class LoginUI : BaseScreen<LoginUI>
                 loadingObject.SetActive(false);
                 if (!result)
                 {
-                    StartCoroutine(OnShowBroadCast("다시시도 해주세요"));
+                    StartCoroutine(OnShowBroadCast(error));
                     return;
                 }
                 GameManager.instance.ChangeState(GameManager.GameState.Tutorial);
@@ -135,7 +135,7 @@ public class LoginUI : BaseScreen<LoginUI>
                 loadingObject.SetActive(false);
                 if (!result)
                 {
-                    StartCoroutine(OnShowBroadCast("다시시도 해주세요"));
+                    StartCoroutine(OnShowBroadCast(error));
                     return;
                 }
                 GameManager.instance.ChangeState(GameManager.GameState.Tutorial);

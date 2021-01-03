@@ -67,10 +67,14 @@ public class WorldPackage : MonoBehaviour
         players[index].gameObject.SetActive(false);
         gameRecord.Push(index);
 
+        Invoke("InvokeDieEvent", 0.25f);
+    }
+
+    public void InvokeDieEvent()
+    {
         // 호스트가 아니면 바로 리턴
         if (BackEndMatchManager.instance.isHost)
         {
-            Debug.Log(players[index] + " Die");
             // 플레이어가 죽으면 바로 종료 체크
             SendGameEndOrder();
         }
@@ -174,23 +178,10 @@ public class WorldPackage : MonoBehaviour
     {
         Debug.Log("현재 상태 : " + GameManager.instance.gameState);
         StartCountMessage msg = new StartCountMessage(START_COUNT);
-        Camera.main.transform.position = startingPoint[2].position;
-        Camera.main.transform.rotation = startingPoint[2].rotation;
 
         // 카운트 다운
         for (int i = 0; i < START_COUNT + 1; ++i)
         {
-            if (i == 2)
-            {
-                Camera.main.transform.position = startingPoint[1].position;
-                Camera.main.transform.rotation = startingPoint[1].rotation;
-            }
-            else if (i == 4)
-            {
-                Camera.main.transform.position = startingPoint[0].position;
-                Camera.main.transform.rotation = startingPoint[0].rotation;
-            }
-
             msg.time = START_COUNT - i;
             BackEndMatchManager.instance.SendDataToInGame(msg);
             yield return new WaitForSeconds(1); //1초 단위
@@ -243,6 +234,10 @@ public class WorldPackage : MonoBehaviour
             case Protocol.Type.StartCount:
                 // 아무것도 못하게 하기
                 StartCountMessage startCount = DataParser.ReadJsonData<StartCountMessage>(args.BinaryUserData);
+                if (startCount.time == 0)
+                    GameUI.instance.SetStartText("게임 시작");
+                else
+                    GameUI.instance.SetStartText(startCount.time.ToString());
                 break;
             case Protocol.Type.GameStart:
                 // 플레이 가능하게 하기
@@ -404,6 +399,11 @@ public class WorldPackage : MonoBehaviour
 
         hpImages[1].fillAmount = (float)(players[otherPlayerIndex].Stats.CurHp / players[otherPlayerIndex].Stats.MaxHp);
         hpImages[0].fillAmount = (float)(players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
+
+        if (players[data.playerSession].State != PlayerCurState.DEFENSE)
+            StartCoroutine(players[otherPlayerIndex].AttackEffect(1f));
+        else
+            StartCoroutine(players[otherPlayerIndex].DefenseEffect(1f));
     }
 
     private void ProcessPlayerData(PlayerStaminaMessage data)
@@ -548,7 +548,6 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 players[otherPlayerIndex].AttackPointFalse();
 
-                StartCoroutine(players[myPlayerIndex].DefenseEffect(1f));
                 return;
             }
             else
@@ -563,7 +562,6 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 players[otherPlayerIndex].AttackPointFalse();
 
-                StartCoroutine(players[myPlayerIndex].AttackEffect(1f));
                 Debug.Log("약공 들어감");
                 return;
 
@@ -585,7 +583,6 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 players[otherPlayerIndex].AttackPointFalse();
 
-                StartCoroutine(players[myPlayerIndex].DefenseEffect(1f));
             }
             else
             {
@@ -600,7 +597,6 @@ public class WorldPackage : MonoBehaviour
                 players[myPlayerIndex].HitStop(0.2f, 0.2f);
                 players[otherPlayerIndex].AttackPointFalse();
 
-                StartCoroutine(players[myPlayerIndex].AttackEffect(1f));
                 Debug.Log("강공 들어감");
 
             }

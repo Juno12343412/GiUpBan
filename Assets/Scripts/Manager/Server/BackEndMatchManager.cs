@@ -428,11 +428,6 @@ public partial class BackEndMatchManager : MonoBehaviour
             Debug.Log(string.Format("이전 방장 : {0} / 새 방장 : {1}", args.OldSuperUserRecord.m_nickname, args.NewSuperUserRecord.m_nickname));
             // 호스트 재설정
             SetSubHost(args.NewSuperUserRecord.m_sessionId);
-            if (isHost)
-            {
-                // 만약 서브호스트로 설정되면 다른 모든 클라이언트에 싱크메시지 전송
-                //Invoke("SendGameSyncMessage", 1.0f);
-            }
         };
     }
 
