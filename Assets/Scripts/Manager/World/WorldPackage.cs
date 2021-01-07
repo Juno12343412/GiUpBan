@@ -322,6 +322,8 @@ public class WorldPackage : MonoBehaviour
 
         players[data.playerSession].Anim.SetInteger("AttackKind", 1);
         players[data.playerSession].Anim.SetBool("isAttack", true);
+        players[data.playerSession].PlaySound("Dummy_Swing_Sound");
+        players[otherPlayerIndex].PlaySound("Dummy_Swing_Sound");
     }
 
     // 강한 공격 상태
@@ -338,6 +340,8 @@ public class WorldPackage : MonoBehaviour
 
         players[data.playerSession].Anim.SetInteger("AttackKind", 2);
         players[data.playerSession].Anim.SetBool("isAttack", true);
+        players[data.playerSession].PlaySound("Dummy_Swing_Sound");
+        players[otherPlayerIndex].PlaySound("Dummy_Swing_Sound");
     }
 
     // 방어 상태
@@ -401,9 +405,16 @@ public class WorldPackage : MonoBehaviour
         hpImages[0].fillAmount = (float)(players[myPlayerIndex].Stats.CurHp / players[myPlayerIndex].Stats.MaxHp);
 
         if (players[data.playerSession].State != PlayerCurState.DEFENSE)
+        {
             StartCoroutine(players[otherPlayerIndex].AttackEffect(1f));
+            players[otherPlayerIndex].PlaySound("Hit_Dummy");
+        }
         else
+        {
             StartCoroutine(players[otherPlayerIndex].DefenseEffect(1f));
+            players[otherPlayerIndex].PlaySound("Defense_Dummy");
+
+        }
     }
 
     private void ProcessPlayerData(PlayerStaminaMessage data)

@@ -33,8 +33,8 @@ namespace Protocol
 
     public enum Direction : sbyte
     {
-        Left,
-        Right,
+        Left = 0,
+        Right = 1,
         NONE = 99
     }
 

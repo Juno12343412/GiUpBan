@@ -34,4 +34,8 @@ public class CameraFuncs : MonoBehaviour
             transform.position = initPos;
         }
     }
+    public void CameraAnimReset()
+    {
+        GetComponent<Animator>().SetBool("isMove", false);
+    }
 }

@@ -5,6 +5,8 @@ using Manager.Pooling;
 using Protocol;
 using BackEnd.Tcp;
 using BackEnd;
+using Manager.Sound;
+
 
 public enum PlayerCurState
 {
@@ -87,7 +89,7 @@ public class PlayerScript : PoolingObject
             {
                 if (BackEndMatchManager.instance.IsMySessionId(index))
                     cameraFuncs.SetShakeTime(0, 0);
-
+                characterCamera.GetComponent<Animator>().SetBool("isGameOver", true);
                 Time.timeScale = 1;
 
                 WorldPackage.instance.playerDie(index);
@@ -278,6 +280,8 @@ public class PlayerScript : PoolingObject
             stats.Stamina -= stats.ReductionStamina;
             State = PlayerCurState.WEAK_ATTACK;
 
+            characterCamera.GetComponent<Animator>().SetBool("isMove", true);
+            characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
             if (BackEndMatchManager.instance.isHost)
             {
                 int keyCode = (int)State;
@@ -301,6 +305,8 @@ public class PlayerScript : PoolingObject
         {
             stats.Stamina -= stats.ReductionStamina * 1.5f;
             State = PlayerCurState.STRONG_ATTACK;
+            characterCamera.GetComponent<Animator>().SetBool("isMove", true);
+            characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
 
             if (BackEndMatchManager.instance.isHost)
             {
@@ -428,5 +434,11 @@ public class PlayerScript : PoolingObject
             effectObjs[1].gameObject.SetActive(false);
         }
     }
-}
 
+    public void PlaySound(string key, float volume = 1f)
+    {
+        GetComponent<SoundPlayer>().PlaySound(key, volume);
+    }
+
+    
+}

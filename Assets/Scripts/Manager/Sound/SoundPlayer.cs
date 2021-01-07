@@ -58,7 +58,7 @@ namespace Manager.Sound
         {
             bgmPlayer.Stop();
         }
-
+        
         public void StopSFX()
         {
             sfxPlayer.Stop();
