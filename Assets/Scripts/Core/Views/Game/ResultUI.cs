@@ -93,7 +93,7 @@ public partial class GameUI : BaseScreen<GameUI>
         if (GameManager.instance.gameState != GameManager.GameState.MatchLobby)
         {
             GameManager.instance.ChangeState(GameManager.GameState.MatchLobby);
-            AdsManager.instance.ShowAd();
+            AdsManager.instance.AdsShow();
         }
     }
 }

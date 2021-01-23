@@ -13,6 +13,7 @@ public class Card
     [HideInInspector] public Image levelBaseImg = null;
     [HideInInspector] public Image levelUpBaseImg = null;
     [HideInInspector] public Text characterNameText = null, characterLevelText = null, characterCountText = null;
+    [HideInInspector] public Image selectImg = null;
     [HideInInspector] public int upgradePrice = 100, upgradeNeedCard = 10;
 
     public bool isHave = false;
@@ -48,6 +49,7 @@ public partial class MainUI : BaseScreen<MainUI>
             card.characterNameText = card.obj.transform.GetChild(1).GetComponent<Text>();
             card.characterLevelText = card.obj.transform.GetChild(2).GetComponent<Text>();
             card.characterCountText = card.levelBaseImg.gameObject.transform.GetChild(0).GetComponent<Text>();
+            card.selectImg = card.obj.transform.GetChild(7).GetComponent<Image>();
         }
         SetInventory();
 
@@ -104,6 +106,86 @@ public partial class MainUI : BaseScreen<MainUI>
                 case 3: // 도끼
                     characterExplainText.text = "도끼를 사용하는 무서운 전사입니다.\n가끔씩 나무꾼과 토목을 하러 간다는 소문이...";
                     characterAttackSpeedText.text = "느림";
+                    characterGradeText.text = "일반";
+                    break;
+                case 4: // 스탭
+                    characterExplainText.text = "창을 사용하는 전사입니다. \n그의 창으로 어떤 것이든 뚫어버릴 수 있죠";
+                    characterAttackSpeedText.text = "빠름";
+                    characterGradeText.text = "일반";
+                    break;
+                case 5: // 시프
+                    characterExplainText.text = "단검을 사용하는 전사입니다. 주머니를 조심하세요";
+                    characterAttackSpeedText.text = "빠름";
+                    characterGradeText.text = "일반";
+                    break;
+                case 6: // 피오라
+                    characterExplainText.text = "레이피어를 사용하는 전사입니다. \n빠르고 정교한 움직임으로 적을 처리합니다.";
+                    characterAttackSpeedText.text = "빠름";
+                    characterGradeText.text = "일반";
+                    break;
+                case 7: // 사이드
+                    characterExplainText.text = "낫을 사용하는 전사 입니다. \n그의 무시무시한 낫으로 마당 잡초들을 모조리 처치했다고 하네요";
+                    characterAttackSpeedText.text = "느림";
+                    characterGradeText.text = "일반";
+                    break;
+                case 8: // 스미스
+                    characterExplainText.text = "망치를 사용하는 전사입니다. \n그의 단단한 갑옷은 쉽게 뚫지 못할겁니다.";
+                    characterAttackSpeedText.text = "느림";
+                    characterGradeText.text = "일반";
+                    break;
+                case 9: // 라운드
+                    characterExplainText.text = "양손검을 사용하는 전사입니다.\n 그의 큰 검으로 적을 정리합니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "일반";
+                    break;
+                case 10: // 듀크
+                    characterExplainText.text = "검과 방패를 사용하는 전사입니다. \n그의 방패는 무엇이든지 막을 수 있죠";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "일반";
+                    break;
+                case 11: // 빈센트
+                    characterExplainText.text = "한손검을 사용하는 광전사입니다. \n무거운 갑옷을 입고 큰 동작을 하다니 체력이 남아나질 않겠군요";
+                    characterAttackSpeedText.text = "느림";
+                    characterGradeText.text = "일반";
+                    break;
+                case 12: // 플레타
+                    characterExplainText.text = "쌍검을 사용하는 전사입니다. \n그의 쉽틈 없는 공격에선 벗어나기 힘들겁니다.";
+                    characterAttackSpeedText.text = "매우 빠름";
+                    characterGradeText.text = "일반";
+                    break;
+                case 13: // 더스틴
+                    characterExplainText.text = "도끼를 사용하는 용맹한 전사입니다.\n 그의 도끼는 방어구의 수명을 갉아 먹습니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "일반";
+                    break;
+                case 14: // 루이스
+                    characterExplainText.text = "창을 사용하는 전사입니다.\n 거대한 창으로 공격합니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "일반";
+                    break;
+                case 15: // 월리
+                    characterExplainText.text = "단검을 사용하는 전사입니다. \n그의 얍삽한 공격은 누구도 대응하기 쉽지 않을겁니다.";
+                    characterAttackSpeedText.text = "빠름";
+                    characterGradeText.text = "일반";
+                    break;
+                case 16: // 아일린
+                    characterExplainText.text = "레이피어를 사용하는 전사입니다. \n찌르는 공격을 매우 좋아한다네요";
+                    characterAttackSpeedText.text = "빠름";
+                    characterGradeText.text = "일반";
+                    break;
+                case 17: // 체이스
+                    characterExplainText.text = "낫을 사용하는 전사입니다. \n그의 낫은 적들을 절단해버립니다.";
+                    characterAttackSpeedText.text = "느림";
+                    characterGradeText.text = "일반";
+                    break;
+                case 18: // 랄프
+                    characterExplainText.text = "망치를 사용하는 전사입니다. \n그와 싸우다 보면 갑옷이 강화될지도 모르겠군요";
+                    characterAttackSpeedText.text = "느림";
+                    characterGradeText.text = "일반";
+                    break;
+                case 19: // 알베토
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
                     characterGradeText.text = "일반";
                     break;
                 default:
@@ -191,11 +273,14 @@ public partial class MainUI : BaseScreen<MainUI>
             card.characterImg.sprite = characterImgs[index];
             card.characterNameText.text = card.kind.ToString();
 
+            if (index == BackEndServerManager.instance.myInfo.nowCharacter)
+                card.selectImg.gameObject.SetActive(true);
+            else
+                card.selectImg.gameObject.SetActive(false);
+
             if (card.isHave)
             {
                 var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == (int)card.kind);
-
-                Debug.Log(value);
 
                 card.upgradePrice = BackEndServerManager.instance.myInfo.charactersLevel[value] * 10;
                 card.upgradeNeedCard = BackEndServerManager.instance.myInfo.charactersLevel[value] * 5;
@@ -246,5 +331,6 @@ public partial class MainUI : BaseScreen<MainUI>
 
         PlayerStats.instance.SetStats();
         SetNickName();
+        SetInventory();
     }
 }

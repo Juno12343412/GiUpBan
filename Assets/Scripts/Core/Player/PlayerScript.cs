@@ -89,9 +89,7 @@ public class PlayerScript : PoolingObject
             {
                 if (BackEndMatchManager.instance.IsMySessionId(index))
                     cameraFuncs.SetShakeTime(0, 0);
-                characterCamera.GetComponent<Animator>().SetBool("isGameOver", true);
                 Time.timeScale = 1;
-
                 WorldPackage.instance.playerDie(index);
             }
 
@@ -129,24 +127,24 @@ public class PlayerScript : PoolingObject
             //Debug.Log("현재 캐릭터들 개수 : " + stats.charactersLevel[stats.nowCharacter]);
             //Debug.Log("현재 캐릭터 : " + stats.nowCharacter);
 
-            if (stats.charactersLevel[stats.nowCharacter] == 1)
-            {
-                // 여기 수정 ...
-                //stats.MaxHp = stats.pMaxHp[stats.nowCharacter];
-                //stats.Stamina = stats.pStamina[stats.nowCharacter];
-                //stats.StaminaM = stats.pStaminaM[stats.nowCharacter];
-                //stats.Damage = stats.pDamage[stats.nowCharacter];
-                //stats.Penetration = stats.pPenetration[stats.nowCharacter];
-            }
-            else if (stats.charactersLevel[stats.nowCharacter] >= 2)
-            {
-                // 여기 수정 ...
-                //stats.MaxHp = stats.pMaxHp[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-                //stats.Stamina = stats.pStamina[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-                //stats.StaminaM = stats.pStaminaM[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-                //stats.Damage = stats.pDamage[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-                //stats.Penetration = stats.pPenetration[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
-            }
+            //if (stats.charactersLevel[stats.nowCharacter] == 1)
+            //{
+            //    // 여기 수정 ...
+            //    //stats.MaxHp = stats.pMaxHp[stats.nowCharacter];
+            //    //stats.Stamina = stats.pStamina[stats.nowCharacter];
+            //    //stats.StaminaM = stats.pStaminaM[stats.nowCharacter];
+            //    //stats.Damage = stats.pDamage[stats.nowCharacter];
+            //    //stats.Penetration = stats.pPenetration[stats.nowCharacter];
+            //}
+            //else if (stats.charactersLevel[stats.nowCharacter] >= 2)
+            //{
+            //    // 여기 수정 ...
+            //    //stats.MaxHp = stats.pMaxHp[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+            //    //stats.Stamina = stats.pStamina[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+            //    //stats.StaminaM = stats.pStaminaM[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+            //    //stats.Damage = stats.pDamage[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+            //    //stats.Penetration = stats.pPenetration[stats.nowCharacter] * (stats.charactersLevel[stats.nowCharacter] * 0.6f);
+            //}
 
             State = PlayerCurState.IDLE;
 
@@ -434,11 +432,4 @@ public class PlayerScript : PoolingObject
             effectObjs[1].gameObject.SetActive(false);
         }
     }
-
-    public void PlaySound(string key, float volume = 1f)
-    {
-        GetComponent<SoundPlayer>().PlaySound(key, volume);
-    }
-
-    
 }

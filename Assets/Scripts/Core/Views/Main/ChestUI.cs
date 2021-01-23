@@ -401,7 +401,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
     void GiveCard(int index)
     {
-        SendQueue.Enqueue(Backend.Probability.GetProbability, "767", callback =>
+        SendQueue.Enqueue(Backend.Probability.GetProbability, "843", callback =>
         {
             // 그 다음 카드 부분
             if (callback.IsSuccess())
@@ -409,7 +409,7 @@ public partial class MainUI : BaseScreen<MainUI>
                 int card = -1;
                 int count = Random.Range((index + 1) * 2, (index + 1) * 5);
 
-                var log = callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString();
+                var log = callback.GetReturnValuetoJSON()["element"]["Item"]["S"].ToString();
                 Debug.Log(log);
 
                 switch (log)
@@ -426,6 +426,54 @@ public partial class MainUI : BaseScreen<MainUI>
                     case "도끼":
                         card = 3;
                         break;
+                    case "스탭":
+                        card = 4;
+                        break;
+                    case "시프":
+                        card = 5;
+                        break;
+                    case "피오라":
+                        card = 6;
+                        break;
+                    case "사이드":
+                        card = 7;
+                        break;
+                    case "스미스":
+                        card = 8;
+                        break;
+                    case "라운드":
+                        card = 9;
+                        break;
+                    case "듀크":
+                        card = 10;
+                        break;
+                    case "빈센트":
+                        card = 11;
+                        break;
+                    case "플레타":
+                        card = 12;
+                        break;
+                    case "더스틴":
+                        card = 13;
+                        break;
+                    case "루이스":
+                        card = 14;
+                        break;
+                    case "윌리":
+                        card = 15;
+                        break;
+                    case "아일린":
+                        card = 16;
+                        break;
+                    case "체이스":
+                        card = 17;
+                        break;
+                    case "랄프":
+                        card = 18;
+                        break;
+                    case "알베토":
+                        card = 19;
+                        break;
                     default:
                         break;
                 }
@@ -433,14 +481,16 @@ public partial class MainUI : BaseScreen<MainUI>
                 if (CheckHaveCard(card))
                 {
                     Debug.Log("캐릭터 있음 : " + card);
-                    BackEndServerManager.instance.myInfo.levelExp[card] += count;
+
+                    var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
+                    BackEndServerManager.instance.myInfo.levelExp[value] += count;
                 }
                 else
                 {
                     Debug.Log("캐릭터 없음");
                     BackEndServerManager.instance.myInfo.haveCharacters.Add(card);
                     BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
-                    BackEndServerManager.instance.myInfo.levelExp.Add(-1);
+                    BackEndServerManager.instance.myInfo.levelExp.Add(1);
 
                     var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
                     BackEndServerManager.instance.myInfo.levelExp[value] += count;

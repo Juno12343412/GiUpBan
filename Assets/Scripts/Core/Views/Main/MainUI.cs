@@ -29,8 +29,12 @@ public partial class MainUI : BaseScreen<MainUI>
     [Header("Main")]
     [SerializeField] private Text nameText = null;
     [SerializeField] private GameObject textObject = null;
+    [SerializeField] private Image tearImage = null;
     [SerializeField] private Text tearText = null;
     [SerializeField] private Text broadcastText = null;
+
+    [Header("Ranking")]
+    [SerializeField] private GameObject rankObject = null;
 
     [HideInInspector] public List<string> readyUserList = new List<string>();
 
@@ -46,6 +50,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
         cardUpgrade.SetActive(false);
         cardPurchase.SetActive(false);
+        rankObject.SetActive(false);
 
         BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
@@ -238,7 +243,14 @@ public partial class MainUI : BaseScreen<MainUI>
             SetShopItems();
 
         SetNickName();
+        SetTear();
+        SetInventory();
+    }
+
+    public void SetTear()
+    {
         tearText.text = BackEndServerManager.instance.myInfo.point.ToString();
+        tearImage.sprite = tearImages[(int)GetPointToRank(BackEndServerManager.instance.myInfo.point)];
     }
 
     public IEnumerator OnShowBroadCast(string text = "")

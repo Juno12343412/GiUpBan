@@ -10,6 +10,22 @@ public enum CharacterKind : byte
     벤전스,
     듀얼,
     도끼,
+    스탭,
+    시프,
+    피오라,
+    사이드,
+    스미스,
+    라운드,
+    듀크,
+    빈센트,
+    플레타,
+    더스틴,
+    루이스,
+    윌리,
+    아일린,
+    체이스,
+    랄프,
+    알베토,
     MAX,
     NONE = 99
 }
@@ -58,7 +74,7 @@ public class PlayerStats : MonoBehaviour
 
         [Header("Chart")]
         // Chart
-        [HideInInspector] public List<string> pName = new List<string>();                           // 캐릭터 이름
+        public List<string> pName = new List<string>();                           // 캐릭터 이름
         [HideInInspector] public List<double> pCurHp = new List<double>();                          // 캐릭터 체력
         [HideInInspector] public List<double> pMaxHp = new List<double>();                          // 캐릭터 최대 체력
         [HideInInspector] public List<double> pArmor = new List<double>();                          // 캐릭터 방어력
@@ -219,7 +235,7 @@ public class PlayerStats : MonoBehaviour
     public void LoadChart()
     {
         // 모든 캐릭터 정보
-        SendQueue.Enqueue(Backend.Chart.GetChartContents, "12133", callback =>
+        SendQueue.Enqueue(Backend.Chart.GetChartContents, "12858", callback =>
         {
             if (callback.IsSuccess())
             {

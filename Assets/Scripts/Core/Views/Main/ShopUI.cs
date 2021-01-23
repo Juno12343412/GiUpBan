@@ -127,7 +127,8 @@ public partial class MainUI : BaseScreen<MainUI>
             {
                 Debug.Log("캐릭터 있음");
 
-                BackEndServerManager.instance.myInfo.levelExp[items[curSelectItem].itemKind] += items[curSelectItem].itemCount;
+                var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == items[curSelectItem].itemKind);
+                BackEndServerManager.instance.myInfo.levelExp[value] += items[curSelectItem].itemCount;
             }
             else
             {
@@ -140,7 +141,7 @@ public partial class MainUI : BaseScreen<MainUI>
                 var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == items[curSelectItem].itemKind);
                 BackEndServerManager.instance.myInfo.levelExp[value] += items[curSelectItem].itemCount;
             }
-            items[curSelectItem].itemCount = 0;
+            items[curSelectItem].itemCount = 1;
             
             ShowShop();
             SetInventory();
@@ -152,7 +153,7 @@ public partial class MainUI : BaseScreen<MainUI>
         }
         else
         {
-            StartCoroutine(OnShowBroadCast("쿨로버 부족"));
+            StartCoroutine(OnShowBroadCast("클로버 부족"));
         }
     }
 

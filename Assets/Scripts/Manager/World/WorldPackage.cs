@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Protocol;
-using BackEnd;
 using BackEnd.Tcp;
 using Manager.Pooling;
+using Manager.Sound;
 
 public class WorldPackage : MonoBehaviour
 {
@@ -19,6 +19,7 @@ public class WorldPackage : MonoBehaviour
 
     public SessionId myPlayerIndex = SessionId.None;
     public SessionId otherPlayerIndex = SessionId.None;
+    public SessionId diePlayer = SessionId.None;
 
     public bool myAttackPoint = false;
 
@@ -64,15 +65,25 @@ public class WorldPackage : MonoBehaviour
 
     public void PlayerDieEvent(SessionId index)
     {
-        players[index].gameObject.SetActive(false);
-        gameRecord.Push(index);
+        diePlayer = index;
+        players[index].Anim.SetBool("isGroggy", false);
+        players[index].Anim.SetBool("isGameOver", true);
+        //players[index].characterCamera.GetComponent<Animator>().SetBool("isGameOver", true);
 
-        Invoke("InvokeDieEvent", 0.25f);
+        Invoke("InvokeDieEvent", 5f);
     }
 
     public void InvokeDieEvent()
     {
+        Debug.Log("3초 뒤...");
+
         // 호스트가 아니면 바로 리턴
+        players[diePlayer].gameObject.SetActive(false);
+        players[diePlayer].Anim.SetBool("isGameOver", false);
+        //players[diePlayer].characterCamera.GetComponent<Animator>().SetBool("isGameOver", false);
+
+        gameRecord.Push(diePlayer);
+
         if (BackEndMatchManager.instance.isHost)
         {
             // 플레이어가 죽으면 바로 종료 체크
@@ -322,8 +333,7 @@ public class WorldPackage : MonoBehaviour
 
         players[data.playerSession].Anim.SetInteger("AttackKind", 1);
         players[data.playerSession].Anim.SetBool("isAttack", true);
-        players[data.playerSession].PlaySound("Dummy_Swing_Sound");
-        players[otherPlayerIndex].PlaySound("Dummy_Swing_Sound");
+        SoundPlayer.instance.PlaySound("Dummy_Swing_Sound");
     }
 
     // 강한 공격 상태
@@ -340,8 +350,7 @@ public class WorldPackage : MonoBehaviour
 
         players[data.playerSession].Anim.SetInteger("AttackKind", 2);
         players[data.playerSession].Anim.SetBool("isAttack", true);
-        players[data.playerSession].PlaySound("Dummy_Swing_Sound");
-        players[otherPlayerIndex].PlaySound("Dummy_Swing_Sound");
+        SoundPlayer.instance.PlaySound("Dummy_Swing_Sound");
     }
 
     // 방어 상태
@@ -407,13 +416,12 @@ public class WorldPackage : MonoBehaviour
         if (players[data.playerSession].State != PlayerCurState.DEFENSE)
         {
             StartCoroutine(players[otherPlayerIndex].AttackEffect(1f));
-            players[otherPlayerIndex].PlaySound("Hit_Dummy");
+            SoundPlayer.instance.PlaySound("Hit_Dummy");
         }
         else
         {
             StartCoroutine(players[otherPlayerIndex].DefenseEffect(1f));
-            players[otherPlayerIndex].PlaySound("Defense_Dummy");
-
+            SoundPlayer.instance.PlaySound("Defense_Dummy");
         }
     }
 
