@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using Manager.View;
+using Manager.Sound;
 using BackEnd;
 
 public enum Tear : byte
@@ -64,6 +65,7 @@ public partial class MainUI : BaseScreen<MainUI>
     public int    basePosY  = 0;
     public int    rankCount = 0;
     public string rankUUID  = "";
+    public GameObject rankParent = null;
 
     public override void ShowScreen()
     {
@@ -79,6 +81,8 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void OpenRankUI()
     {
+        SoundPlayer.instance.PlaySound("Click");
+
         rankObject.SetActive(true);
         SetRank();
     }
@@ -94,12 +98,13 @@ public partial class MainUI : BaseScreen<MainUI>
         rankNullText.SetActive(false);
 
         Backend.Rank.RankList(callback => { Debug.Log("Rank : " + callback); rankUUID = callback.Rows()[0]["uuid"]["S"].ToString(); });
-        rankList = new List<Rank>();
 
         if (rankUIList != null)
         {
             for (int i = 0; i < rankUIList.Count; i++)
                 Destroy(rankUIList[i].boardObject);
+
+            rankUIList = null;
         }
 
         SendQueue.Enqueue(Backend.Rank.GetRankByUuid, rankUUID, 100, callback =>
@@ -108,6 +113,8 @@ public partial class MainUI : BaseScreen<MainUI>
             {
                 Debug.Log("랭킹 변동 : " + callback);
 
+                rankUIList = new List<RankUI>();
+                rankList = new List<Rank>();
                 rankCount = callback.Rows().Count;
                 
                 for (int i = 0; i < rankCount; i++)
@@ -119,7 +126,7 @@ public partial class MainUI : BaseScreen<MainUI>
                         ));
 
                     rankUIList.Add(new RankUI());
-                    rankUIList[i].boardObject = Instantiate(rankBoardObject, new Vector3(0, basePosY + (i * 200), 0), Quaternion.identity);
+                    rankUIList[i].boardObject = Instantiate(rankBoardObject, new Vector3(rankBoardObject.transform.position.x, rankBoardObject.transform.position.y, rankBoardObject.transform.position.z), Quaternion.identity, rankParent.transform);
 
                     rankUIList[i] = new RankUI(
                         rankUIList[i].boardObject.transform.GetChild(1).GetChild(0).GetComponent<Image>(),
@@ -127,15 +134,26 @@ public partial class MainUI : BaseScreen<MainUI>
                         rankUIList[i].boardObject.transform.GetChild(2).GetChild(0).GetComponent<Text>(),
                         rankUIList[i].boardObject.transform.GetChild(3).GetComponent<Text>()
                         );
-                }
 
-                for (int i = 0; i < rankUIList.Count; i++)
-                {
+                    rankUIList[i].boardObject = rankParent.transform.GetChild(i).gameObject;
+                    rankUIList[i].boardObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(rankBoardObject.transform.position.x, basePosY - (i * 200f));
+
                     rankUIList[i].tearImage.sprite = tearImages[(int)rankList[i].tearEnum];
                     rankUIList[i].nameAnTearText.text = rankList[i].name;
                     rankUIList[i].pointText.text = rankList[i].point.ToString();
-                    rankUIList[i].rankText.text = i.ToString();
+                    rankUIList[i].rankText.text = (i + 1).ToString();
+                    rankUIList[i].boardObject.SetActive(true);
                 }
+
+                //Debug.Log(rankUIList.Count);
+                //for (int i = 0; i < rankUIList.Count; i++)
+                //{
+                //    rankUIList[i].tearImage.sprite = tearImages[(int)rankList[i].tearEnum];
+                //    rankUIList[i].nameAnTearText.text = rankList[i].name;
+                //    rankUIList[i].pointText.text = rankList[i].point.ToString();
+                //    rankUIList[i].rankText.text = i.ToString();
+                //    rankUIList[i].boardObject.SetActive(true);
+                //}
 
                 rankBackGroundObject.SetActive(true);
             }

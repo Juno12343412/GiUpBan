@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Manager.View;
+using Manager.Sound;
 
 // InGame
 public partial class GameUI : BaseScreen<GameUI>
@@ -16,6 +17,7 @@ public partial class GameUI : BaseScreen<GameUI>
 
     void Start()
     {
+        SoundPlayer.instance.PlaySound("BattleStart");
         HideScreen();
     }
 

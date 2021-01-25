@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using Manager.View;
+using Manager.Sound;
 using BackEnd.Tcp;
 
 // Result
@@ -36,6 +37,8 @@ public partial class GameUI : BaseScreen<GameUI>
         {
             if (BackEndMatchManager.instance.IsMySessionId(user))
             {
+                SoundPlayer.instance.PlaySound("WinSound");
+
                 BackEndServerManager.instance.myInfo.point += 30;
                 ResultText.text = "승리";
                 ScoreText.text = BackEndServerManager.instance.myInfo.point + "+(30)";

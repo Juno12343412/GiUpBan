@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Manager.View;
+using Manager.Sound;
 
 [System.Serializable]
 public class Card
@@ -214,6 +215,8 @@ public partial class MainUI : BaseScreen<MainUI>
         {
             if (BackEndServerManager.instance.myInfo.gold >= cards[curSelectCard].upgradePrice)
             {
+                SoundPlayer.instance.PlaySound("Upgrade");
+
                 BackEndServerManager.instance.myInfo.gold -= cards[curSelectCard].upgradePrice;
                 BackEndServerManager.instance.myInfo.levelExp[value] -= cards[curSelectCard].upgradeNeedCard;
                 
@@ -223,6 +226,8 @@ public partial class MainUI : BaseScreen<MainUI>
                 
                 SetInventory();
                 UpdateUpgradeUI();
+
+                PlayerStats.instance.Save();
             }
             else
             {
@@ -238,12 +243,15 @@ public partial class MainUI : BaseScreen<MainUI>
     // 3.
     public void OnUpgrade()
     {
+        SoundPlayer.instance.PlaySound("Click");
         UpgradeCard(curSelectCard);
     }
 
     // 2.
     public void OpenUpgradeUI(int index)
     {
+        SoundPlayer.instance.PlaySound("Click");
+
         curSelectCard = index;
         if (cards[curSelectCard].isHave)
         {
@@ -321,6 +329,8 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void CharacterChange()
     {
+        SoundPlayer.instance.PlaySound("Click");
+
         BackEndServerManager.instance.myInfo.nowCharacter = curSelectCard;
         cardUpgrade.SetActive(false);
 
@@ -332,5 +342,6 @@ public partial class MainUI : BaseScreen<MainUI>
         PlayerStats.instance.SetStats();
         SetNickName();
         SetInventory();
+        PlayerStats.instance.Save();
     }
 }

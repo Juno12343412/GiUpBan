@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Manager.View;
+using Manager.Sound;
 using BackEnd;
 
 public enum ChestState : byte
@@ -25,7 +26,7 @@ public class Chest
     public Text idleArenaText = null;
     public Text disDiamondText = null;
 
-    public ChestKind chestKind = ChestKind.브론즈;
+    public ChestKind chestKind = ChestKind.NONE;
     public ChestState chestState = ChestState.Idle;
 
     public int disTime = 0;
@@ -135,6 +136,8 @@ public partial class MainUI : BaseScreen<MainUI>
         curHaveChests++;
         BackEndServerManager.instance.myInfo.haveChests = curHaveChests;
         BackEndServerManager.instance.myInfo.disStartTime = startTime;
+
+        PlayerStats.instance.SaveChest();
     }
 
     // 해당 인덱스의 상자 체킹 (열 시간이 지났는가 안지났는가)
@@ -186,6 +189,8 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void OpenDismissing(int index)
     {
+        SoundPlayer.instance.PlaySound("Click");
+
         curSelectMyChest = index;
 
         disKindText.text = myChests[index].chestKind.ToString();
@@ -218,11 +223,22 @@ public partial class MainUI : BaseScreen<MainUI>
     // 다이아몬드 체스트
     public void OpenDiamondChestUI(int index)
     {
+        SoundPlayer.instance.PlaySound("Click");
+
         count = index + 2;
         chestItemCountText.text = count.ToString();
 
         chestDisObject.SetActive(false);
         chestOpenObject.SetActive(true);
+
+        if (index == (int)ChestKind.실버)
+            chestImg.sprite = chestImgs[1];
+        else if (index == (int)ChestKind.골드)
+            chestImg.sprite = chestImgs[2];
+        else if (index == (int)ChestKind.다이아)
+            chestImg.sprite = chestImgs[3];
+        else
+            chestImg.sprite = chestImgs[0];
 
         chestImg.gameObject.SetActive(true);
 
@@ -233,6 +249,7 @@ public partial class MainUI : BaseScreen<MainUI>
     {
         if (BackEndServerManager.instance.myInfo.diamond >= myChests[curSelectChest].diamondPrice)
         {
+            SoundPlayer.instance.PlaySound("Click");
             Debug.Log("다이아몬드로 상자 열음");
 
             BackEndServerManager.instance.myInfo.diamond -= myChests[curSelectChest].diamondPrice;
@@ -260,11 +277,22 @@ public partial class MainUI : BaseScreen<MainUI>
     // 메인에서 잠금해제가 완료된 상자 터치할 때
     public void OpenChestUI(int index)
     {
+        SoundPlayer.instance.PlaySound("Click");
+
         count = (int)myChests[curSelectMyChest].chestKind + 2;
         chestItemCountText.text = count.ToString();
 
         chestDisObject.SetActive(false);
         chestOpenObject.SetActive(true);
+
+        if (index == (int)ChestKind.실버)
+            chestImg.sprite = chestImgs[1];
+        else if (index == (int)ChestKind.골드)
+            chestImg.sprite = chestImgs[2];
+        else if (index == (int)ChestKind.다이아)
+            chestImg.sprite = chestImgs[3];
+        else
+            chestImg.sprite = chestImgs[0];
 
         chestImg.gameObject.SetActive(true);
 
@@ -283,6 +311,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void OpenChest(int index)
     {
+        SoundPlayer.instance.PlaySound("Click");
         chestItemCountText.text = (count - 1).ToString();
 
         if (count == 0)
@@ -306,6 +335,8 @@ public partial class MainUI : BaseScreen<MainUI>
             CheckDis();
 
             CloseChest();
+
+            PlayerStats.instance.Save();
             return;
         }
         else if (count == index + 2)
@@ -401,109 +432,600 @@ public partial class MainUI : BaseScreen<MainUI>
 
     void GiveCard(int index)
     {
-        SendQueue.Enqueue(Backend.Probability.GetProbability, "843", callback =>
+        if (index == (int)ChestKind.골드)
         {
-            // 그 다음 카드 부분
-            if (callback.IsSuccess())
+            SendQueue.Enqueue(Backend.Probability.GetProbability, "976", callback =>
             {
-                int card = -1;
-                int count = Random.Range((index + 1) * 2, (index + 1) * 5);
-
-                var log = callback.GetReturnValuetoJSON()["element"]["Item"]["S"].ToString();
-                Debug.Log(log);
-
-                switch (log)
                 {
-                    case "나이트":
-                        card = 0;
-                        break;
-                    case "벤전스":
-                        card = 1;
-                        break;
-                    case "듀얼":
-                        card = 2;
-                        break;
-                    case "도끼":
-                        card = 3;
-                        break;
-                    case "스탭":
-                        card = 4;
-                        break;
-                    case "시프":
-                        card = 5;
-                        break;
-                    case "피오라":
-                        card = 6;
-                        break;
-                    case "사이드":
-                        card = 7;
-                        break;
-                    case "스미스":
-                        card = 8;
-                        break;
-                    case "라운드":
-                        card = 9;
-                        break;
-                    case "듀크":
-                        card = 10;
-                        break;
-                    case "빈센트":
-                        card = 11;
-                        break;
-                    case "플레타":
-                        card = 12;
-                        break;
-                    case "더스틴":
-                        card = 13;
-                        break;
-                    case "루이스":
-                        card = 14;
-                        break;
-                    case "윌리":
-                        card = 15;
-                        break;
-                    case "아일린":
-                        card = 16;
-                        break;
-                    case "체이스":
-                        card = 17;
-                        break;
-                    case "랄프":
-                        card = 18;
-                        break;
-                    case "알베토":
-                        card = 19;
-                        break;
-                    default:
-                        break;
-                }
+                    // 그 다음 카드 부분
+                    if (callback.IsSuccess())
+                    {
+                        int card = -1;
+                        int count = Random.Range((index + 1) * 2, (index + 1) * 5);
 
-                if (CheckHaveCard(card))
+                        var log = callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString();
+                        Debug.Log(log);
+
+                        switch (log)
+                        {
+                            case "기사":
+                                card = 0;
+                                break;
+                            case "벤전스":
+                                card = 1;
+                                break;
+                            case "도끼":
+                                card = 2;
+                                break;
+                            case "듀얼":
+                                card = 3;
+                                break;
+                            case "스탭":
+                                card = 4;
+                                break;
+                            case "시프":
+                                card = 5;
+                                break;
+                            case "피오라":
+                                card = 6;
+                                break;
+                            case "사이드":
+                                card = 7;
+                                break;
+                            case "스미스":
+                                card = 8;
+                                break;
+                            case "라운드":
+                                card = 9;
+                                break;
+                            case "듀크":
+                                card = 10;
+                                break;
+                            case "빈센트":
+                                card = 11;
+                                break;
+                            case "플레타":
+                                card = 12;
+                                break;
+                            case "더스틴":
+                                card = 13;
+                                break;
+                            case "루이스":
+                                card = 14;
+                                break;
+                            case "윌리":
+                                card = 15;
+                                break;
+                            case "아일린":
+                                card = 16;
+                                break;
+                            case "체이스":
+                                card = 17;
+                                break;
+                            case "랄프":
+                                card = 18;
+                                break;
+                            case "알버트":
+                                card = 19;
+                                break;
+                            case "재클린":
+                                card = 20;
+                                break;
+                            case "앤드류":
+                                card = 21;
+                                break;
+                            case "콜린":
+                                card = 22;
+                                break;
+                            case "찰스":
+                                card = 23;
+                                break;
+                            case "케빈":
+                                card = 24;
+                                break;
+                            case "다비":
+                                card = 25;
+                                break;
+                            case "모냇":
+                                card = 26;
+                                break;
+                            case "조지":
+                                card = 27;
+                                break;
+                            case "아모스":
+                                card = 28;
+                                break;
+                            case "던칸":
+                                card = 29;
+                                break;
+                            case "로랜스":
+                                card = 30;
+                                break;
+                            case "해럴드":
+                                card = 31;
+                                break;
+                            case "스니퍼":
+                                card = 32;
+                                break;
+                            case "레오나드":
+                                card = 33;
+                                break;
+                            case "스팅":
+                                card = 34;
+                                break;
+                            case "비아나":
+                                card = 35;
+                                break;
+                            case "미셀":
+                                card = 36;
+                                break;
+                            case "제이스":
+                                card = 37;
+                                break;
+                            case "안토니":
+                                card = 38;
+                                break;
+                            case "렉스":
+                                card = 39;
+                                break;
+                            case "사무엘":
+                                card = 40;
+                                break;
+                            case "에드윈":
+                                card = 41;
+                                break;
+                            case "로이드":
+                                card = 42;
+                                break;
+                            case "아돌프":
+                                card = 43;
+                                break;
+                            case "아폴로":
+                                card = 44;
+                                break;
+                            case "닐":
+                                card = 45;
+                                break;
+                            case "마샤":
+                                card = 46;
+                                break;
+                            case "리퍼":
+                                card = 47;
+                                break;
+                            case "도글라스":
+                                card = 48;
+                                break;
+                            case "스텔라":
+                                card = 49;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (CheckHaveCard(card))
+                        {
+                            Debug.Log("캐릭터 있음 : " + card);
+
+                            var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
+                            BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                        }
+                        else
+                        {
+                            Debug.Log("캐릭터 없음");
+                            BackEndServerManager.instance.myInfo.haveCharacters.Add(card);
+                            BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
+                            BackEndServerManager.instance.myInfo.levelExp.Add(1);
+
+                            var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
+                            BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                        }
+
+                        cardText.text = log;
+                        ShowResultCard(card, count);
+
+                        SetInventory();
+                    }
+                    else
+                        Debug.Log("실패 !");
+                }
+            });
+        }
+        else if (index == (int)ChestKind.다이아)
+        {
+            SendQueue.Enqueue(Backend.Probability.GetProbability, "975", callback =>
+            {
                 {
-                    Debug.Log("캐릭터 있음 : " + card);
+                    // 그 다음 카드 부분
+                    if (callback.IsSuccess())
+                    {
+                        int card = -1;
+                        int count = Random.Range((index + 1) * 2, (index + 1) * 5);
 
-                    var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
-                    BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                        var log = callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString();
+                        Debug.Log(log);
+
+                        switch (log)
+                        {
+                            case "기사":
+                                card = 0;
+                                break;
+                            case "벤전스":
+                                card = 1;
+                                break;
+                            case "도끼":
+                                card = 2;
+                                break;
+                            case "듀얼":
+                                card = 3;
+                                break;
+                            case "스탭":
+                                card = 4;
+                                break;
+                            case "시프":
+                                card = 5;
+                                break;
+                            case "피오라":
+                                card = 6;
+                                break;
+                            case "사이드":
+                                card = 7;
+                                break;
+                            case "스미스":
+                                card = 8;
+                                break;
+                            case "라운드":
+                                card = 9;
+                                break;
+                            case "듀크":
+                                card = 10;
+                                break;
+                            case "빈센트":
+                                card = 11;
+                                break;
+                            case "플레타":
+                                card = 12;
+                                break;
+                            case "더스틴":
+                                card = 13;
+                                break;
+                            case "루이스":
+                                card = 14;
+                                break;
+                            case "윌리":
+                                card = 15;
+                                break;
+                            case "아일린":
+                                card = 16;
+                                break;
+                            case "체이스":
+                                card = 17;
+                                break;
+                            case "랄프":
+                                card = 18;
+                                break;
+                            case "알버트":
+                                card = 19;
+                                break;
+                            case "재클린":
+                                card = 20;
+                                break;
+                            case "앤드류":
+                                card = 21;
+                                break;
+                            case "콜린":
+                                card = 22;
+                                break;
+                            case "찰스":
+                                card = 23;
+                                break;
+                            case "케빈":
+                                card = 24;
+                                break;
+                            case "다비":
+                                card = 25;
+                                break;
+                            case "모냇":
+                                card = 26;
+                                break;
+                            case "조지":
+                                card = 27;
+                                break;
+                            case "아모스":
+                                card = 28;
+                                break;
+                            case "던칸":
+                                card = 29;
+                                break;
+                            case "로랜스":
+                                card = 30;
+                                break;
+                            case "해럴드":
+                                card = 31;
+                                break;
+                            case "스니퍼":
+                                card = 32;
+                                break;
+                            case "레오나드":
+                                card = 33;
+                                break;
+                            case "스팅":
+                                card = 34;
+                                break;
+                            case "비아나":
+                                card = 35;
+                                break;
+                            case "미셀":
+                                card = 36;
+                                break;
+                            case "제이스":
+                                card = 37;
+                                break;
+                            case "안토니":
+                                card = 38;
+                                break;
+                            case "렉스":
+                                card = 39;
+                                break;
+                            case "사무엘":
+                                card = 40;
+                                break;
+                            case "에드윈":
+                                card = 41;
+                                break;
+                            case "로이드":
+                                card = 42;
+                                break;
+                            case "아돌프":
+                                card = 43;
+                                break;
+                            case "아폴로":
+                                card = 44;
+                                break;
+                            case "닐":
+                                card = 45;
+                                break;
+                            case "마샤":
+                                card = 46;
+                                break;
+                            case "리퍼":
+                                card = 47;
+                                break;
+                            case "도글라스":
+                                card = 48;
+                                break;
+                            case "스텔라":
+                                card = 49;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (CheckHaveCard(card))
+                        {
+                            Debug.Log("캐릭터 있음 : " + card);
+
+                            var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
+                            BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                        }
+                        else
+                        {
+                            Debug.Log("캐릭터 없음");
+                            BackEndServerManager.instance.myInfo.haveCharacters.Add(card);
+                            BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
+                            BackEndServerManager.instance.myInfo.levelExp.Add(1);
+
+                            var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
+                            BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                        }
+
+                        cardText.text = log;
+                        ShowResultCard(card, count);
+
+                        SetInventory();
+                    }
+                    else
+                        Debug.Log("실패 !");
                 }
-                else
+            });
+        }
+        else
+        {
+            SendQueue.Enqueue(Backend.Probability.GetProbability, "977", callback =>
+            {
                 {
-                    Debug.Log("캐릭터 없음");
-                    BackEndServerManager.instance.myInfo.haveCharacters.Add(card);
-                    BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
-                    BackEndServerManager.instance.myInfo.levelExp.Add(1);
+                    // 그 다음 카드 부분
+                    if (callback.IsSuccess())
+                    {
+                        int card = -1;
+                        int count = Random.Range((index + 1) * 2, (index + 1) * 5);
 
-                    var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
-                    BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                        var log = callback.GetReturnValuetoJSON()["element"]["item"]["S"].ToString();
+                        Debug.Log(log);
+
+                        switch (log)
+                        {
+                            case "기사":
+                                card = 0;
+                                break;
+                            case "벤전스":
+                                card = 1;
+                                break;
+                            case "도끼":
+                                card = 2;
+                                break;
+                            case "듀얼":
+                                card = 3;
+                                break;
+                            case "스탭":
+                                card = 4;
+                                break;
+                            case "시프":
+                                card = 5;
+                                break;
+                            case "피오라":
+                                card = 6;
+                                break;
+                            case "사이드":
+                                card = 7;
+                                break;
+                            case "스미스":
+                                card = 8;
+                                break;
+                            case "라운드":
+                                card = 9;
+                                break;
+                            case "듀크":
+                                card = 10;
+                                break;
+                            case "빈센트":
+                                card = 11;
+                                break;
+                            case "플레타":
+                                card = 12;
+                                break;
+                            case "더스틴":
+                                card = 13;
+                                break;
+                            case "루이스":
+                                card = 14;
+                                break;
+                            case "윌리":
+                                card = 15;
+                                break;
+                            case "아일린":
+                                card = 16;
+                                break;
+                            case "체이스":
+                                card = 17;
+                                break;
+                            case "랄프":
+                                card = 18;
+                                break;
+                            case "알버트":
+                                card = 19;
+                                break;
+                            case "재클린":
+                                card = 20;
+                                break;
+                            case "앤드류":
+                                card = 21;
+                                break;
+                            case "콜린":
+                                card = 22;
+                                break;
+                            case "찰스":
+                                card = 23;
+                                break;
+                            case "케빈":
+                                card = 24;
+                                break;
+                            case "다비":
+                                card = 25;
+                                break;
+                            case "모냇":
+                                card = 26;
+                                break;
+                            case "조지":
+                                card = 27;
+                                break;
+                            case "아모스":
+                                card = 28;
+                                break;
+                            case "던칸":
+                                card = 29;
+                                break;
+                            case "로랜스":
+                                card = 30;
+                                break;
+                            case "해럴드":
+                                card = 31;
+                                break;
+                            case "스니퍼":
+                                card = 32;
+                                break;
+                            case "레오나드":
+                                card = 33;
+                                break;
+                            case "스팅":
+                                card = 34;
+                                break;
+                            case "비아나":
+                                card = 35;
+                                break;
+                            case "미셀":
+                                card = 36;
+                                break;
+                            case "제이스":
+                                card = 37;
+                                break;
+                            case "안토니":
+                                card = 38;
+                                break;
+                            case "렉스":
+                                card = 39;
+                                break;
+                            case "사무엘":
+                                card = 40;
+                                break;
+                            case "에드윈":
+                                card = 41;
+                                break;
+                            case "로이드":
+                                card = 42;
+                                break;
+                            case "아돌프":
+                                card = 43;
+                                break;
+                            case "아폴로":
+                                card = 44;
+                                break;
+                            case "닐":
+                                card = 45;
+                                break;
+                            case "마샤":
+                                card = 46;
+                                break;
+                            case "리퍼":
+                                card = 47;
+                                break;
+                            case "도글라스":
+                                card = 48;
+                                break;
+                            case "스텔라":
+                                card = 49;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        if (CheckHaveCard(card))
+                        {
+                            Debug.Log("캐릭터 있음 : " + card);
+
+                            var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
+                            BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                        }
+                        else
+                        {
+                            Debug.Log("캐릭터 없음");
+                            BackEndServerManager.instance.myInfo.haveCharacters.Add(card);
+                            BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
+                            BackEndServerManager.instance.myInfo.levelExp.Add(1);
+
+                            var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == card);
+                            BackEndServerManager.instance.myInfo.levelExp[value] += count;
+                        }
+
+                        cardText.text = log;
+                        ShowResultCard(card, count);
+
+                        SetInventory();
+                    }
+                    else
+                        Debug.Log("실패 !");
                 }
-
-                cardText.text = log;
-                ShowResultCard(card, count);
-
-                SetInventory();
-            }
-            else
-                Debug.Log("실패 !");
-        });
+            });
+        }
     }
 
     // 상자 열때 무슨 아이템 나왔는지 보여주는 함수

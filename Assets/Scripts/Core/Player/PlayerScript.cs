@@ -57,7 +57,7 @@ public class PlayerScript : PoolingObject
     private bool isDelay = false;
     [HideInInspector] public Animator Anim;
     public Camera characterCamera = null;
-    private CameraFuncs cameraFuncs = null;
+    public CameraFuncs cameraFuncs = null;
 
     [SerializeField] private GameObject[] effectObjs = null;
     #endregion
@@ -88,7 +88,7 @@ public class PlayerScript : PoolingObject
             if (stats.CurHp <= 0)
             {
                 if (BackEndMatchManager.instance.IsMySessionId(index))
-                    cameraFuncs.SetShakeTime(0, 0);
+                    cameraFuncs.SetShakeTime(0, 0, Vector3.zero);
                 Time.timeScale = 1;
                 WorldPackage.instance.playerDie(index);
             }
@@ -331,6 +331,8 @@ public class PlayerScript : PoolingObject
                 int keyCode = (int)State;
                 KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
+
+                StartCoroutine(cameraFuncs.ZoomCamera(2f, 1f));
             }
             else
             {
@@ -366,9 +368,9 @@ public class PlayerScript : PoolingObject
         isStun = false;
     }
 
-    public void SufferDamage(double Damage)
+    public void SufferDamage(double Damage, Direction Direction)
     {
-        PlayerDamagedMessage damagedMsg = new PlayerDamagedMessage(index, Damage);
+        PlayerDamagedMessage damagedMsg = new PlayerDamagedMessage(index, Damage, Direction);
         BackEndMatchManager.instance.SendDataToInGame(damagedMsg);
     }
     public void CancelTrue()
@@ -402,8 +404,13 @@ public class PlayerScript : PoolingObject
 
     public void HitStop(float _Time, float _Scale)
     {
-        cameraFuncs.SetShakeTime(_Time, _Scale);
+        cameraFuncs.SetShakeTime(_Time, _Scale, Vector3.zero);
         StartCoroutine(CR_TimeStop(_Time * 0.2f));
+    }
+
+    public void CameraShake(float _Time, float _Scale, Vector3 _Dir)
+    {
+        cameraFuncs.SetShakeTime(_Time, _Scale, _Dir);
     }
 
     public IEnumerator CR_TimeStop(float _Time)

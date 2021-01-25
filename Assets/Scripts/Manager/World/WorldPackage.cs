@@ -357,6 +357,8 @@ public class WorldPackage : MonoBehaviour
     private void ProcessPlayerData(PlayerDefenseMessage data)
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
+        players[data.playerSession].HitStop(0.2f, 0.2f);
+
         players[data.playerSession].AnimationReset();
         if (players[data.playerSession].Direction == Direction.Left)
             players[data.playerSession].Anim.SetInteger("AttackDir", 0);
@@ -403,7 +405,14 @@ public class WorldPackage : MonoBehaviour
 
         if (!BackEndMatchManager.instance.IsMySessionId(data.playerSession))
         {
-            players[myPlayerIndex].HitStop(0.2f, 0.2f);
+            players[myPlayerIndex].HitStop((float)data.damage * 0.2f,(float)data.damage * 0.2f);
+        }
+        else if (BackEndMatchManager.instance.IsMySessionId(data.playerSession))
+        {
+            if (data.direction == Direction.Left) 
+                players[myPlayerIndex].CameraShake(0.2f, 0.2f, Vector3.right);
+            else
+                players[myPlayerIndex].CameraShake(0.2f, 0.2f, Vector3.left);
         }
 
         Debug.Log("넣기전 체력" + players[data.playerSession].Stats.CurHp);
@@ -558,7 +567,7 @@ public class WorldPackage : MonoBehaviour
             {
                 players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f)
-                    * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
+                    * players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Direction);
 
                 players[otherPlayerIndex].StunOn(players[otherPlayerIndex].Stats.WeakAttackStun);
 
@@ -572,7 +581,7 @@ public class WorldPackage : MonoBehaviour
             else
             {
                 players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
-                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f));
+                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f), players[myPlayerIndex].Direction);
 
                 players[myPlayerIndex].StunOn(players[otherPlayerIndex].Stats.WeakAttackStun);
 
@@ -593,7 +602,7 @@ public class WorldPackage : MonoBehaviour
             {
                 players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
                     * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f)
-                    * players[myPlayerIndex].Stats.DefeneseReceivingDamage);
+                    * players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Direction);
 
                 players[otherPlayerIndex].StunOn(players[otherPlayerIndex].Stats.StrongAttackStun);
 
@@ -607,7 +616,7 @@ public class WorldPackage : MonoBehaviour
             {
 
                 players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
-                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f));
+                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f), players[myPlayerIndex].Direction);
 
                 players[myPlayerIndex].StunOn(players[otherPlayerIndex].Stats.StrongAttackStun);
 

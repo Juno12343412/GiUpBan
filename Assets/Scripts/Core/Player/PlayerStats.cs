@@ -6,7 +6,7 @@ using BackEnd;
 
 public enum CharacterKind : byte
 {
-    나이트 = 0,
+    기사 = 0,
     벤전스,
     듀얼,
     도끼,
@@ -25,7 +25,37 @@ public enum CharacterKind : byte
     아일린,
     체이스,
     랄프,
-    알베토,
+    알버트,
+    재클린,
+    앤드류,
+    콜린,
+    찰스,
+    케빈,
+    다비,
+    모냇,
+    조지,
+    아모스,
+    던칸,
+    로랜스,
+    해럴드,
+    스니퍼,
+    레오나드,
+    스팅,
+    비아나,
+    미셀,
+    제이스,
+    안토니,
+    렉스,
+    사무엘,
+    에드윈,
+    로이드,
+    아돌프,
+    아폴로,
+    닐,
+    마샤,
+    리퍼,
+    도글라스,
+    스텔라,
     MAX,
     NONE = 99
 }
@@ -235,7 +265,7 @@ public class PlayerStats : MonoBehaviour
     public void LoadChart()
     {
         // 모든 캐릭터 정보
-        SendQueue.Enqueue(Backend.Chart.GetChartContents, "12858", callback =>
+        SendQueue.Enqueue(Backend.Chart.GetChartContents, "13704", callback =>
         {
             if (callback.IsSuccess())
             {

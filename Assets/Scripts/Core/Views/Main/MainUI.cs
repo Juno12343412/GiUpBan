@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using BackEnd.Tcp;
 using BackEnd;
 using Manager.View;
+using Manager.Sound;
 
 public partial class MainUI : BaseScreen<MainUI>
 {
@@ -42,6 +43,8 @@ public partial class MainUI : BaseScreen<MainUI>
     {
         Time.timeScale = 1;
 
+        SoundPlayer.instance.PlayBGM("MainBgm", 0.5f);
+
         matchlookingObject.SetActive(false);
         matchFoundObject.SetActive(false);
         matchReconnectObject.SetActive(false);
@@ -71,6 +74,8 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void OpenMatchUI()
     {
+        SoundPlayer.instance.PlaySound("Click");
+
         // 매치 서버에 대기방 생성 요청
         if (BackEndMatchManager.instance.CreateMatchRoom() == true)
         {
@@ -190,6 +195,9 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void MatchDoneCallback()
     {
+        SoundPlayer.instance.StopBGM();
+        SoundPlayer.instance.PlaySound("FindMatching");
+
         matchlookingObject.SetActive(false);
         matchFoundObject.SetActive(true);
     }
@@ -245,6 +253,8 @@ public partial class MainUI : BaseScreen<MainUI>
         SetNickName();
         SetTear();
         SetInventory();
+
+        PlayerStats.instance.Save();
     }
 
     public void SetTear()

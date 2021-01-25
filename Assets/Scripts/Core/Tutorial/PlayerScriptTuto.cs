@@ -394,7 +394,7 @@ public class PlayerScriptTuto : PoolingObject
 
     public void HitStop(float _Time, float _Scale)
     {
-        cameraFuncs.SetShakeTime(_Time, _Scale);
+        cameraFuncs.SetShakeTime(_Time, _Scale, Vector3.zero);
         StartCoroutine(CR_TimeStop(_Time * 0.2f));
     }
 

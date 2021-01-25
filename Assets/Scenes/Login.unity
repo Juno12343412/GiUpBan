@@ -3039,7 +3039,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
       propertyPath: clips.Array.size
-      value: 3
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
       propertyPath: clips.Array.data[0]
@@ -3053,6 +3053,34 @@ PrefabInstance:
       propertyPath: clips.Array.data[2]
       value: 
       objectReference: {fileID: 8300000, guid: dfe27de2c9eb82a4cbe82f03b3479350, type: 3}
+    - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
+      propertyPath: clips.Array.data[3]
+      value: 
+      objectReference: {fileID: 8300000, guid: a67565bc3d84c904fb55bf777dfdf0dc, type: 3}
+    - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
+      propertyPath: clips.Array.data[4]
+      value: 
+      objectReference: {fileID: 8300000, guid: e7ebe435c828e514f945b35b841eccfc, type: 3}
+    - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
+      propertyPath: clips.Array.data[5]
+      value: 
+      objectReference: {fileID: 8300000, guid: 07ead4284a2103b448d70fe58d9d188a, type: 3}
+    - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
+      propertyPath: clips.Array.data[6]
+      value: 
+      objectReference: {fileID: 8300000, guid: 7ef9dd3da2ee56e408edaa976dca0df0, type: 3}
+    - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
+      propertyPath: clips.Array.data[7]
+      value: 
+      objectReference: {fileID: 8300000, guid: 6788a59d1f317c9489ab38c104bd4c25, type: 3}
+    - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
+      propertyPath: clips.Array.data[8]
+      value: 
+      objectReference: {fileID: 8300000, guid: 6ff9f24f6818e8945a2dd39c6ce78fa7, type: 3}
+    - target: {fileID: 1205683695, guid: d12ca0fe0e6fd2747961d99c9dbf6025, type: 3}
+      propertyPath: clips.Array.data[9]
+      value: 
+      objectReference: {fileID: 8300000, guid: bcbf393899f070448bdeac73e2063f03, type: 3}
     - target: {fileID: 9131468558171056924, guid: d12ca0fe0e6fd2747961d99c9dbf6025,
         type: 3}
       propertyPath: m_Name

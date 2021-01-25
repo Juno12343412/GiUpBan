@@ -123,10 +123,12 @@ namespace Protocol
     {
         public SessionId playerSession;
         public double damage;
-        public PlayerDamagedMessage(SessionId session, double damage) : base(Type.Damaged)
+        public Direction direction;
+        public PlayerDamagedMessage(SessionId session, double damage, Direction direction) : base(Type.Damaged)
         {
             this.playerSession = session;
             this.damage = damage;
+            this.direction = direction;
         }
     }
 

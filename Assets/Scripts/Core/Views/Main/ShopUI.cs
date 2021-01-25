@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Manager.View;
+using Manager.Sound;
 using UnityEngine.UI;
 
 public enum ChestKind : byte
@@ -9,11 +10,15 @@ public enum ChestKind : byte
     한,
     조셉트,
     폴,
-    브론즈,
-    실버,
-    골드,
     굿,
     예아,
+    백,
+    오수,
+    김도,
+    준,
+    실버,
+    골드,
+    다이아,
     MAX,
     NONE = 99
 }
@@ -114,6 +119,7 @@ public partial class MainUI : BaseScreen<MainUI>
             }
             item.itemNameText.text = ((CharacterKind)item.itemKind).ToString();
         }
+        PlayerStats.instance.Save();
     }
 
     // 카드 구매
@@ -125,6 +131,7 @@ public partial class MainUI : BaseScreen<MainUI>
             BackEndServerManager.instance.myInfo.gold -= items[curSelectItem].itemPrice;
             if (CheckHaveCard(items[curSelectItem].itemKind))
             {
+                SoundPlayer.instance.PlaySound("Purchase");
                 Debug.Log("캐릭터 있음");
 
                 var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == items[curSelectItem].itemKind);
@@ -136,12 +143,12 @@ public partial class MainUI : BaseScreen<MainUI>
 
                 BackEndServerManager.instance.myInfo.haveCharacters.Add(items[curSelectItem].itemKind);
                 BackEndServerManager.instance.myInfo.charactersLevel.Add(1);
-                BackEndServerManager.instance.myInfo.levelExp.Add(-1);
+                BackEndServerManager.instance.myInfo.levelExp.Add(1);
 
                 var value = BackEndServerManager.instance.myInfo.haveCharacters.FindIndex(find => find == items[curSelectItem].itemKind);
                 BackEndServerManager.instance.myInfo.levelExp[value] += items[curSelectItem].itemCount;
             }
-            items[curSelectItem].itemCount = 1;
+            items[curSelectItem].itemCount = 0;
             
             ShowShop();
             SetInventory();
@@ -150,6 +157,7 @@ public partial class MainUI : BaseScreen<MainUI>
             BackEndServerManager.instance.myInfo.cardCount[curSelectItem] = items[curSelectItem].itemCount;
 
             SetGoldUI();
+            PlayerStats.instance.Save();
         }
         else
         {
@@ -174,7 +182,7 @@ public partial class MainUI : BaseScreen<MainUI>
             Debug.Log(index);
 
             // 이미지 설정하는 코드 추가 [...]
-            item.itemKind = Random.Range(0, (int)CharacterKind.MAX);
+            item.itemKind = Random.Range(0, 30);
 
             item.itemMaxCount = Random.Range(1, 65);
             item.itemCount = item.itemMaxCount;
@@ -241,6 +249,8 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void OpenPurchaseUI(int index)
     {
+        SoundPlayer.instance.PlaySound("Click");
+
         curSelectItem = index;
         if (items[curSelectItem].itemCount > 0)
         {
@@ -265,6 +275,8 @@ public partial class MainUI : BaseScreen<MainUI>
         // 상자 열기
         if (BackEndServerManager.instance.myInfo.diamond >= chests[curSelectChest].chestPrice)
         {
+            SoundPlayer.instance.PlaySound("Purchase");
+
             BackEndServerManager.instance.myInfo.diamond -= chests[curSelectChest].chestPrice;
             OpenDiamondChest(chests[curSelectChest].chestKind);
         }
