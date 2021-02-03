@@ -31,6 +31,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
     [Header("Upgrade")]
     [SerializeField] private Image upgradeCharacterImg = null;
+    [SerializeField] private Image gradeImg = null;
     [SerializeField] private Image levelBaseImg = null;
     [SerializeField] private Image levelUpBaseImg = null;
     [SerializeField] private Text characterNameText = null, characterLevelText = null, characterGradeText = null, characterCountText = null;
@@ -189,8 +190,179 @@ public partial class MainUI : BaseScreen<MainUI>
                     characterAttackSpeedText.text = "보통";
                     characterGradeText.text = "일반";
                     break;
+                case 20: // 재클린
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 21: // 앤드류
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 22: // 콜린
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 23: // 찰스
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 24: // 케빈
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 25: // 다비
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 26: // 모냇
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 27: // 조지
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 28: // 아모스
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 29: // 던칸
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "에픽";
+                    break;
+                case 30: // 로랜스
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 31: // 해럴드
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 32: // 스니퍼
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 33: // 레오나드
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 34: // 스팅
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 35: // 비아나
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 36: // 미셀
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 37: // 제이스
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 38: // 안토니
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 39: // 렉스
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "유니크";
+                    break;
+                case 40: // 사무엘
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 41: // 에드윈
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 42: // 로이드
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 43: // 아돌프
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 44: // 아폴로
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 45: // 닐
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 46: // 마샤
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 47: // 리퍼
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 48: // 도글라스
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
+                case 49: // 스텔라
+                    characterExplainText.text = "양손검을 사용하는 전사입니다. \n큰 검을 들고 빠른 속도를 공격하다니 저건 사기입니다.";
+                    characterAttackSpeedText.text = "보통";
+                    characterGradeText.text = "레전드리";
+                    break;
                 default:
                     break;
+            }
+
+            if (characterGradeText.text == "일반")
+            {
+                characterGradeText.color = new Color(99f / 255f, 99f / 255f, 99f / 255f, 255f);
+                gradeImg.color = new Color(99f / 255f, 99f / 255f, 99f / 255f, 255f);
+            }
+            else if (characterGradeText.text == "에픽")
+            {
+                characterGradeText.color = new Color(214f / 255f, 150f / 255f, 203f / 255f, 255f);
+                gradeImg.color = new Color(214f / 255f, 150f / 255f, 192f / 203f, 255f);
+            }
+            else if (characterGradeText.text == "유니크")
+            {
+                characterGradeText.color = new Color(241f / 255f, 233f / 255f, 121f / 255f, 255f);
+                gradeImg.color = new Color(241f / 255f, 233f / 255f, 121f / 255f, 255f);
+            }
+            else if (characterGradeText.text == "레전드리")
+            {
+                characterGradeText.color = new Color(211f / 255f, 99f / 255f, 99f / 255f, 255f);
+                gradeImg.color = new Color(211f / 255f, 99f / 255f, 99f / 255f, 255f);
             }
 
             if (BackEndServerManager.instance.myInfo.levelExp[value] >= cards[curSelectCard].upgradeNeedCard)

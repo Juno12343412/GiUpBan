@@ -97,70 +97,67 @@ public partial class MainUI : BaseScreen<MainUI>
         rankBackGroundObject.SetActive(false);
         rankNullText.SetActive(false);
 
-        Backend.Rank.RankList(callback => { Debug.Log("Rank : " + callback); rankUUID = callback.Rows()[0]["uuid"]["S"].ToString(); });
+        Backend.Rank.RankList(bro => { 
+            
+            if (bro.IsSuccess())
+            { 
+                Debug.Log("Rank : " + bro); 
+                rankUUID = bro.Rows()[0]["uuid"]["S"].ToString();
 
-        if (rankUIList != null)
-        {
-            for (int i = 0; i < rankUIList.Count; i++)
-                Destroy(rankUIList[i].boardObject);
-
-            rankUIList = null;
-        }
-
-        SendQueue.Enqueue(Backend.Rank.GetRankByUuid, rankUUID, 100, callback =>
-        {
-            if (callback.IsSuccess() && callback.Rows().Count > 0)
-            {
-                Debug.Log("랭킹 변동 : " + callback);
-
-                rankUIList = new List<RankUI>();
-                rankList = new List<Rank>();
-                rankCount = callback.Rows().Count;
-                
-                for (int i = 0; i < rankCount; i++)
+                if (rankUIList != null)
                 {
-                    rankList.Add(new Rank(
-                        GetPointToRank(Convert.ToInt32(callback.Rows()[i]["score"]["N"].ToString())), // Tear
-                        Convert.ToInt32(callback.Rows()[i]["score"]["N"].ToString()),                 // Score
-                        callback.Rows()[i]["nickname"]["S"].ToString()                                // Name
-                        ));
+                    for (int i = 0; i < rankUIList.Count; i++)
+                        Destroy(rankUIList[i].boardObject);
 
-                    rankUIList.Add(new RankUI());
-                    rankUIList[i].boardObject = Instantiate(rankBoardObject, new Vector3(rankBoardObject.transform.position.x, rankBoardObject.transform.position.y, rankBoardObject.transform.position.z), Quaternion.identity, rankParent.transform);
-
-                    rankUIList[i] = new RankUI(
-                        rankUIList[i].boardObject.transform.GetChild(1).GetChild(0).GetComponent<Image>(),
-                        rankUIList[i].boardObject.transform.GetChild(0).GetComponent<Text>(),
-                        rankUIList[i].boardObject.transform.GetChild(2).GetChild(0).GetComponent<Text>(),
-                        rankUIList[i].boardObject.transform.GetChild(3).GetComponent<Text>()
-                        );
-
-                    rankUIList[i].boardObject = rankParent.transform.GetChild(i).gameObject;
-                    rankUIList[i].boardObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(rankBoardObject.transform.position.x, basePosY - (i * 200f));
-
-                    rankUIList[i].tearImage.sprite = tearImages[(int)rankList[i].tearEnum];
-                    rankUIList[i].nameAnTearText.text = rankList[i].name;
-                    rankUIList[i].pointText.text = rankList[i].point.ToString();
-                    rankUIList[i].rankText.text = (i + 1).ToString();
-                    rankUIList[i].boardObject.SetActive(true);
+                    rankUIList = null;
                 }
 
-                //Debug.Log(rankUIList.Count);
-                //for (int i = 0; i < rankUIList.Count; i++)
-                //{
-                //    rankUIList[i].tearImage.sprite = tearImages[(int)rankList[i].tearEnum];
-                //    rankUIList[i].nameAnTearText.text = rankList[i].name;
-                //    rankUIList[i].pointText.text = rankList[i].point.ToString();
-                //    rankUIList[i].rankText.text = i.ToString();
-                //    rankUIList[i].boardObject.SetActive(true);
-                //}
+                SendQueue.Enqueue(Backend.Rank.GetRankByUuid, rankUUID, 100, callback =>
+                {
+                    if (callback.IsSuccess() && callback.Rows().Count > 0)
+                    {
+                        Debug.Log("랭킹 변동 : " + callback);
 
-                rankBackGroundObject.SetActive(true);
-            }
-            else
-            {
-                rankBackGroundObject.SetActive(true);
-                rankNullText.SetActive(true);
+                        rankUIList = new List<RankUI>();
+                        rankList = new List<Rank>();
+                        rankCount = callback.Rows().Count;
+
+                        for (int i = 0; i < rankCount; i++)
+                        {
+                            rankList.Add(new Rank(
+                                GetPointToRank(Convert.ToInt32(callback.Rows()[i]["score"]["N"].ToString())), // Tear
+                                Convert.ToInt32(callback.Rows()[i]["score"]["N"].ToString()),                 // Score
+                                callback.Rows()[i]["nickname"]["S"].ToString()                                // Name
+                                ));
+
+                            rankUIList.Add(new RankUI());
+                            rankUIList[i].boardObject = Instantiate(rankBoardObject, new Vector3(rankBoardObject.transform.position.x, rankBoardObject.transform.position.y, rankBoardObject.transform.position.z), Quaternion.identity, rankParent.transform);
+
+                            rankUIList[i] = new RankUI(
+                                rankUIList[i].boardObject.transform.GetChild(1).GetChild(0).GetComponent<Image>(),
+                                rankUIList[i].boardObject.transform.GetChild(0).GetComponent<Text>(),
+                                rankUIList[i].boardObject.transform.GetChild(2).GetChild(0).GetComponent<Text>(),
+                                rankUIList[i].boardObject.transform.GetChild(3).GetComponent<Text>()
+                                );
+
+                            rankUIList[i].boardObject = rankParent.transform.GetChild(i).gameObject;
+                            rankUIList[i].boardObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(rankBoardObject.transform.position.x, basePosY - (i * 200f));
+
+                            rankUIList[i].tearImage.sprite = tearImages[(int)rankList[i].tearEnum];
+                            rankUIList[i].nameAnTearText.text = rankList[i].name;
+                            rankUIList[i].pointText.text = rankList[i].point.ToString();
+                            rankUIList[i].rankText.text = (i + 1).ToString();
+                            rankUIList[i].boardObject.SetActive(true);
+                        }
+
+                        rankBackGroundObject.SetActive(true);
+                    }
+                    else
+                    {
+                        rankBackGroundObject.SetActive(true);
+                        rankNullText.SetActive(true);
+                    }
+                });
             }
         });
     }
