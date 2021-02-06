@@ -44,6 +44,7 @@ public partial class MainUI : BaseScreen<MainUI>
     public int curHaveChests = 0;
     public int curSelectMyChest = 0;
     public int curDisChest = -1;
+    bool pack = false;
     // Main
 
     // Dismissing
@@ -245,6 +246,34 @@ public partial class MainUI : BaseScreen<MainUI>
         Invoke("ContinueOpenChest", 1.5f);
     }
 
+    public void BuyDiamondInApp(int dia)
+    {
+        BackEndServerManager.instance.myInfo.diamond += dia;
+        SetGoldUI();
+    }
+
+    public void OpenChestPack()
+    {
+        curSelectChest = 2;
+        //SoundPlayer.instance.PlaySound("Click");
+        //Debug.Log("다이아몬드로 상자 열음");
+
+        //count = (int)myChests[curSelectChest].chestKind + 2;
+        //chestItemCountText.text = count.ToString();
+
+        //chestDisObject.SetActive(false);
+        //chestOpenObject.SetActive(true);
+
+        //chestImg.gameObject.SetActive(true);
+
+        //myChests[curSelectChest].idleChest.SetActive(false);
+        //myChests[curSelectChest].disChest.SetActive(false);
+        //myChests[curSelectChest].openChest.SetActive(false);
+
+        //Invoke("ContinueOpenChest", 1.5f);
+        OpenDiamondChestUI((int)ChestKind.다이아);
+    }
+
     public void OpenChestDiamondUI()
     {
         if (BackEndServerManager.instance.myInfo.diamond >= myChests[curSelectChest].diamondPrice)
@@ -253,6 +282,7 @@ public partial class MainUI : BaseScreen<MainUI>
             Debug.Log("다이아몬드로 상자 열음");
 
             BackEndServerManager.instance.myInfo.diamond -= myChests[curSelectChest].diamondPrice;
+
 
             count = (int)myChests[curSelectMyChest].chestKind + 2;
             chestItemCountText.text = count.ToString();

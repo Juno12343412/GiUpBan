@@ -295,7 +295,7 @@ public partial class MainUI : BaseScreen<MainUI>
 
         chestCardText.text = "x" + (index + 1) * 5;
         chestGoldText.text = (index + 1) * 100 + "-" + (index + 1) * 999;
-
+        
         diamondChestDisObject.SetActive(true);
     }
 
