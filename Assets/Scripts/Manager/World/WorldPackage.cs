@@ -133,24 +133,40 @@ public class WorldPackage : MonoBehaviour
         players = new Dictionary<SessionId, PlayerScript>();
         BackEndMatchManager.instance.SetPlayerSessionList(gamers);
 
+        Debug.Log("게이머 수 : " + gamers.Count);
+
         int index = 0;
         foreach (var sessionId in gamers)
         {
             GameObject player = playerPool.Spawn().gameObject;
             players.Add(sessionId, player.GetComponent<PlayerScript>());
 
+            Debug.Log("현재 세션 : " + sessionId);
+
             if (BackEndMatchManager.instance.IsMySessionId(sessionId))
             {
                 myPlayerIndex = sessionId;
                 players[sessionId].PlayerSetting(true, myPlayerIndex, BackEndMatchManager.instance.GetNickNameBySessionId(sessionId));
             }
-            else
+            else if (!BackEndMatchManager.instance.IsMySessionId(sessionId) || sessionId == SessionId.None)
             {
-                otherPlayerIndex = sessionId;
-                players[sessionId].PlayerSetting(false, sessionId, BackEndMatchManager.instance.GetNickNameBySessionId(sessionId));
+
+                if (sessionId != SessionId.Reserve)
+                {
+                    otherPlayerIndex = sessionId;
+                    players[sessionId].PlayerSetting(false, sessionId, BackEndMatchManager.instance.GetNickNameBySessionId(sessionId));
+                }
+                else
+                {
+                    otherPlayerIndex = SessionId.Reserve;
+                    players[sessionId].PlayerSetting(false, sessionId, BackEndMatchManager.instance.GetNickNameBySessionId(sessionId), true);
+                }
             }
             index += 1;
         }
+
+        Debug.Log("나 : " + myPlayerIndex);
+        Debug.Log("적 : " + otherPlayerIndex);
 
         var message = instance.GetNowGameState(myPlayerIndex);
         BackEndMatchManager.instance.SendDataToInGame(message);
@@ -321,7 +337,6 @@ public class WorldPackage : MonoBehaviour
     // 약한 공격 상태
     private void ProcessPlayerData(PlayerWeakAttackMessage data)
     {
-        Debug.Log(data.playerSession);
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         Debug.Log(BackEndMatchManager.instance.GetNickNameBySessionId(data.playerSession) + "가 " + data.playerDirection + "쪽으로 약한 공격을 함");
         players[data.playerSession].AnimationReset();
@@ -374,12 +389,24 @@ public class WorldPackage : MonoBehaviour
     // 스턴 상태
     private void ProcessPlayerData(PlayerStunMessage data)
     {
-        players[data.playerSession].AnimationReset();
-        players[data.playerSession].State = PlayerCurState.STUN;
+        Debug.Log("플레이어가 스턴 : " + data.playerSession);
 
-        players[data.playerSession].Anim.SetBool("isGroggy", true);
-        players[data.playerSession].Anim.SetBool("isAttack", false);
+        if (players[otherPlayerIndex].isAI)
+        {
+            players[otherPlayerIndex].AnimationReset();
+            players[otherPlayerIndex].State = PlayerCurState.STUN;
 
+            players[otherPlayerIndex].Anim.SetBool("isGroggy", true);
+            players[otherPlayerIndex].Anim.SetBool("isAttack", false);
+        }
+        else
+        {
+            players[data.playerSession].AnimationReset();
+            players[data.playerSession].State = PlayerCurState.STUN;
+
+            players[data.playerSession].Anim.SetBool("isGroggy", true);
+            players[data.playerSession].Anim.SetBool("isAttack", false);
+        }
 
         //players[data.playerSession].Anim.SetInteger("AttackKind", 3);
 
@@ -390,18 +417,18 @@ public class WorldPackage : MonoBehaviour
     // 공격 종료 상태
     private void ProcessPlayerData(PlayerAttackEndMessage data)
     {
-        //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
         players[data.playerSession].Anim.SetBool("isAttack", false);
         players[data.playerSession].Anim.SetBool("isGroggy", false);
 
         players[data.playerSession].AttackPointFalse();
         players[data.playerSession].CancelFalse();
+        //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
     }
 
     private void ProcessPlayerData(PlayerDamagedMessage data)
     {
         //players[data.playerSession] <- 이걸 통해서 그 플레이어 세션에 맞는 플레이어의 함수를 실행시키게함
-        Debug.Log("데미지넣음" + data.damage);
+        Debug.Log("데미지넣음" + data.playerSession);
 
         if (!BackEndMatchManager.instance.IsMySessionId(data.playerSession))
         {
@@ -424,19 +451,37 @@ public class WorldPackage : MonoBehaviour
 
         if (players[data.playerSession].State != PlayerCurState.DEFENSE)
         {
-            StartCoroutine(players[otherPlayerIndex].AttackEffect(1f));
-            SoundPlayer.instance.PlaySound("Hit_Dummy");
+            if (players[data.playerSession].isAI)
+            {
+                StartCoroutine(players[data.playerSession].AttackEffect(1f));
+                SoundPlayer.instance.PlaySound("Hit_Dummy");
+            }
+            else
+            {
+                StartCoroutine(players[otherPlayerIndex].AttackEffect(1f));
+                SoundPlayer.instance.PlaySound("Hit_Dummy");
+            }
         }
         else
         {
-            StartCoroutine(players[otherPlayerIndex].DefenseEffect(1f));
-            SoundPlayer.instance.PlaySound("Defense_Dummy");
+            if (players[data.playerSession].isAI)
+            {
+                StartCoroutine(players[data.playerSession].DefenseEffect(1f));
+                SoundPlayer.instance.PlaySound("Defense_Dummy");
+            }
+            else
+            {
+                StartCoroutine(players[otherPlayerIndex].DefenseEffect(1f));
+                SoundPlayer.instance.PlaySound("Defense_Dummy");
+            }
         }
+
+        players[otherPlayerIndex].State = PlayerCurState.IDLE;
+        players[myPlayerIndex].State = PlayerCurState.IDLE;
     }
 
     private void ProcessPlayerData(PlayerStaminaMessage data)
     {
-        Debug.Log("스태미나 변동 : " + data.stamina);
         players[data.playerSession].Stats.Stamina = data.stamina;
 
         staminaImages[1].fillAmount = (float)(players[otherPlayerIndex].Stats.Stamina / 100f);
@@ -561,74 +606,159 @@ public class WorldPackage : MonoBehaviour
 
     private void ProcessCalData(CalculationMessage calMessage)
     {
-        if (players[otherPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
+        Debug.Log("계산 들어옴");
+
+        if (players[otherPlayerIndex].GetAttackPoint())
         {
-            if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
+            Debug.Log("AI 아님");
+
+            if (players[otherPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
             {
-                players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
-                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f)
-                    * players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Direction);
+                if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
+                {
+                    players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
+                        * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f)
+                        * players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Direction);
 
-                players[otherPlayerIndex].StunOn(players[otherPlayerIndex].Stats.WeakAttackStun);
+                    players[otherPlayerIndex].StunOn(players[otherPlayerIndex].Stats.WeakAttackStun);
 
-                players[myPlayerIndex].AttackPointFalse();
+                    players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(0.2f, 0.2f);
-                players[otherPlayerIndex].AttackPointFalse();
+                    players[myPlayerIndex].HitStop(0.2f, 0.2f);
+                    players[otherPlayerIndex].AttackPointFalse();
 
-                return;
-            }
-            else
+                    return;
+                }
+                else
+                {
+                    players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
+                        * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f), players[myPlayerIndex].Direction);
+
+                    players[myPlayerIndex].StunOn(players[otherPlayerIndex].Stats.WeakAttackStun);
+
+                    players[myPlayerIndex].AttackPointFalse();
+
+                    players[myPlayerIndex].HitStop(0.2f, 0.2f);
+                    players[otherPlayerIndex].AttackPointFalse();
+
+                    Debug.Log("약공 들어감");
+                    return;
+
+                }
+            } // 약공
+
+            if (players[otherPlayerIndex].State == PlayerCurState.STRONG_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
             {
-                players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.WeakAttackDamage
-                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.WeakAttackPenetration) * 0.01f), players[myPlayerIndex].Direction);
+                if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
+                {
+                    players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
+                        * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f)
+                        * players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Direction);
 
-                players[myPlayerIndex].StunOn(players[otherPlayerIndex].Stats.WeakAttackStun);
+                    players[otherPlayerIndex].StunOn(players[otherPlayerIndex].Stats.StrongAttackStun);
 
-                players[myPlayerIndex].AttackPointFalse();
+                    players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(0.2f, 0.2f);
-                players[otherPlayerIndex].AttackPointFalse();
+                    players[myPlayerIndex].HitStop(0.2f, 0.2f);
+                    players[otherPlayerIndex].AttackPointFalse();
 
-                Debug.Log("약공 들어감");
-                return;
+                }
+                else
+                {
 
-            }
-        } // 약공
+                    players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
+                        * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f), players[myPlayerIndex].Direction);
 
-        if (players[otherPlayerIndex].State == PlayerCurState.STRONG_ATTACK && players[otherPlayerIndex].GetAttackPoint() == true)
+                    players[myPlayerIndex].StunOn(players[otherPlayerIndex].Stats.StrongAttackStun);
+
+                    players[myPlayerIndex].AttackPointFalse();
+
+                    players[myPlayerIndex].HitStop(0.2f, 0.2f);
+                    players[otherPlayerIndex].AttackPointFalse();
+
+                    Debug.Log("강공 들어감");
+
+                }
+            } // 강공
+        }
+        else if (players[myPlayerIndex].GetAttackPoint() && players[otherPlayerIndex].isAI)
         {
-            if (players[myPlayerIndex].State == PlayerCurState.DEFENSE && players[myPlayerIndex].Direction == players[otherPlayerIndex].Direction)
+            Debug.Log("AI : " + players[myPlayerIndex].GetAttackPoint());
+
+            if (players[myPlayerIndex].State == PlayerCurState.WEAK_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
             {
-                players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
-                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f)
-                    * players[myPlayerIndex].Stats.DefeneseReceivingDamage, players[myPlayerIndex].Direction);
+                Debug.Log("AI1");
 
-                players[otherPlayerIndex].StunOn(players[otherPlayerIndex].Stats.StrongAttackStun);
+                if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
+                {
+                    Debug.Log("AI2");
+                    players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.WeakAttackDamage
+                        * ((100 - players[myPlayerIndex].Stats.Armor - players[otherPlayerIndex].Stats.WeakAttackPenetration) * 0.01f)
+                        * players[otherPlayerIndex].Stats.DefeneseReceivingDamage, players[otherPlayerIndex].Direction);
 
-                players[myPlayerIndex].AttackPointFalse();
+                    players[myPlayerIndex].StunOn(players[myPlayerIndex].Stats.WeakAttackStun);
 
-                players[myPlayerIndex].HitStop(0.2f, 0.2f);
-                players[otherPlayerIndex].AttackPointFalse();
+                    players[otherPlayerIndex].AttackPointFalse();
 
-            }
-            else
+                    players[otherPlayerIndex].HitStop(0.2f, 0.2f);
+                    players[myPlayerIndex].AttackPointFalse();
+
+                    return;
+                }
+                else
+                {
+                    Debug.Log("AI3");
+
+                    players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.WeakAttackDamage
+                        * ((100 - players[myPlayerIndex].Stats.Armor - players[otherPlayerIndex].Stats.WeakAttackPenetration) * 0.01f), players[otherPlayerIndex].Direction);
+
+                    players[otherPlayerIndex].StunOn(players[myPlayerIndex].Stats.WeakAttackStun);
+
+                    players[otherPlayerIndex].AttackPointFalse();
+
+                    players[otherPlayerIndex].HitStop(0.2f, 0.2f);
+                    players[myPlayerIndex].AttackPointFalse();
+
+                    Debug.Log("약공 들어감");
+                    return;
+
+                }
+            } // 약공
+
+            if (players[myPlayerIndex].State == PlayerCurState.STRONG_ATTACK && players[myPlayerIndex].GetAttackPoint() == true)
             {
+                if (players[otherPlayerIndex].State == PlayerCurState.DEFENSE && players[otherPlayerIndex].Direction == players[myPlayerIndex].Direction)
+                {
+                    players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.StrongAttackDamage
+                        * ((100 - players[myPlayerIndex].Stats.Armor - players[otherPlayerIndex].Stats.StrongAttackPenetration) * 0.01f)
+                        * players[otherPlayerIndex].Stats.DefeneseReceivingDamage, players[otherPlayerIndex].Direction);
 
-                players[myPlayerIndex].SufferDamage(players[myPlayerIndex].Stats.StrongAttackDamage
-                    * ((100 - players[otherPlayerIndex].Stats.Armor - players[myPlayerIndex].Stats.StrongAttackPenetration) * 0.01f), players[myPlayerIndex].Direction);
+                    players[myPlayerIndex].StunOn(players[myPlayerIndex].Stats.StrongAttackStun);
 
-                players[myPlayerIndex].StunOn(players[otherPlayerIndex].Stats.StrongAttackStun);
+                    players[otherPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].AttackPointFalse();
+                    players[otherPlayerIndex].HitStop(0.2f, 0.2f);
+                    players[myPlayerIndex].AttackPointFalse();
 
-                players[myPlayerIndex].HitStop(0.2f, 0.2f);
-                players[otherPlayerIndex].AttackPointFalse();
+                }
+                else
+                {
 
-                Debug.Log("강공 들어감");
+                    players[otherPlayerIndex].SufferDamage(players[otherPlayerIndex].Stats.StrongAttackDamage
+                        * ((100 - players[myPlayerIndex].Stats.Armor - players[otherPlayerIndex].Stats.StrongAttackPenetration) * 0.01f), players[otherPlayerIndex].Direction);
 
-            }
-        } // 강공
+                    players[otherPlayerIndex].StunOn(players[myPlayerIndex].Stats.StrongAttackStun);
+
+                    players[otherPlayerIndex].AttackPointFalse();
+
+                    players[otherPlayerIndex].HitStop(0.2f, 0.2f);
+                    players[myPlayerIndex].AttackPointFalse();
+
+                    Debug.Log("강공 들어감");
+
+                }
+            } // 강공
+        }
     }
 
     private void SetGameRecord(int count, int[] arr)

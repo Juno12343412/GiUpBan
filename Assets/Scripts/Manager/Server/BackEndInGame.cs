@@ -25,11 +25,15 @@ public partial class BackEndMatchManager : MonoBehaviour
         }
         Debug.Log("호스트 설정 완료");
 
+        if (isSandBoxGame == true && isHost == true)
+        {
+            SetAIPlayer();
+        }
+
         if (isHost == true)
         {
             // 0.5초 후 ReadyToLoadRoom 함수 호출
-            Debug.Log("룸씬으로 교체");
-            Invoke("SendChangeRoomScene", 0.5f);
+            Invoke("ReadyToLoadRoom", 0.5f);
         }
     }
 
@@ -116,6 +120,27 @@ public partial class BackEndMatchManager : MonoBehaviour
         }
     }
 
+    private void ReadyToLoadRoom()
+    {
+        if (isSandBoxGame == true)
+        {
+            Debug.Log("샌드박스 모드 활성화. AI 정보 송신");
+            // 샌드박스 모드면 ai 정보 송신
+            foreach (var tmp in gameRecords)
+            {
+                if ((int)tmp.Key > (int)SessionId.Reserve)
+                {
+                    continue;
+                }
+                Debug.Log("ai정보 송신 : " + (int)tmp.Key);
+                SendDataToInGame(new Protocol.AIPlayerInfo(tmp.Value));
+            }
+        }
+
+        Debug.Log("1초 후 룸 씬 전환 메시지 송신");
+        Invoke("SendChangeRoomScene", 1f);
+    }
+
     private void SendChangeRoomScene()
     {
         Debug.Log("게임준비 씬 전환 메시지 송신");
@@ -143,9 +168,54 @@ public partial class BackEndMatchManager : MonoBehaviour
             return;
         }
 
+        RemoveAISessionInGameResult();
         // 승/패 나누는 메세지 띄움
         Backend.Match.MatchEnd(matchGameResult);
     }
+
+    private void RemoveAISessionInGameResult()
+    {
+        string str = string.Empty;
+        List<SessionId> aiSession = new List<SessionId>();
+        if (matchGameResult.m_winners != null)
+        {
+            str += "승자 : ";
+            foreach (var tmp in matchGameResult.m_winners)
+            {
+                if ((int)tmp < (int)SessionId.Reserve)
+                {
+                    aiSession.Add(tmp);
+                }
+                else
+                {
+                    str += tmp + " : ";
+                }
+            }
+            str += "\n";
+            matchGameResult.m_winners.RemoveAll(aiSession.Contains);
+        }
+
+        aiSession.Clear();
+        if (matchGameResult.m_losers != null)
+        {
+            str += "패자 : ";
+            foreach (var tmp in matchGameResult.m_losers)
+            {
+                if ((int)tmp < (int)SessionId.Reserve)
+                {
+                    aiSession.Add(tmp);
+                }
+                else
+                {
+                    str += tmp + " : ";
+                }
+            }
+            str += "\n";
+            matchGameResult.m_losers.RemoveAll(aiSession.Contains);
+        }
+        Debug.Log(str);
+    }
+
 
     // 1:1 게임 결과
     private MatchGameResult OneOnOneRecord(Stack<SessionId> record)
@@ -190,14 +260,14 @@ public partial class BackEndMatchManager : MonoBehaviour
         //    // 호스트가 아니면 단순히 UI 만 띄운다.
         //}
 
-        //if (isHost)
-        //{
-        //    // 현재 매치모드가 1대1 일때 플레이어가 오프라인을 하면 게임을 종료시킴
-        //    if (nowModeType == MatchModeType.OneOnOne)
-        //    {
-        //        WorldPackage.instance.playerDie(sessionId);
-        //    }
-        //}
+        if (isHost)
+        {
+            // 현재 매치모드가 1대1 일때 플레이어가 오프라인을 하면 게임을 종료시킴
+            if (nowModeType == MatchModeType.OneOnOne)
+            {
+                WorldPackage.instance.playerDie(sessionId);
+            }
+        }
         // 현재 매치모드가 1대1 일때 플레이어가 오프라인을 하면 게임을 종료시킴
         if (nowModeType == MatchModeType.OneOnOne)
         {
@@ -224,6 +294,32 @@ public partial class BackEndMatchManager : MonoBehaviour
         SendDataToInGame(message);
     }
 
+    private void SetAIPlayer()
+    {
+        int aiCount = numOfClient - sessionIdList.Count;
+
+        Debug.Log("AI 플레이어 설정 : aiCount : " + aiCount);
+
+        int index = 0;
+        for (int i = 0; i < aiCount; ++i)
+        {
+            MatchUserGameRecord aiRecord = new MatchUserGameRecord();
+            aiRecord.m_nickname = "AIPlayer" + index;
+            aiRecord.m_sessionId = SessionId.Reserve;
+            aiRecord.m_numberOfMatches = 0;
+            aiRecord.m_numberOfWin = 0;
+            aiRecord.m_numberOfDefeats = 0;
+            aiRecord.m_numberOfDraw = 0;
+            aiRecord.m_mmr = 1000;
+
+            Debug.Log("AI 세션 : " + aiRecord.m_sessionId);
+
+            gameRecords.Add(aiRecord.m_sessionId, aiRecord);
+            sessionIdList.Add(aiRecord.m_sessionId);
+            index += 1;
+        }
+    }
+
     public bool PrevGameMessage(byte[] BinaryUserData)
     {
         Protocol.Message msg = DataParser.ReadJsonData<Protocol.Message>(BinaryUserData);
@@ -235,6 +331,10 @@ public partial class BackEndMatchManager : MonoBehaviour
         // 게임 설정 사전 작업 패킷 검사 
         switch (msg.type)
         {
+            case Protocol.Type.AIPlayerInfo:
+                Protocol.AIPlayerInfo aiPlayerInfo = DataParser.ReadJsonData<Protocol.AIPlayerInfo>(BinaryUserData);
+                ProcessAIDate(aiPlayerInfo);
+                return true;
             case Protocol.Type.LoadRoomScene:
                 if (isHost)
                 {
@@ -249,4 +349,11 @@ public partial class BackEndMatchManager : MonoBehaviour
         return false;
     }
 
+    private void ProcessAIDate(Protocol.AIPlayerInfo aIPlayerInfo)
+    {
+        MatchInGameSessionEventArgs args = new MatchInGameSessionEventArgs();
+        args.GameRecord = aIPlayerInfo.GetMatchRecord();
+
+        ProcessMatchInGameAccess(args);
+    }
 }

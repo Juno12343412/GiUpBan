@@ -53,8 +53,8 @@ public class PlayerScript : PoolingObject
     #region 기타 변수들
     private bool Cancel = false;
     private bool AttackPoint = false;
-    private bool isStun = false;
-    private bool isDelay = false;
+    public bool isStun { get; private set; } = false;
+    public bool isDelay { get; private set; } = false;
     [HideInInspector] public Animator Anim;
     public Camera characterCamera = null;
     public CameraFuncs cameraFuncs = null;
@@ -67,6 +67,7 @@ public class PlayerScript : PoolingObject
     public string nickName = string.Empty;
     public bool isMe { get; private set; } = false;
     public bool isLive { get; private set; } = false;
+    public bool isAI { get; private set; } = false;
     // New Var
 
     public override string objectName => "Player";
@@ -101,14 +102,19 @@ public class PlayerScript : PoolingObject
                         PlayerControl();
                 }
             }
+            else if (isAI && !GetComponent<AIScript>().isStart)
+            {
+                StartCoroutine(GetComponent<AIScript>().OnFSM());
+            }
         }
     }
 
-    public void PlayerSetting(bool isMe, SessionId index, string nickName)
+    public void PlayerSetting(bool isMe, SessionId index, string nickName, bool isAI = false)
     {
         this.isMe = isMe;
         this.index = index;
         this.nickName = nickName;
+        this.isAI = isAI;
 
         if (this.isMe)
         {
@@ -158,6 +164,29 @@ public class PlayerScript : PoolingObject
         {
             transform.position = WorldPackage.instance.startingPoint[1].position;
             transform.rotation = WorldPackage.instance.startingPoint[1].rotation;
+
+            if (isAI)
+            {
+                int charKind = Random.Range((int)CharacterKind.기사, (int)CharacterKind.MAX);
+
+                CharactersPrefab[charKind].SetActive(true);
+
+                stats.MaxHp = stats.CurHp = BackEndServerManager.instance.myInfo.pMaxHp[charKind];
+                stats.Stamina = BackEndServerManager.instance.myInfo.pStamina[charKind];
+                stats.ReductionStamina = BackEndServerManager.instance.myInfo.pReductionStamina[charKind];
+                stats.WeakAttackDamage = BackEndServerManager.instance.myInfo.pWeakAttackDamage[charKind];
+                stats.WeakAttackStun = BackEndServerManager.instance.myInfo.pWeakAttackStun[charKind];
+                stats.WeakAttackPenetration = BackEndServerManager.instance.myInfo.pWeakAttackPenetration[charKind];
+                stats.StrongAttackDamage = BackEndServerManager.instance.myInfo.pStrongAttackDamage[charKind];
+                stats.StrongAttackStun = BackEndServerManager.instance.myInfo.pStrongAttackStun[charKind];
+                stats.StrongAttackPenetration = BackEndServerManager.instance.myInfo.pStrongAttackPenetration[charKind];
+                stats.DefeneseReceivingDamage = BackEndServerManager.instance.myInfo.pDefenseReceivingDamage[charKind];
+                stats.DefeneseReductionStun = BackEndServerManager.instance.myInfo.pDefenseReductionStun[charKind];
+                stats.nowCharacter = charKind;
+                Anim = CharactersPrefab[charKind].GetComponent<Animator>();
+
+                gameObject.AddComponent<AIScript>();
+            }
         }
 
         isLive = true;
@@ -280,6 +309,9 @@ public class PlayerScript : PoolingObject
 
             characterCamera.GetComponent<Animator>().SetBool("isMove", true);
             characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
+
+            Debug.Log("터치 : " + (SessionId)index);
+            
             if (BackEndMatchManager.instance.isHost)
             {
                 int keyCode = (int)State;
@@ -306,6 +338,8 @@ public class PlayerScript : PoolingObject
             characterCamera.GetComponent<Animator>().SetBool("isMove", true);
             characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
 
+            Debug.Log("스와이프 : " + (SessionId)index);
+
             if (BackEndMatchManager.instance.isHost)
             {
                 int keyCode = (int)State;
@@ -326,6 +360,8 @@ public class PlayerScript : PoolingObject
         {
             State = PlayerCurState.DEFENSE;
 
+            Debug.Log("긴 터치 : " + (SessionId)index);
+
             if (BackEndMatchManager.instance.isHost)
             {
                 int keyCode = (int)State;
@@ -338,6 +374,93 @@ public class PlayerScript : PoolingObject
             {
                 PlayerDefenseMessage defenceMsg = new PlayerDefenseMessage(index, Direction);
                 BackEndMatchManager.instance.SendDataToInGame(defenceMsg);
+            }
+        }
+    } // 긴 터치
+
+    public void PlayerAITouch()
+    {
+        if (isAI)
+        {
+            if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 10))
+            {
+                stats.Stamina -= stats.ReductionStamina;
+                State = PlayerCurState.WEAK_ATTACK;
+
+                characterCamera.GetComponent<Animator>().SetBool("isMove", true);
+                characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
+
+                Debug.Log("터치 : " + (SessionId)index);
+
+                if (BackEndMatchManager.instance.isHost && !isAI)
+                {
+                    int keyCode = (int)State;
+                    KeyMessage msg = new KeyMessage(keyCode, transform.position);
+                    msg = new KeyMessage(keyCode, transform.position, Direction);
+
+                    BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
+                }
+                else
+                {
+                    PlayerWeakAttackMessage weakMsg = new PlayerWeakAttackMessage(index, Direction);
+                    BackEndMatchManager.instance.SendDataToInGame(weakMsg);
+                }
+            }
+        }
+    } // 일반 터치
+
+    public void PlayerAISwipe()
+    {
+        if (isAI)
+        {
+            isSwipe = true;
+            if ((!Anim.GetBool("isAttack") || Cancel) && (stats.Stamina >= 20))
+            {
+                stats.Stamina -= stats.ReductionStamina * 1.5f;
+                State = PlayerCurState.STRONG_ATTACK;
+                characterCamera.GetComponent<Animator>().SetBool("isMove", true);
+                characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
+
+                Debug.Log("스와이프 : " + (SessionId)index);
+
+                if (BackEndMatchManager.instance.isHost && !isAI)
+                {
+                    int keyCode = (int)State;
+                    KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
+                    BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
+                }
+                else
+                {
+                    PlayerStrongAttackMessage strongMsg = new PlayerStrongAttackMessage(index, Direction);
+                    BackEndMatchManager.instance.SendDataToInGame(strongMsg);
+                }
+            }
+        }
+    } // 스와이프
+
+    public void PlayerAILongTouch()
+    {
+        if (isAI)
+        {
+            if ((!Anim.GetBool("isAttack") || Cancel))
+            {
+                State = PlayerCurState.DEFENSE;
+
+                Debug.Log("긴 터치 : " + (SessionId)index);
+
+                if (BackEndMatchManager.instance.isHost && !isAI)
+                {
+                    int keyCode = (int)State;
+                    KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
+                    BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
+
+                    StartCoroutine(cameraFuncs.ZoomCamera(2f, 1f));
+                }
+                else
+                {
+                    PlayerDefenseMessage defenceMsg = new PlayerDefenseMessage(index, Direction);
+                    BackEndMatchManager.instance.SendDataToInGame(defenceMsg);
+                }
             }
         }
     } // 긴 터치
@@ -366,6 +489,7 @@ public class PlayerScript : PoolingObject
     public void isStunFalse()
     {
         isStun = false;
+        State = PlayerCurState.IDLE;
     }
 
     public void SufferDamage(double Damage, Direction Direction)

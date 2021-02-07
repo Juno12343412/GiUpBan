@@ -10,7 +10,10 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private Image tearInfoImage = null;
     [SerializeField] private Text  tearInfoText = null;
     [SerializeField] private Text  tearInfoExplainText = null;
-    
+
+    [SerializeField] private GameObject tearUpObject = null;
+    [SerializeField] private GameObject tearLightObject = null;
+
     public void OpenTearInfo()
     {
         tearInfoObject.SetActive(true);
@@ -20,6 +23,20 @@ public partial class MainUI : BaseScreen<MainUI>
     public void CloseTearInfo()
     {
         tearInfoObject.SetActive(false);
+    }
+
+    public void ShowTearUp()
+    {
+        tearUpObject.SetActive(true);
+        tearLightObject.SetActive(true);
+        Invoke("HideTearUp", 1f);
+        OpenTearInfo();
+    }
+
+    public void HideTearUp()
+    {
+        tearUpObject.SetActive(false);
+        tearLightObject.SetActive(false);
     }
 
     void SetTearInfo()

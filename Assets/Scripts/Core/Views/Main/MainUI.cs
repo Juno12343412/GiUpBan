@@ -58,7 +58,16 @@ public partial class MainUI : BaseScreen<MainUI>
         BackEndMatchManager.instance.JoinMatchServer();
         BackEndMatchManager.instance.HandlerSetting();
 
+        BackEndServerManager.instance.myInfo.oldPoint = BackEndServerManager.instance.myInfo.point;
+
         Invoke("StartDataSetting", 0.25f);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+            ShowTearUp();
+
     }
 
     private void SetNickName()
@@ -259,6 +268,9 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void SetTear()
     {
+        if (GetPointToRank(BackEndServerManager.instance.myInfo.oldPoint) != GetPointToRank(BackEndServerManager.instance.myInfo.point))
+            ShowTearUp();
+
         tearText.text = BackEndServerManager.instance.myInfo.point.ToString();
         tearImage.sprite = tearImages[(int)GetPointToRank(BackEndServerManager.instance.myInfo.point)];
     }
@@ -273,5 +285,10 @@ public partial class MainUI : BaseScreen<MainUI>
             yield return new WaitForSeconds(1f);
             broadcastText.gameObject.SetActive(false);
         }
+    }
+
+    public void BuyNoAddInApp()
+    {
+        BackEndServerManager.instance.myInfo.ads = true;
     }
 }

@@ -38,6 +38,7 @@ public partial class BackEndMatchManager : MonoBehaviour
         public MatchModeType matchModeType; // 매치 모드 타입
         public string headCount;            // 매칭 인원
         public int matchMinute;             // 게임 시간
+        public bool isSandBoxEnable;        // 샌드박스 모드 (AI매칭)
     }
     public List<MatchInfo> matchInfos { get; private set; } = new List<MatchInfo>(); // 콘솔에서 생성한 매칭 카드들의 리스트
 
@@ -53,6 +54,7 @@ public partial class BackEndMatchManager : MonoBehaviour
     private bool isConnectInGameServer = false;
     private bool isJoinGameRoom = false;
     public  bool isReconnectProcess { get; private set; } = false;
+    public bool isSandBoxGame { get; private set; } = false;
 
     private int numOfClient = 2;                    // 매치에 참가한 유저의 총 수
 
@@ -362,8 +364,8 @@ public partial class BackEndMatchManager : MonoBehaviour
             {
                 Debug.Log("게임 결과 업로드 실패 : " + args.ErrInfo);
                 LeaveInGameRoom();
+                GameUI.instance.ShowResultBoard(matchGameResult);
                 GameManager.instance.ChangeState(GameManager.GameState.Result);
-                GameUI.instance.OnLeaveGameRoom();
             }
             // 세션리스트 초기화
             sessionIdList = null;
@@ -547,6 +549,7 @@ public partial class BackEndMatchManager : MonoBehaviour
                 matchInfo.inDate = row["inDate"]["S"].ToString();
                 matchInfo.headCount = row["matchHeadCount"]["N"].ToString();
                 matchInfo.matchMinute = Convert.ToInt32(row["match_timeout_m"]["N"].ToString());
+                matchInfo.isSandBoxEnable = row["enable_sandbox"]["BOOL"].ToString().Equals("True");
 
                 foreach (MatchType type in Enum.GetValues(typeof(MatchType)))
                 {

@@ -18,6 +18,7 @@ namespace Protocol
         Damaged,
         Stamina,
 
+        AIPlayerInfo,       // AI가 존재하는 경우 AI 정보
         LoadRoomScene,      // 룸 씬으로 전환
         LoadGameScene,      // 인게임 씬으로 전환
         StartCount,         // 시작 카운트
@@ -313,6 +314,45 @@ namespace Protocol
             this.y = pos.y;
             this.z = pos.z;
             this.direction = direction;
+        }
+    }
+
+    public class AIPlayerInfo : Message
+    {
+        public SessionId m_sessionId;
+        public string m_nickname;
+        public int m_numberOfMatches;
+        public int m_numberOfWin;
+        public int m_numberOfDraw;
+        public int m_numberOfDefeats;
+        public int m_points;
+        public int m_mmr;
+
+        public AIPlayerInfo(MatchUserGameRecord gameRecord) : base(Type.AIPlayerInfo)
+        {
+            this.m_sessionId = gameRecord.m_sessionId;
+            this.m_nickname = gameRecord.m_nickname;
+            this.m_numberOfWin = gameRecord.m_numberOfWin;
+            this.m_numberOfDraw = gameRecord.m_numberOfDraw;
+            this.m_numberOfDefeats = gameRecord.m_numberOfDefeats;
+            this.m_points = gameRecord.m_points;
+            this.m_mmr = gameRecord.m_mmr;
+            this.m_numberOfMatches = gameRecord.m_numberOfMatches;
+        }
+
+        public MatchUserGameRecord GetMatchRecord()
+        {
+            MatchUserGameRecord gameRecord = new MatchUserGameRecord();
+            gameRecord.m_sessionId = this.m_sessionId;
+            gameRecord.m_nickname = this.m_nickname;
+            gameRecord.m_numberOfMatches = this.m_numberOfMatches;
+            gameRecord.m_numberOfWin = this.m_numberOfWin;
+            gameRecord.m_numberOfDraw = this.m_numberOfDraw;
+            gameRecord.m_numberOfDefeats = this.m_numberOfDefeats;
+            gameRecord.m_mmr = this.m_mmr;
+            gameRecord.m_points = this.m_points;
+
+            return gameRecord;
         }
     }
 }

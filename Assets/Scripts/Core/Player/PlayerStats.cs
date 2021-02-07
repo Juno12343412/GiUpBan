@@ -70,7 +70,7 @@ public class PlayerStats : MonoBehaviour
         public int gold = 100;        // 게임 재화
         public int diamond = 100;     // 게임 유료재화
         public bool ads = false;      // 광고 유무
-        public int point = 0;         // 포인트 (티어 제도)
+        public int point = 0, oldPoint = 0;         // 포인트 (티어 제도)
         public string joinTime = "";  // 접속 시간
 
         public bool giveChest = false; // 나중에 체스트 변수로 바뀔 예정 저장 X
