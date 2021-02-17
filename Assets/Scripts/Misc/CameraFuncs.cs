@@ -49,13 +49,19 @@ public class CameraFuncs : MonoBehaviour
         GetComponent<Animator>().SetBool("isMove", false);
     }
 
+    public void CameraSwipe(int dir)
+    {
+        GetComponent<Animator>().SetBool("isMove", true);
+        GetComponent<Animator>().SetInteger("Dir", dir);
+    }
+
     public IEnumerator ZoomCamera(float _Time, float _Scale)
     {
         Debug.Log("줌 시작");
         float progress = _Time;
         yield return null;
 
-        while (progress >= 0f || Camera.main.fieldOfView > 50f)
+        while (progress >= 0f || Camera.main.fieldOfView > 58f)
         {
             GetComponent<Camera>().fieldOfView -= Time.deltaTime * _Scale;
             progress -= Time.deltaTime;
@@ -70,8 +76,8 @@ public class CameraFuncs : MonoBehaviour
             progress -= Time.deltaTime;
             yield return null;
         }
-
         Debug.Log("줌 끝");
         Camera.main.fieldOfView = 60f;
     }
+
 }

@@ -92,6 +92,7 @@ public class PlayerScript : PoolingObject
                     cameraFuncs.SetShakeTime(0, 0, Vector3.zero);
                 Time.timeScale = 1;
                 WorldPackage.instance.playerDie(index);
+                characterCamera.GetComponent<Animator>().SetBool("isGameOver", true);
             }
 
             if (isMe)
@@ -282,12 +283,11 @@ public class PlayerScript : PoolingObject
                 //}
                 //else if (currentSwipe.y > 0 && Mathf.Abs(currentSwipe.y) < Mathf.Abs(currentSwipe.x))
                 //{
-
                 //}
             }
             else
             {
-                if (!isLong && !isSwipe)
+                if (!isLong)
                     PlayerTouch();
             }
         }
@@ -307,10 +307,12 @@ public class PlayerScript : PoolingObject
             stats.Stamina -= stats.ReductionStamina;
             State = PlayerCurState.WEAK_ATTACK;
 
-            characterCamera.GetComponent<Animator>().SetBool("isMove", true);
-            characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
+            if(Direction == Direction.Left)
+                cameraFuncs.CameraSwipe(0);
+            else if(Direction == Direction.Right)
+                cameraFuncs.CameraSwipe(1);
 
-            Debug.Log("터치 : " + (SessionId)index);
+            Debug.Log("터치 : " + (SessionId)index + (int)Direction);
             
             if (BackEndMatchManager.instance.isHost)
             {
@@ -335,8 +337,11 @@ public class PlayerScript : PoolingObject
         {
             stats.Stamina -= stats.ReductionStamina * 1.5f;
             State = PlayerCurState.STRONG_ATTACK;
-            characterCamera.GetComponent<Animator>().SetBool("isMove", true);
-            characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
+
+            if (Direction == Direction.Left)
+                cameraFuncs.CameraSwipe(0);
+            else if (Direction == Direction.Right)
+                cameraFuncs.CameraSwipe(1);
 
             Debug.Log("스와이프 : " + (SessionId)index);
 
@@ -360,7 +365,7 @@ public class PlayerScript : PoolingObject
         {
             State = PlayerCurState.DEFENSE;
 
-            Debug.Log("긴 터치 : " + (SessionId)index);
+            Debug.Log("긴 터치 : " + (SessionId)index + (int)Direction);
 
             if (BackEndMatchManager.instance.isHost)
             {
@@ -368,7 +373,7 @@ public class PlayerScript : PoolingObject
                 KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
                 BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
 
-                StartCoroutine(cameraFuncs.ZoomCamera(2f, 1f));
+                StartCoroutine(cameraFuncs.ZoomCamera(0.5f, 2.0f));
             }
             else
             {
@@ -387,10 +392,9 @@ public class PlayerScript : PoolingObject
                 stats.Stamina -= stats.ReductionStamina;
                 State = PlayerCurState.WEAK_ATTACK;
 
-                characterCamera.GetComponent<Animator>().SetBool("isMove", true);
-                characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
+                
 
-                Debug.Log("터치 : " + (SessionId)index);
+                Debug.Log("터치 : " + (SessionId)index + (int)Direction);
 
                 if (BackEndMatchManager.instance.isHost && !isAI)
                 {
@@ -418,10 +422,9 @@ public class PlayerScript : PoolingObject
             {
                 stats.Stamina -= stats.ReductionStamina * 1.5f;
                 State = PlayerCurState.STRONG_ATTACK;
-                characterCamera.GetComponent<Animator>().SetBool("isMove", true);
-                characterCamera.GetComponent<Animator>().SetInteger("isMove", (int)Direction);
+                
 
-                Debug.Log("스와이프 : " + (SessionId)index);
+                Debug.Log("스와이프 : " + (SessionId)index + (int)Direction);
 
                 if (BackEndMatchManager.instance.isHost && !isAI)
                 {
@@ -446,7 +449,7 @@ public class PlayerScript : PoolingObject
             {
                 State = PlayerCurState.DEFENSE;
 
-                Debug.Log("긴 터치 : " + (SessionId)index);
+                Debug.Log("긴 터치 : " + (SessionId)index + (int)Direction);
 
                 if (BackEndMatchManager.instance.isHost && !isAI)
                 {
@@ -454,7 +457,6 @@ public class PlayerScript : PoolingObject
                     KeyMessage msg = new KeyMessage(keyCode, transform.position, Direction);
                     BackEndMatchManager.instance.AddMsgToLocalQueue(msg);
 
-                    StartCoroutine(cameraFuncs.ZoomCamera(2f, 1f));
                 }
                 else
                 {
