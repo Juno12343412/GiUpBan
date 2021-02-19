@@ -73,6 +73,8 @@ public partial class MainUI : BaseScreen<MainUI>
     [SerializeField] private Text chestKindText = null;
     [SerializeField] private Text chestGoldText = null, chestCardText = null;
     [SerializeField] private Text chestPriceText = null;
+
+    [SerializeField] private GameObject speHideObj = null;
     // Purchase
 
     void ShopInit()

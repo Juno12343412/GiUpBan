@@ -70,6 +70,7 @@ public class PlayerStats : MonoBehaviour
         public int gold = 100;        // 게임 재화
         public int diamond = 100;     // 게임 유료재화
         public bool ads = false;      // 광고 유무
+        public bool pack = false;      // 팩 유무
         public int point = 0, oldPoint = 0;         // 포인트 (티어 제도)
         public string joinTime = "";  // 접속 시간
 
@@ -169,6 +170,7 @@ public class PlayerStats : MonoBehaviour
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Diamond", BackEndServerManager.instance.myInfo.diamond);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
+        param.Add("Pack", BackEndServerManager.instance.myInfo.pack);
         param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
         param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
         param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.charactersLevel);
@@ -196,6 +198,7 @@ public class PlayerStats : MonoBehaviour
         param.Add("Gold", BackEndServerManager.instance.myInfo.gold);
         param.Add("Diamond", BackEndServerManager.instance.myInfo.diamond);
         param.Add("Ads", BackEndServerManager.instance.myInfo.ads);
+        param.Add("Pack", BackEndServerManager.instance.myInfo.pack);
         param.Add("HaveCharacters", BackEndServerManager.instance.myInfo.haveCharacters);
         param.Add("NowCharacter", BackEndServerManager.instance.myInfo.nowCharacter);
         param.Add("CharacterLevel", BackEndServerManager.instance.myInfo.charactersLevel);
@@ -227,6 +230,7 @@ public class PlayerStats : MonoBehaviour
                     BackEndServerManager.instance.myInfo.gold = Convert.ToInt32(callback.Rows()[0]["Gold"]["N"].ToString());
                     BackEndServerManager.instance.myInfo.diamond = Convert.ToInt32(callback.Rows()[0]["Diamond"]["N"].ToString());
                     BackEndServerManager.instance.myInfo.ads = Convert.ToBoolean(callback.Rows()[0]["Ads"]["BOOL"].ToString());
+                    BackEndServerManager.instance.myInfo.pack = Convert.ToBoolean(callback.Rows()[0]["Pack"]["BOOL"].ToString());
                     BackEndServerManager.instance.myInfo.nowCharacter = Convert.ToInt32(callback.Rows()[0]["NowCharacter"]["N"].ToString());
                     BackEndServerManager.instance.myInfo.joinTime = callback.Rows()[0]["JoinTime"]["S"].ToString();
                     for (int i = 0; i < callback.Rows()[0]["HaveCharacters"]["L"].Count; i++)

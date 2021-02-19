@@ -757,10 +757,10 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  cloudProjectId: d8eab731-75f9-426a-8d19-99a0e71e8a44
+  cloudProjectId: 9ace9e25-a2f6-412d-82a3-6b63f1fa50d2
   framebufferDepthMemorylessMode: 0
-  projectName: LogBridge (3)
-  organizationId: junoh02071
+  projectName: LogBridge (6)
+  organizationId: sdh190105
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0

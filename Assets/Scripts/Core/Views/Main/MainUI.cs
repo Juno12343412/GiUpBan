@@ -37,6 +37,9 @@ public partial class MainUI : BaseScreen<MainUI>
     [Header("Ranking")]
     [SerializeField] private GameObject rankObject = null;
 
+    [Header("Ads")]
+    [SerializeField] private GameObject noAds = null;
+
     [HideInInspector] public List<string> readyUserList = new List<string>();
 
     void Start()
@@ -66,7 +69,7 @@ public partial class MainUI : BaseScreen<MainUI>
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))
-            ShowTearUp();
+            AddChest((ChestKind)Random.Range((int)ChestKind.한, (int)ChestKind.MAX), ChestState.Idle, "", BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
 
     }
 
@@ -240,9 +243,8 @@ public partial class MainUI : BaseScreen<MainUI>
         if (BackEndServerManager.instance.myInfo.giveChest)
         {
             Debug.Log("보상 : " + BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
-
             BackEndServerManager.instance.myInfo.giveChest = false;
-            AddChest((ChestKind)Random.Range((int)ChestKind.한, (int)ChestKind.MAX), ChestState.Idle, "", BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
+            AddChest((ChestKind)Random.Range((int)ChestKind.한, (int)ChestKind.골드), ChestState.Idle, "", BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
         }
 
         StartCoroutine(CheckingDay());
@@ -262,6 +264,12 @@ public partial class MainUI : BaseScreen<MainUI>
         SetNickName();
         SetTear();
         SetInventory();
+
+        if (BackEndServerManager.instance.myInfo.ads)
+            noAds.SetActive(false);
+
+        if (BackEndServerManager.instance.myInfo.pack)
+            speHideObj.SetActive(true);
 
         PlayerStats.instance.Save();
     }
@@ -290,5 +298,6 @@ public partial class MainUI : BaseScreen<MainUI>
     public void BuyNoAddInApp()
     {
         BackEndServerManager.instance.myInfo.ads = true;
+        noAds.SetActive(false);
     }
 }

@@ -15,7 +15,7 @@ public class Card
     [HideInInspector] public Image levelUpBaseImg = null;
     [HideInInspector] public Text characterNameText = null, characterLevelText = null, characterCountText = null;
     [HideInInspector] public Image selectImg = null;
-    [HideInInspector] public int upgradePrice = 100, upgradeNeedCard = 10;
+     public int upgradePrice = 100, upgradeNeedCard = 10;
 
     public bool isHave = false;
 }
@@ -395,7 +395,8 @@ public partial class MainUI : BaseScreen<MainUI>
                 if (BackEndServerManager.instance.myInfo.levelExp[value] == 0)
                     BackEndServerManager.instance.myInfo.levelExp[value] = 1;
                 BackEndServerManager.instance.myInfo.charactersLevel[value]++;
-                
+
+                SetGoldUI();
                 SetInventory();
                 UpdateUpgradeUI();
 

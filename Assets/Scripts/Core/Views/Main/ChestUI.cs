@@ -248,8 +248,14 @@ public partial class MainUI : BaseScreen<MainUI>
 
     public void BuyDiamondInApp(int dia)
     {
-        BackEndServerManager.instance.myInfo.diamond += dia;
-        SetGoldUI();
+        if (!BackEndServerManager.instance.myInfo.pack)
+        {
+            BackEndServerManager.instance.myInfo.pack = true;
+            BackEndServerManager.instance.myInfo.diamond += dia;
+
+            speHideObj.SetActive(true);
+            SetGoldUI();
+        }
     }
 
     public void OpenChestPack()
