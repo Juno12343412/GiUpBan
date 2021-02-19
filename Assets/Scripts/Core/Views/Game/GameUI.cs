@@ -17,6 +17,8 @@ public partial class GameUI : BaseScreen<GameUI>
 
     void Start()
     {
+        CameraResolution.SetCamera();
+
         SoundPlayer.instance.PlaySound("BattleStart");
         HideScreen();
     }

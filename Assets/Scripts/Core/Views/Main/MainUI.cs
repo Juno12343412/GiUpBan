@@ -46,6 +46,8 @@ public partial class MainUI : BaseScreen<MainUI>
     {
         Time.timeScale = 1;
 
+        CameraResolution.SetCamera();
+
         SoundPlayer.instance.PlayBGM("MainBgm", 0.5f);
 
         matchlookingObject.SetActive(false);
@@ -240,13 +242,6 @@ public partial class MainUI : BaseScreen<MainUI>
         ShopInit();
         ChestInit();
 
-        if (BackEndServerManager.instance.myInfo.giveChest)
-        {
-            Debug.Log("보상 : " + BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
-            BackEndServerManager.instance.myInfo.giveChest = false;
-            AddChest((ChestKind)Random.Range((int)ChestKind.한, (int)ChestKind.골드), ChestState.Idle, "", BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
-        }
-
         StartCoroutine(CheckingDay());
 
         if (BackEndServerManager.instance.myInfo.haveChests > 0)
@@ -254,6 +249,13 @@ public partial class MainUI : BaseScreen<MainUI>
             SettingMyChest();
             if (curDisChest != -1)
                 StartCoroutine(CheckingChest(curDisChest));
+        }
+        
+        if (BackEndServerManager.instance.myInfo.giveChest)
+        {
+            Debug.Log("보상 : " + BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
+            BackEndServerManager.instance.myInfo.giveChest = false;
+            AddChest((ChestKind)Random.Range((int)ChestKind.한, (int)ChestKind.골드), ChestState.Idle, "", BackEndServerManager.instance.myInfo.haveChestState.FindIndex(value => value == (int)ChestState.NONE));
         }
 
         if (!BackEndServerManager.instance.myInfo.cardKind.Contains(99))

@@ -20,6 +20,8 @@ public class LoginUI : BaseScreen<LoginUI>
 
     void Start()
     {
+        CameraResolution.SetCamera();
+
         titleObject.SetActive(true);
         loginObject.SetActive(true);
         nicknameObject.SetActive(false);

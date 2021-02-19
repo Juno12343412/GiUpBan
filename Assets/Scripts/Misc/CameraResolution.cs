@@ -6,6 +6,8 @@ public class CameraResolution : MonoBehaviour
 
     public static void SetCamera()
     {
+        Debug.Log("카메라 셋팅");
+
         cam = GameObject.Find("Main Camera").GetComponent<Camera>();
 
         Rect rect = cam.rect;

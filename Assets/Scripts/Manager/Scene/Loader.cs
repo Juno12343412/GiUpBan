@@ -40,7 +40,6 @@ namespace Manager.Scene
                 yield return null;
             }
             Debug.Log("isDone");
-            CameraResolution.SetCamera();
         }
 
         public static float GetLoadingProgress()
