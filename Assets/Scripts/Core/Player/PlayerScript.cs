@@ -273,7 +273,10 @@ public class PlayerScript : PoolingObject
                 if (currentSwipe.y > 0 && Mathf.Abs(currentSwipe.y) > Mathf.Abs(currentSwipe.x))
                 {
                     if (!isLong)
+                    {
                         PlayerSwipe();
+                        isSwipe = true;
+                    }
                 }
                 //else if (currentSwipe.y < 0 && Mathf.Abs(currentSwipe.y) > Mathf.Abs(currentSwipe.x))
                 //{
@@ -285,10 +288,9 @@ public class PlayerScript : PoolingObject
                 //{
                 //}
             }
-            else
+            if (!isSwipe && !isLong)
             {
-                if (!isLong)
-                    PlayerTouch();
+                PlayerTouch();
             }
         }
     } // 화면 컨트롤
@@ -307,13 +309,13 @@ public class PlayerScript : PoolingObject
             stats.Stamina -= stats.ReductionStamina;
             State = PlayerCurState.WEAK_ATTACK;
 
-            if(Direction == Direction.Left)
+            if (Direction == Direction.Left)
                 cameraFuncs.CameraSwipe(0);
-            else if(Direction == Direction.Right)
+            else if (Direction == Direction.Right)
                 cameraFuncs.CameraSwipe(1);
 
             Debug.Log("터치 : " + (SessionId)index + (int)Direction);
-            
+
             if (BackEndMatchManager.instance.isHost)
             {
                 int keyCode = (int)State;
@@ -392,7 +394,7 @@ public class PlayerScript : PoolingObject
                 stats.Stamina -= stats.ReductionStamina;
                 State = PlayerCurState.WEAK_ATTACK;
 
-                
+
 
                 Debug.Log("터치 : " + (SessionId)index + (int)Direction);
 
@@ -422,7 +424,7 @@ public class PlayerScript : PoolingObject
             {
                 stats.Stamina -= stats.ReductionStamina * 1.5f;
                 State = PlayerCurState.STRONG_ATTACK;
-                
+
 
                 Debug.Log("스와이프 : " + (SessionId)index + (int)Direction);
 
