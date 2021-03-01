@@ -10,7 +10,8 @@ public class Loading : MonoBehaviour
 
     void Awake()
     {
-       
+        CameraResolution.SetCamera();
+
         Loader.LoaderCallback();
     }
     void Update()

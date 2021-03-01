@@ -161,7 +161,7 @@ public class PlayerScriptTuto : PoolingObject
                 break;
             case 1:
                 PlayerControl(tuto);
-                for(int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                     Effects[i].enabled = false;
                 Effects[0].enabled = true;
                 break;
@@ -275,14 +275,15 @@ public class PlayerScriptTuto : PoolingObject
                 if (currentSwipe.y > 0 && Mathf.Abs(currentSwipe.y) > Mathf.Abs(currentSwipe.x))
                 {
                     if (!isLong)
+                    {
                         PlayerSwipe();
+                        isSwipe = true;
+                    }
                 }
             }
-            else
-            {
-                if (!isLong && !isSwipe)
-                    PlayerTouch();
-            }
+            if (!isLong && !isSwipe)
+                PlayerTouch();
+
         }
     } // 화면 컨트롤
 
@@ -405,5 +406,5 @@ public class PlayerScriptTuto : PoolingObject
         Time.timeScale = 1;
     }
 
-    
+
 }

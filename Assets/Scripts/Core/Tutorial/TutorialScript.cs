@@ -9,6 +9,8 @@ public class TutorialScript : MonoBehaviour
     
     void Start()
     {
+        CameraResolution.SetCamera();
+
         guideImage.color = new Color(0, 0, 0, 0);
     }
 
